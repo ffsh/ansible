@@ -1,0 +1,5 @@
+[gateways]
+brunsbach ansible_ssh_host=168.119.49.106 ffsh_ipv6_address=fddf:0bf7:80::96:1 ffsh_ipv4_address=10.144.96.1 dhcp_range=10.144.96.2-10.144.111.254 ffsh_map_mac=00:5b:27:80:00:96 ffsh_bat_mac=00:5b:27:81:00:96 owner=benjamin
+
+[gateways:vars]
+ansible_user=root

@@ -1,0 +1,25 @@
+- hosts: all
+  vars:
+    base_packages:
+      - build-essential
+      - git
+      - apt-transport-https
+      - bridge-utils
+      - ntp
+      - net-tools
+  tasks:
+    - name: Install basic packages
+      apt:
+        name: '{{ base_packages }}'
+    - name: Create network configuration
+      template:
+        src: configs/network/60-ffsh-init.cfg
+        dest: /etc/network/interfaces.d/60-ffsh-init.cfg
+    - name: Enable IP forwarding
+      copy:
+        src: configs/network/forwarding.conf
+        dest: /etc/sysctl.d/forwarding.conf
+#    - name: Firewall
+#      copy:
+#        src: configs/firewall/
+#        dest: /etc/network/iptables.up.rules
