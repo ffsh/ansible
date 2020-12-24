@@ -1,0 +1,11 @@
+- name: Install network tools
+  apt:
+    name: ['bridge-utils', 'ntp', 'net-tools']
+- name: Create network configuration
+  template:
+    src: templates/60-ffsh-init.cfg
+    dest: /etc/network/interfaces.d/60-ffsh-init.cfg
+- name: Enable IP forwarding
+  copy:
+    src: templates/forwarding.conf
+    dest: /etc/sysctl.d/forwarding.conf

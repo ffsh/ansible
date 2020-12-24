@@ -1,0 +1,74 @@
+- name: Install dependencies for batman-adv
+  apt:
+    name: ['linux-headers-amd64', 'libnl-3-dev', 'libnl-genl-3-dev', 'libcap-dev', 'pkg-config', 'build-essential']
+
+- name: Download batman source
+  get_url:
+    url: "https://downloads.open-mesh.org/batman/releases/batman-adv-{{ batman_version }}/batman-adv-{{ batman_version }}.tar.gz"
+    dest: /opt/batman-adv-{{ batman_version }}.tar.gz
+
+- name: Unpack batman-adv
+  unarchive:
+    src: /opt/batman-adv-{{ batman_version }}.tar.gz
+    dest: /usr/src
+    remote_src: True
+  when: not ansible_check_mode
+
+- name: Configure DKMS
+  template:
+    src: dkms.conf
+    dest: /usr/src/batman-adv-{{ batman_version }}/dkms.conf
+  when: not ansible_check_mode
+
+- name: Build and install batman-adv
+  command: "dkms install -m batman-adv -v {{ batman_version }} && modprobe batman-adv"
+  #notify: restart batman
+  changed_when: false
+  when: not ansible_check_mode
+
+- name: Add batman-adv to modules
+  lineinfile:
+    path: /etc/modules
+    line: batman-adv
+  when: not ansible_check_mode
+
+- name: Check if batctl is already installed
+  stat:
+    path: "/usr/local/sbin/batctl"
+  register: batctl
+
+- name: Check batctl version
+  shell: |
+    batctl -v | awk '{print $2}'
+  args:
+    executable: bash
+  when: batctl.stat.exists
+  changed_when: false
+  register: batctl_version
+  check_mode: no
+
+- name: Set batctl_version to stdout
+  set_fact:
+    batctl_version: "{{ batctl_version.stdout }}"
+  when: batctl.stat.exists
+
+- name: Download batctl source
+  get_url:
+    url: "https://downloads.open-mesh.org/batman/releases/batman-adv-{{ batman_version }}/batctl-{{ batman_version }}.tar.gz"
+    dest: /opt/batctl-{{ batman_version }}.tar.gz
+  when: batctl_version != batman_version and not ansible_check_mode
+
+- name: Unpack batctl
+  unarchive:
+    src: /opt/batctl-{{ batman_version }}.tar.gz
+    dest: /opt
+    remote_src: True
+  when: batctl_version != batman_version and not ansible_check_mode
+
+- name: build and install batctl
+  shell: |
+    make
+    make install
+  args:
+    chdir: /opt/batctl-{{ batman_version }}
+  when: batctl_version != batman_version and not ansible_check_mode

@@ -1,0 +1,15 @@
+- name: Install basic packages
+  apt:
+    name: dkms
+- name: Check for currently installed batman-adv
+  shell: |
+    dkms status batman-adv | egrep 'batman-adv, ([0-9]+\.[0-9]+(\.[0-9]+)?), .*: installed' | cut -d, -f2 | awk '{$1=$1};1'
+  args:
+    executable: bash
+  register: installed_batman_version
+  when: batman_version is defined
+  changed_when: False
+  check_mode: no
+
+- include: from_source.yml
+  when: installed_batman_version != batman_version
