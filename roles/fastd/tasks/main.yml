@@ -15,3 +15,8 @@
   args:
     executable: bash
   when: not ansible_check_mode
+- name: Add ffsh system user
+  user:
+    name: ffsh
+    system: yes
+    create_home: no
