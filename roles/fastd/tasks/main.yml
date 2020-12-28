@@ -1,0 +1,17 @@
+# TODO check if fastd is already installed to speed up
+- name: Enable buster backports
+  lineinfile:
+    path: /etc/apt/sources.list
+    regexp: '# deb http://deb.debian.org/debian buster-backports main contrib non-free'
+    line: deb http://deb.debian.org/debian buster-backports main contrib non-free
+  when: not ansible_check_mode
+- name: Update apt cache
+  apt:
+    update_cache: yes
+  when: not ansible_check_mode
+- name: Install fastd
+  shell: |
+    apt install -t buster-backports fastd
+  args:
+    executable: bash
+  when: not ansible_check_mode

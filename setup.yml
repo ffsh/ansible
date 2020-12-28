@@ -6,6 +6,7 @@
   roles:
     - { role: network, tags: "network"}
     - { role: batman-adv, tags: "batman-adv", batman_version: "2020.4"}
+    - { role: fastd, tags: "fastd"}
 
 #    - name: Firewall
 #      copy:

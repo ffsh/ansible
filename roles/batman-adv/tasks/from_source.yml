@@ -47,6 +47,7 @@
   register: batctl_version
   check_mode: no
 
+# no error
 - name: Set batctl_version to stdout
   set_fact:
     batctl_version: "{{ batctl_version.stdout }}"
@@ -57,6 +58,8 @@
     url: "https://downloads.open-mesh.org/batman/releases/batman-adv-{{ batman_version }}/batctl-{{ batman_version }}.tar.gz"
     dest: /opt/batctl-{{ batman_version }}.tar.gz
   when: batctl_version != batman_version and not ansible_check_mode
+
+# TODO what about the old version
 
 - name: Unpack batctl
   unarchive:
