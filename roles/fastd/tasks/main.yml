@@ -11,7 +11,7 @@
   when: not ansible_check_mode
 - name: Install fastd
   shell: |
-    apt install -t buster-backports fastd
+    apt install -t buster-backports fastd -y
   args:
     executable: bash
   when: not ansible_check_mode

@@ -1,0 +1,3 @@
+[submodule "roles/ohmyzsh"]
+	path = roles/ohmyzsh
+	url = https://github.com/gantsign/ansible-role-oh-my-zsh.git

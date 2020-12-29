@@ -1,4 +1,7 @@
 - hosts: all
+  vars:
+    users:
+      - username: root
   pre_tasks:
   - name: Update apt cache
     apt:
@@ -7,6 +10,8 @@
     - { role: network, tags: "network"}
     - { role: batman, tags: "batman-adv", batman_version: "2020.4"}
     - { role: fastd, tags: "fastd"}
+    - { role: motd, tags: "motd"}
+    - { role: ohmyzsh, tags: "oh-my-zsh"}
 
 #    - name: Firewall
 #      copy:

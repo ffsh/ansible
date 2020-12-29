@@ -3,7 +3,6 @@
     name: dkms
 - name: Check for currently installed batman-adv
   shell: |
-    set -o pipefail
     dkms status batman-adv | egrep 'batman-adv, ([0-9]+\.[0-9]+(\.[0-9]+)?), .*: installed' | cut -d, -f2 | awk '{$1=$1};1'
   args:
     executable: bash

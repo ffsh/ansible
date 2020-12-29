@@ -1,0 +1,28 @@
+---
+- name: install neofetch
+  apt:
+    pkg: [ 'neofetch']
+    state: present
+#- name: First run neofetch
+#  shell: |
+#    neofetch
+# - name: Copy logo
+#   copy:
+#     src: files/ffsh-logo.txt
+#     dest: /root/.config/neofetch/ffsh-logo.txt
+# - name: Adjust neofetch config
+#   lineinfile:
+#     path: /root/.config/neofetch/config.conf
+#     regexp: 'image_source="auto"'
+#     line: 'image_source="/root/.config/neofetch/ffsh-logo.txt"'
+- name: Set motd header
+  copy:
+    src: files/00-header
+    dest: /etc/update-motd.d/00-header
+    owner: root
+    group: root
+    mode: '0744'
+- name: remove /etc/motd
+  file:
+    path: /etc/motd
+    state: absent
