@@ -24,7 +24,7 @@
 - name: parse interfaces
   set_fact:
     internet_interface="{{ item }}"
-  when: hostvars[inventory_hostname]['ansible_{{item}}']['ipv4']['address'] == ansible_ssh_host
+  when: hostvars[inventory_hostname]['ansible_{{ item }}']['ipv4']['address'] == ansible_ssh_host
   with_items:
     - "{{ ansible_interfaces }}"
 - name: Please check
