@@ -20,3 +20,23 @@
     name: ffsh
     system: yes
     create_home: no
+# this is not allowed maybe wirte a script instead
+- name: parse interfaces
+  set_fact:
+    internet_interface="{{ item }}"
+  when: hostvars[inventory_hostname]['ansible_{{item}}']['ipv4']['address'] == ansible_ssh_host
+  with_items:
+    - "{{ ansible_interfaces }}"
+- name: Please check
+  debug:
+    msg: "Will asume that your interface to the internet is {{ internet_interface }} please check /etc/fastd/ffsh/fastd.conf"
+- name: Create directory
+  file:
+    path: /etc/fastd/ffsh/
+    owner: root
+    group: root
+    state: directory
+- name: Create fastd config
+  template:
+    src: templates/fastd.conf
+    dest: /etc/fastd/ffsh/fastd.conf
