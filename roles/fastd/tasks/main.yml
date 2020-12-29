@@ -35,8 +35,10 @@
     path: /etc/fastd/ffsh/
     owner: root
     group: root
+    mode: '0644'
     state: directory
 - name: Create fastd config
   template:
     src: templates/fastd.conf
     dest: /etc/fastd/ffsh/fastd.conf
+    mode: '0644'
