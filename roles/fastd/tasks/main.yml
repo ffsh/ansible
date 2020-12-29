@@ -23,10 +23,10 @@
 # this is not allowed maybe wirte a script instead
 - name: parse interfaces
   set_fact:
-    internet_interface="{{ item }}"
-  when: hostvars[inventory_hostname]['ansible_{{ item }}']['ipv4']['address'] == ansible_ssh_host
-  with_items:
-    - "{{ ansible_interfaces }}"
+    internet_interface="eth0"
+#  when: hostvars[inventory_hostname]['ansible_{{ item }}']['ipv4']['address'] == ansible_ssh_host
+#  with_items:
+#    - "{{ ansible_interfaces }}"
 - name: Please check
   debug:
     msg: "Will asume that your interface to the internet is {{ internet_interface }} please check /etc/fastd/ffsh/fastd.conf"
@@ -41,4 +41,25 @@
   template:
     src: templates/fastd.conf
     dest: /etc/fastd/ffsh/fastd.conf
+    mode: '0600'
+    owner: root
+    group: root
+- name: Install git
+  apt:
+    name: git
+- name: Clone Gateway repository
+  git:
+    repo: https://github.com/ffsh/gateways.git
+    dest: /etc/fastd/ffsh/gateways
+- name: Adjust permissions of gateway directory
+  file:
+    path: /etc/fastd/ffsh/gateways
+    owner: ffsh
+    group: ffsh
     mode: '0644'
+    state: directory
+- name: Enable sytemd service
+  systemd:
+      enabled: yes
+      state: started
+      name: fastd@ffsh
