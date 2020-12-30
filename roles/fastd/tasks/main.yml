@@ -35,7 +35,14 @@
     path: /etc/fastd/ffsh/
     owner: root
     group: root
-    mode: '0644'
+    mode: '0645'
+    state: directory
+- name: Adjust fastd permissions
+  file:
+    path: /etc/fastd
+    owner: root
+    group: root
+    mode: '0645'
     state: directory
 - name: Create fastd config
   template:
@@ -51,12 +58,11 @@
   git:
     repo: https://github.com/ffsh/gateways.git
     dest: /etc/fastd/ffsh/gateways
+    force: yes
 - name: Adjust permissions of gateway directory
   file:
     path: /etc/fastd/ffsh/gateways
-    owner: ffsh
-    group: ffsh
-    mode: '0644'
+    mode: '0765'
     state: directory
 - name: Enable sytemd service
   systemd:
