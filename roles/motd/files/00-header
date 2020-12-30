@@ -1,3 +1,3 @@
 #!/bin/bash
 
-/usr/bin/neofetch
+/usr/bin/neofetch --config "/root/.config/neofetch/config.conf"
