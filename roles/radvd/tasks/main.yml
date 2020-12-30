@@ -1,0 +1,12 @@
+- name: Install radvd
+  apt:
+    name: radvd
+- name: Configure radvd
+  template:
+    dest: /etc/radvd.conf
+    src: templates/radvd.conf
+- name: Enable systemd radvd
+  systemd:
+    enabled: yes
+    state: started
+    name: radvd
