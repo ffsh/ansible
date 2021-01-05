@@ -29,3 +29,8 @@
     enabled: yes
     state: restarted
     name: bind9
+- name: Update the bind dns zones via cron
+  cron:
+    name: "Update dns zones"
+    minute: "*/15"
+    job: "cd /etc/bind/zones && git pull -qpf"
