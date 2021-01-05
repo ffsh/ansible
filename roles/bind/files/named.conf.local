@@ -1,0 +1,31 @@
+include "/etc/bind/zones.rfc1918";
+
+zone "stormarn.freifunk.net" {
+       type master;
+       file "/etc/bind/zones/db.net.freifunk.stormarn";
+  };
+
+zone "freifunk-stormarn.de" {
+       type master;
+       file "/etc/bind/zones/db.de.freifunk-stormarn";
+  };
+
+zone "lauenburg.freifunk.net" {
+       type master;
+       file "/etc/bind/zones/db.net.freifunk.lauenburg";
+  };
+
+zone "freifunk-lauenburg.de" {
+       type master;
+       file "/etc/bind/zones/db.de.freifunk-lauenburg";
+  };
+
+zone "freifunk-suedholstein.de" {
+        type master;
+        file "/etc/bind/zones/db.de.freifunk-suedholstein";
+};
+
+zone "ffshev.de" {
+     type master;
+     file "/etc/bind/zones/db.de.ffshev";
+};

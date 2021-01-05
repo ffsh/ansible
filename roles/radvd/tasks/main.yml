@@ -5,8 +5,8 @@
   template:
     dest: /etc/radvd.conf
     src: templates/radvd.conf
-- name: Enable systemd radvd
+- name: Restart radvd
   systemd:
     enabled: yes
-    state: started
+    state: restarted
     name: radvd

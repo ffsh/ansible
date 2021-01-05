@@ -1,3 +1,31 @@
 - name: Install bind
   apt:
     name: bind9
+- name: Adjust configuration options
+  copy:
+    src: files/named.conf.options
+    dest: /etc/bind/named.conf.options
+    mode: '0640'
+    owner: root
+    group: bind
+- name: Add local zones
+  copy:
+    src: files/named.conf.local
+    dest: /etc/bind/named.conf.local
+    mode: '0640'
+    owner: root
+    group: bind
+- name: Install git
+  apt:
+    name: git
+- name: Clone bind respository
+  git:
+    repo: https://github.com/ffsh/bind.git
+    dest: /etc/bind/zones
+    force: yes
+    version: zones
+- name: Restart bind
+  systemd:
+    enabled: yes
+    state: restarted
+    name: bind9
