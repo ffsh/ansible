@@ -1,0 +1,9 @@
+{
+  "batman": "bat0",
+  "bridge": "br-ffsh",
+  "mesh-vpn": [ "ffsh-mesh" ],
+  "mesh-wlan": [ "802.11s", "batman-adv" ],
+  "fastd_socket": "/run/fastd/fastd-ffsh.socket",
+  "rate_limit": 30,
+  "rate_limit_burst": 10
+}

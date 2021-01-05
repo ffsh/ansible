@@ -12,6 +12,7 @@
     - { role: fastd, tags: "fastd", fastd_target: "fastd 21"}
     - { role: radvd, tags: "radvd"}
     - { role: bind, tags: "dns"}
+    - { role: respondd, tags: "respondd"}
     - { role: motd, tags: "motd"}
     - { role: ohmyzsh, tags: "oh-my-zsh"}
 

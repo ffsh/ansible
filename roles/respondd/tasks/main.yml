@@ -1,0 +1,25 @@
+- name: Clone  ffggrz/ext-respondd 
+  git:
+    repo: https://github.com/ffggrz/ext-respondd.git
+    dest: /opt/ext-respondd/
+    force: yes
+- name: Copy systemd job
+  copy:
+    remote_src: yes
+    src: /opt/ext-respondd/ext-respondd.service.example
+    dest: /etc/systemd/system/respondd.service
+- name: Copy config
+  copy:
+    src: files/config.json
+    dest: /opt/ext-respondd/config.json
+    mode: '0644'
+    owner: root
+    group: root
+- name: Install python3-netifaces
+  apt:
+    name: python3-netifaces
+- name: Systemd set up respondd
+  systemd:
+    daemon_reload: yes
+    state: restarted
+    name: respondd
