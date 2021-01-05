@@ -9,8 +9,9 @@
   roles:
     - { role: network, tags: "network"}
     - { role: batman, tags: "batman-adv", batman_version: "2020.4"}
-    - { role: fastd, tags: "fastd"}
+    - { role: fastd, tags: "fastd", fastd_target: "fastd 21"}
     - { role: radvd, tags: "radvd"}
+    - { role: bind, tags: "dns"}
     - { role: motd, tags: "motd"}
     - { role: ohmyzsh, tags: "oh-my-zsh"}
 
