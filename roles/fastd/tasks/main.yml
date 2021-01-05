@@ -6,8 +6,9 @@
   when: not ansible_check_mode
 - name: Check if fastd v21 is installed
   shell: |
-    fastd -v
+    fastd -v 2>/dev/null
   register: fastd_version
+  ignore_errors: yes
 - name: Update apt cache
   apt:
     update_cache: yes
@@ -54,6 +55,16 @@
     mode: '0600'
     owner: root
     group: root
+- name: Create tmpfiles.d
+  copy:
+    src: files/fastd.conf
+    dest: /etc/tmpfiles.d/fastd.conf
+    mode: '0644'
+    owner: root
+    group: root
+- name: run tmpfiles.d
+  shell: |
+    systemd-tmpfiles --create
 - name: Install git
   apt:
     name: git
@@ -67,6 +78,13 @@
     path: /etc/fastd/ffsh/gateways
     mode: '0765'
     state: directory
+- name: TODO copy iptaples script
+  template:
+    src: templates/iptables.sh
+    dest: /etc/fastd/ffsh/iptables_ffsh.sh
+    mode: '0700'
+    owner: root
+    group: root
 - name: Enable sytemd service
   systemd:
       enabled: yes
