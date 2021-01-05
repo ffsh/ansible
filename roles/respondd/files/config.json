@@ -1,4 +1,5 @@
 {
+  "addr": "ff02::2:1001",
   "batman": "bat0",
   "bridge": "br-ffsh",
   "mesh-vpn": [ "ffsh-mesh" ],
