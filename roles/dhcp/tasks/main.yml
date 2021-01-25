@@ -1,0 +1,15 @@
+- name: Install isc-dhcp-server
+  apt:
+    name: isc-dhcp-server
+- name: Create dhpc.conf file
+  template:
+    src: templates/dhcp.conf
+    dest: /etc/dhcp/dhcpd.conf
+    mode: '0600'
+    owner: root
+    group: root
+- name: Change interface
+  lineinfile:
+    path: /etc/default/isc-dhcp-server
+    regexp: 'INTERFACESv4=""'
+    line: INTERFACESv4="br-ffsh"

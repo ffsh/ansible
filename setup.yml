@@ -11,6 +11,7 @@
     - { role: batman, tags: "batman-adv", batman_version: "2020.4"}
     - { role: fastd, tags: "fastd", fastd_target: "fastd 21"}
     - { role: radvd, tags: "radvd"}
+    - { role: dhcp, tags: "isc-dhcp4-server"}
     - { role: bind, tags: "dns"}
     - { role: respondd, tags: "respondd"}
     - { role: motd, tags: "motd"}
