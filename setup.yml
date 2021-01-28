@@ -14,6 +14,7 @@
     - { role: dhcp, tags: "isc-dhcp4-server"}
     - { role: bind, tags: "dns"}
     - { role: respondd, tags: "respondd"}
+    - { role: tools, tags: "admin-tools"}
     - { role: motd, tags: "motd"}
     - { role: ohmyzsh, tags: "oh-my-zsh"}
 
