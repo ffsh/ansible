@@ -7,9 +7,9 @@
 /sbin/iptables -t nat -D POSTROUTING -s 0/0 -d 0/0 -j MASQUERADE > /dev/null 2>&1
 /sbin/iptables -t nat -I POSTROUTING -s 0/0 -d 0/0 -j MASQUERADE
 /sbin/iptables -t nat -D POSTROUTING -s 0/0 -d 0/0 -o tun0 -j MASQUERADE > /dev/null 2>&1
-/sbin/iptables -t mangle -D PREROUTING -s 10.144.96.0/20 -j MARK --set-mark 0x1 > /dev/null 2>&1
-/sbin/iptables -t mangle -I PREROUTING -s 10.144.96.0/20 -j MARK --set-mark 0x1
-/sbin/iptables -t mangle -D OUTPUT -s 10.144.96.0/20 -j MARK --set-mark 0x1 > /dev/null 2>&1
-/sbin/iptables -t mangle -I OUTPUT -s 10.144.96.0/20 -j MARK --set-mark 0x1
+/sbin/iptables -t mangle -D PREROUTING -s {{ ffsh_ipv4_space }} -j MARK --set-mark 0x1 > /dev/null 2>&1
+/sbin/iptables -t mangle -I PREROUTING -s {{ ffsh_ipv4_space }} -j MARK --set-mark 0x1
+/sbin/iptables -t mangle -D OUTPUT -s {{ ffsh_ipv4_space }} -j MARK --set-mark 0x1 > /dev/null 2>&1
+/sbin/iptables -t mangle -I OUTPUT -s {{ ffsh_ipv4_space }} -j MARK --set-mark 0x1
 # IGMP/MLD segmentation
 echo 2 > /sys/class/net/bat0/brport/multicast_router
