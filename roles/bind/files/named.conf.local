@@ -1,31 +1,37 @@
 include "/etc/bind/zones.rfc1918";
 
 zone "stormarn.freifunk.net" {
-       type master;
-       file "/etc/bind/zones/db.net.freifunk.stormarn";
+     type master;
+     file "/etc/bind/zones/db.net.freifunk.stormarn";
+     allow-transfer { none; };
   };
 
 zone "freifunk-stormarn.de" {
-       type master;
-       file "/etc/bind/zones/db.de.freifunk-stormarn";
+     type master;
+     file "/etc/bind/zones/db.de.freifunk-stormarn";
+     allow-transfer { none; };
   };
 
 zone "lauenburg.freifunk.net" {
-       type master;
-       file "/etc/bind/zones/db.net.freifunk.lauenburg";
+     type master;
+     file "/etc/bind/zones/db.net.freifunk.lauenburg";
+     allow-transfer { none; };
   };
 
 zone "freifunk-lauenburg.de" {
-       type master;
-       file "/etc/bind/zones/db.de.freifunk-lauenburg";
+     type master;
+     file "/etc/bind/zones/db.de.freifunk-lauenburg";
+     allow-transfer { none; };
   };
 
 zone "freifunk-suedholstein.de" {
-        type master;
-        file "/etc/bind/zones/db.de.freifunk-suedholstein";
+     type master;
+     file "/etc/bind/zones/db.de.freifunk-suedholstein";
+     allow-transfer { none; };
 };
 
 zone "ffshev.de" {
      type master;
      file "/etc/bind/zones/db.de.ffshev";
+     allow-transfer { none; };
 };
