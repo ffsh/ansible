@@ -8,3 +8,10 @@
     mode: '0640'
     owner: root
     group: root
+- name: Copy fix-batman.sh
+  template:
+    src: templates/fix-batman.sh
+    dest: /root/fix-batman.sh
+    mode: '0740'
+    owner: root
+    group: root

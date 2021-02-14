@@ -8,13 +8,13 @@
       update_cache: yes
   roles:
     - { role: network, tags: "network"}
-    - { role: batman, tags: "batman-adv", batman_version: "2020.4"}
+    - { role: batman, tags: "batman-adv", batman_version: "2021.0"}
     - { role: fastd, tags: "fastd", fastd_target: "fastd 21"}
     - { role: radvd, tags: "radvd"}
     - { role: dhcp, tags: "isc-dhcp4-server"}
     - { role: bind, tags: "dns"}
     - { role: respondd, tags: "respondd"}
-    - { role: tools, tags: "admin-tools"}
+    - { role: tools, tags: "admin-tools", batman_version: "2021.0"}
     - { role: motd, tags: "motd"}
     - { role: ohmyzsh, tags: "oh-my-zsh"}
 

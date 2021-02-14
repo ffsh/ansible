@@ -1,3 +1,4 @@
 #!/bin/bash
 
 /usr/bin/neofetch --config "/root/.config/neofetch/config.conf"
+batctl -v
