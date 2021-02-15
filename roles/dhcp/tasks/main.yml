@@ -1,6 +1,16 @@
 - name: Install isc-dhcp-server
   apt:
     name: isc-dhcp-server
+- name: Clone Gateway repository
+  git:
+    repo: https://github.com/ffsh/dhcp-static.git
+    dest: /etc/dhcp/dhcpd-static
+    force: yes
+- name: Update the dhcp static file via cron
+  cron:
+    name: "Update dhcp static"
+    minute: "*/15"
+    job: "cd /etc/dhcp/dhcpd-static && git pull -qpf"
 - name: Create dhpc.conf file
   template:
     src: templates/dhcp.conf
