@@ -33,4 +33,4 @@
   cron:
     name: "Update dns zones"
     minute: "*/15"
-    job: "cd /etc/bind/zones && git pull -qpf"
+    job: "cd /etc/bind/zones && git pull -qpf && systemctl reload bind9"

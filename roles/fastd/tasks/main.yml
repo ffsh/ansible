@@ -73,6 +73,11 @@
     repo: https://github.com/ffsh/gateways.git
     dest: /etc/fastd/ffsh/gateways
     force: yes
+- name: Update the gateways via cron
+  cron:
+    name: "Update gateways"
+    minute: "*/15"
+    job: "cd /etc/fastd/ffsh/gateways && git pull -qpf"
 - name: Adjust permissions of gateway directory
   file:
     path: /etc/fastd/ffsh/gateways
