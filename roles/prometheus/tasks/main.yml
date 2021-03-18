@@ -1,0 +1,82 @@
+- name: Download node_exporter
+  get_url:
+    url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz"
+    dest: /opt/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz
+
+- name: Unpack node_exporter
+  unarchive:
+    src: /opt/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz
+    dest: /opt
+    remote_src: True
+    mode: '0644'
+    owner: root
+    group: root
+  when: not ansible_check_mode
+
+- name: Add prometheus system user
+  user:
+    name: prometheus
+    system: yes
+    create_home: no
+
+- name: Move node_exporter-{{ node_exporter_version }}.linux-amd64
+  copy:
+    remote_src: True
+    src: /opt/node_exporter-{{ node_exporter_version }}.linux-amd64/
+    dest: /opt/node_exporter/
+    mode: '0744'
+    owner: prometheus
+    group: prometheus
+
+- name: Adjust prometheus permissions
+  file:
+    path: /opt/node_exporter/node_exporter
+    owner: prometheus
+    group: prometheus
+    mode: '0744'
+    state: file
+
+- name: Create prometheus service
+  copy:
+    src: files/node_exporter.service
+    dest: /etc/systemd/system
+    mode: '0600'
+    owner: root
+    group: root
+
+- name: Start node_exporter service
+  systemd:
+    daemon-reload: yes
+    enabled: yes
+    name: node_exporter
+    state: restarted
+
+- name: Install nginx
+  apt:
+    name: nginx
+
+- name: Copy nginx config
+  template:
+    src: templates/nginx-prometheus.conf
+    dest: /etc/nginx/sites-available/
+    mode: '0600'
+    owner: root
+    group: root
+
+- name: Enable nginx config
+  file:
+    src: /etc/nginx/sites-available/nginx-prometheus.conf
+    dest: /etc/nginx/sites-enabled/nginx-prometheus.conf
+    owner: root
+    group: root
+    state: link
+
+- name: Delete default config
+  file:
+    dest: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Restart nginx service
+  systemd:
+    name: nginx
+    state: restarted
