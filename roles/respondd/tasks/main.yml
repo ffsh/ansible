@@ -1,4 +1,4 @@
-- name: Clone  ffggrz/ext-respondd 
+- name: Clone  ffggrz/ext-respondd
   git:
     repo: https://github.com/ffggrz/ext-respondd.git
     dest: /opt/ext-respondd/
@@ -22,9 +22,11 @@
     mode: '0644'
     owner: root
     group: root
-- name: Install python3-netifaces
+- name: Install python3-netifaces and ethtool
   apt:
-    name: python3-netifaces
+    pkg:
+      - python3-netifaces
+      - ethtool
 - name: Systemd set up respondd
   systemd:
     enabled: yes
