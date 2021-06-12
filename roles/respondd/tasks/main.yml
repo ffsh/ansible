@@ -24,9 +24,7 @@
     group: root
 - name: Install python3-netifaces and ethtool
   apt:
-    pkg:
-      - python3-netifaces
-      - ethtool
+    name: ['python3-netifaces', 'ethtool']
 - name: Systemd set up respondd
   systemd:
     enabled: yes
