@@ -28,3 +28,22 @@ You can change the content any time by
 ```
 ansible-vault edit --vault-id fastd_key@prompt host_vars/brunsbach.yml
 ```
+
+## Usage
+
+Run playbook on all gateways listed in hosts:
+
+```
+ansible-playbook --vault-id=fastd_key@prompt setup.yml
+```
+
+Run playbook on one host (untested)
+```
+ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit $hostname
+```
+
+Run only the roles with the specific tag:
+
+```
+ansible-playbook --vault-id=fastd_key@prompt setup.yml --tags "ssh keys"
+```
