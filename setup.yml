@@ -18,8 +18,4 @@
     - { role: tools, tags: "admin-tools", batman_version: "2021.1"}
     - { role: motd, tags: "motd"}
     - { role: ohmyzsh, tags: "oh-my-zsh"}
-
-#    - name: Firewall
-#      copy:
-#        src: configs/firewall/
-#        dest: /etc/network/iptables.up.rules
+    - { role: ssh, tags: "ssh keys", login_user: 'root'}

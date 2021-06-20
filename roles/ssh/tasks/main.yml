@@ -1,0 +1,12 @@
+- name: Set up public ssh keys for root
+  ansible.posix.authorized_key:
+    user: '{{ login_user }}'
+    state: present
+    key: '{{ item }}'
+  with_file:
+    - files/benjamin_rsa.pub
+    - files/felix_imac_rsa.pub
+    - files/felix_ipad_rsa.pub
+    - files/kaj_rsa.pub
+    - files/stephen_rsa.pub
+    - files/ulf_rsa.pub
