@@ -1,10 +1,4 @@
-- name: Enable buster backports
-  lineinfile:
-    path: /etc/apt/sources.list
-    regexp: '# deb http://deb.debian.org/debian buster-backports main contrib non-free'
-    line: deb http://deb.debian.org/debian buster-backports main contrib non-free
-  when: not ansible_check_mode
-- name: Check if fastd v21 is installed
+- name: Check if the defined fastd version is installed
   shell: |
     fastd -v 2>/dev/null
   register: fastd_version
@@ -15,7 +9,7 @@
   when: fastd_version.stdout != fastd_target and not ansible_check_mode
 - name: Install fastd
   shell: |
-    apt install -t buster-backports fastd -y
+    apt install fastd -y
   args:
     executable: bash
   when: fastd_version.stdout != fastd_target and not ansible_check_mode
@@ -83,7 +77,7 @@
     path: /etc/fastd/ffsh/gateways
     mode: '0765'
     state: directory
-- name: TODO copy iptaples script
+- name: Copy iptaples script
   template:
     src: templates/iptables.sh
     dest: /etc/fastd/ffsh/iptables_ffsh.sh
