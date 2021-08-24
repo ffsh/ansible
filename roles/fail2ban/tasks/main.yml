@@ -1,0 +1,14 @@
+- name: Install fail2ban
+  apt:
+    name: ['fail2ban']
+    update_cache: yes
+- name: copy fail2ban config
+  copy:
+    src: files/jail.local
+    dest: /etc/fail2ban/jail.local
+    mode: '0644'
+- name: Restart fail2ban
+  systemd:
+      enabled: yes
+      state: restarted
+      name: fail2ban

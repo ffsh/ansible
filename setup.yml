@@ -8,6 +8,7 @@
       update_cache: yes
   roles:
     - { role: network, tags: "network"}
+    - { role: fail2ban, tags: "fail2ban"}
     - { role: batman, tags: "batman-adv", batman_version: "2021.1"}
     - { role: fastd, tags: "fastd", fastd_target: "fastd 21"}
     - { role: radvd, tags: "radvd"}

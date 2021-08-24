@@ -1,0 +1,10 @@
+#
+# Managed by ansible
+# filter ssh logins
+#
+[sshd]
+enabled   = true
+maxretry  = 5
+findtime  = 1d
+bantime   = 2h
+ignoreip  = 127.0.0.1/8
