@@ -1,6 +1,6 @@
 - name: Install network tools
   apt:
-    name: ['bridge-utils', 'ntp', 'net-tools']
+    name: ['bridge-utils', 'ntp', 'net-tools', 'iptables', 'bmon']
 - name: Create network configuration
   template:
     src: templates/60-ffsh-init.cfg
