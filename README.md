@@ -9,10 +9,10 @@ As the login is done via ssh make sure that the ssh key is registered at your id
 That way Ansible will be able to automatically detect the right ssh key and connect to the server.
 
 ## hosts
-If you want to deploy to a new gateway you need to add it to the hosts file.
+If you want to deploy to a new gateway you need to add it to the /hosts file in the repo, just compare it to brunsbach and add your own details.
 
 ## host_vars/$gatewayname.yml
-You need to supply your fastd secret as an encrypted secret, you get the password via the NOC Team.
+You also need to supply your fastd secret as an encrypted secret, you get the password via the NOC Team.
 
 To create a new fastd secret, execute the following, this will ask you for a password and open an editor.
 ```
