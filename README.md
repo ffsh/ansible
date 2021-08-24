@@ -12,11 +12,11 @@ That way Ansible will be able to automatically detect the right ssh key and conn
 If you want to deploy to a new gateway you need to add it to the hosts file.
 
 ## host_vars/$gatewayname.yml
-You need to supply your fastd secret as an encrypted secret, you may use the standard password or your own. #TODO check
+You need to supply your fastd secret as an encrypted secret, you get the password via the NOC Team.
 
 To create a new fastd secret, execute the following, this will ask you for a password and open an editor.
 ```
-ansible-vault create --vault-id fastd_key@prompt host_vars/brunsbach.yml
+ansible-vault create --vault-id fastd_key@prompt host_vars/$gatewayname.yml
 ```
 Enter
 ```
@@ -26,7 +26,7 @@ save and close the editor, done you added your secret :)
 
 You can change the content any time by
 ```
-ansible-vault edit --vault-id fastd_key@prompt host_vars/brunsbach.yml
+ansible-vault edit --vault-id fastd_key@prompt host_vars/$gatewayname.yml
 ```
 
 ## Usage
