@@ -23,3 +23,8 @@
     path: /etc/default/isc-dhcp-server
     regexp: 'INTERFACESv4=""'
     line: INTERFACESv4="br-ffsh"
+- name: Enable sytemd service
+  systemd:
+      enabled: yes
+      state: restarted
+      name: isc-dhcp-server
