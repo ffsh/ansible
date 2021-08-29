@@ -3,6 +3,11 @@ This repository holds the Ansible playbook to deploy a ffsh gateway in the stand
 It is based on https://docs.freifunk-suedholstein.de/de/latest/gateway.html but changes were made where it was plausible.
 
 # requirements
+Clone the repository and update the submodules
+
+```
+git submodule update --init
+```
 
 ## ssh-key
 As the login is done via ssh make sure that the ssh key is registered at your identity manager `ssh-add $keyfile`.
