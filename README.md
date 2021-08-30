@@ -1,4 +1,5 @@
 # Ansible
+[![Ansible Lint](https://github.com/ffsh/ansible/actions/workflows/ansible-lint.yml/badge.svg?branch=main)](https://github.com/ffsh/ansible/actions/workflows/ansible-lint.yml)
 This repository holds the Ansible playbook to deploy a ffsh gateway in the standard configuration.
 It is based on https://docs.freifunk-suedholstein.de/de/latest/gateway.html but changes were made where it was plausible.
 
