@@ -1,0 +1,7 @@
+- name: Create tmpfiles.d
+  copy:
+    src: files/ffsh.zsh-theme
+    dest: /root/.oh-my-zsh/custom/themes/ffsh.zsh-theme
+    mode: '0644'
+    owner: root
+    group: root
