@@ -1,33 +1,13 @@
-- name: Check if the defined fastd version is installed
-  shell: |
-    fastd -v 2>/dev/null
-  register: fastd_version
-  ignore_errors: yes
 - name: Update apt cache
   apt:
     update_cache: yes
-  when: fastd_version.stdout != fastd_target and not ansible_check_mode
-- name: Install fastd
-  shell: |
-    apt install fastd -y
-  args:
-    executable: bash
-  when: fastd_version.stdout != fastd_target and not ansible_check_mode
+    name: ['fastd']
+  when: not ansible_check_mode
 - name: Add ffsh system user
   user:
     name: ffsh
     system: yes
     create_home: no
-# this is not allowed maybe wirte a script instead
-- name: parse interfaces
-  set_fact:
-    internet_interface="eth0"
-#  when: hostvars[inventory_hostname]['ansible_{{ item }}']['ipv4']['address'] == ansible_ssh_host
-#  with_items:
-#    - "{{ ansible_interfaces }}"
-- name: Please check
-  debug:
-    msg: "Will asume that your interface to the internet is {{ internet_interface }} please check /etc/fastd/ffsh/fastd.conf"
 - name: Create directory
   file:
     path: /etc/fastd/ffsh/
@@ -56,9 +36,8 @@
     mode: '0644'
     owner: root
     group: root
-- name: run tmpfiles.d
-  shell: |
-    systemd-tmpfiles --create
+  notify:
+    - Run systemd-tmpfiles
 - name: Install git
   apt:
     name: git
@@ -67,6 +46,7 @@
     repo: https://github.com/ffsh/gateways.git
     dest: /etc/fastd/ffsh/gateways
     force: yes
+    version: master
 - name: Update the gateways via cron
   cron:
     name: "Update gateways"

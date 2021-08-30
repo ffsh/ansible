@@ -2,10 +2,11 @@
   apt:
     name: isc-dhcp-server
 - name: Clone Gateway repository
-  git:
+  ansible.builtin.git:
     repo: https://github.com/ffsh/dhcp-static.git
     dest: /etc/dhcp/dhcpd-static
     force: yes
+    version: master
 - name: Update the dhcp static file via cron
   cron:
     name: "Update dhcp static"
@@ -23,7 +24,7 @@
     path: /etc/default/isc-dhcp-server
     regexp: 'INTERFACESv4=""'
     line: INTERFACESv4="br-ffsh"
-- name: Enable sytemd service
+- name: Enable and restart service
   systemd:
       enabled: yes
       state: restarted

@@ -1,0 +1,2 @@
+- name: Run systemd-tmpfiles
+  ansible.builtin.command: systemd-tmpfiles --create

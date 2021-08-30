@@ -3,11 +3,15 @@
     repo: https://github.com/ffggrz/ext-respondd.git
     dest: /opt/ext-respondd/
     force: yes
+    version: master
 - name: Copy systemd job
   copy:
     remote_src: yes
     src: /opt/ext-respondd/ext-respondd.service.example
     dest: /etc/systemd/system/respondd.service
+    mode: '0644'
+    owner: root
+    group: root
 - name: Copy config
   copy:
     src: files/config.json

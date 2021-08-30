@@ -3,13 +3,14 @@
   apt:
     pkg: [ 'neofetch']
     state: present
-- name: First run neofetch
-  shell: |
-    neofetch
+  notify: First run neofetch
 - name: Copy logo
   copy:
     src: files/ffsh-logo.txt
     dest: /root/.config/neofetch/ffsh-logo.txt
+    owner: root
+    group: root
+    mode: '0644'
 - name: Adjust neofetch config
   lineinfile:
     path: /root/.config/neofetch/config.conf

@@ -5,6 +5,9 @@
   template:
     dest: /etc/radvd.conf
     src: templates/radvd.conf
+    owner: root
+    group: root
+    mode: '0644'
 - name: Restart radvd
   systemd:
     enabled: yes
