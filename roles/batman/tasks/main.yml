@@ -1,5 +1,5 @@
 - name: Install basic packages
-  apt:
+  ansible.builtin.apt:
     name: dkms
 - name: Check for currently installed batman-adv
   shell: |

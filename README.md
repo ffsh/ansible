@@ -4,9 +4,8 @@
 This repository holds the Ansible playbook to deploy a ffsh gateway in the standard configuration.
 It is based on https://docs.freifunk-suedholstein.de/de/latest/gateway.html but changes were made where it was plausible.
 
-# requirements
+## requirements
 Clone the repository and update the submodules
-
 ```
 git submodule update --init
 ```

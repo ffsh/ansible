@@ -1,5 +1,5 @@
 - name: Install isc-dhcp-server
-  apt:
+  ansible.builtin.apt:
     name: isc-dhcp-server
 - name: Clone Gateway repository
   ansible.builtin.git:
@@ -13,7 +13,7 @@
     minute: "*/15"
     job: "cd /etc/dhcp/dhcpd-static && git pull -qpf"
 - name: Create dhpc.conf file
-  template:
+  ansible.builtin.template:
     src: templates/dhcp.conf
     dest: /etc/dhcp/dhcpd.conf
     mode: '0600'

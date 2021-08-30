@@ -1,21 +1,21 @@
 - name: Install dependencies for batman-adv
-  apt:
+  ansible.builtin.apt:
     name: ['linux-headers-amd64', 'libnl-3-dev', 'libnl-genl-3-dev', 'libcap-dev', 'pkg-config', 'build-essential']
 
 - name: Download batman source
-  get_url:
+  ansible.builtin.get_url:
     url: "https://downloads.open-mesh.org/batman/releases/batman-adv-{{ batman_version }}/batman-adv-{{ batman_version }}.tar.gz"
     dest: /opt/batman-adv-{{ batman_version }}.tar.gz
 
 - name: Unpack batman-adv
-  unarchive:
+  ansible.builtin.unarchive:
     src: /opt/batman-adv-{{ batman_version }}.tar.gz
     dest: /usr/src
     remote_src: True
   when: not ansible_check_mode
 
 - name: Configure DKMS
-  template:
+  ansible.builtin.template:
     src: dkms.conf
     dest: /usr/src/batman-adv-{{ batman_version }}/dkms.conf
     mode: '0644'
@@ -56,7 +56,7 @@
   when: batctl.stat.exists
 
 - name: Download batctl source
-  get_url:
+  ansible.builtin.get_url:
     url: "https://downloads.open-mesh.org/batman/releases/batman-adv-{{ batman_version }}/batctl-{{ batman_version }}.tar.gz"
     dest: /opt/batctl-{{ batman_version }}.tar.gz
   when: batctl_version != batman_version and not ansible_check_mode
@@ -64,7 +64,7 @@
 # TODO what about the old version
 
 - name: Unpack batctl
-  unarchive:
+  ansible.builtin.unarchive:
     src: /opt/batctl-{{ batman_version }}.tar.gz
     dest: /opt
     remote_src: True

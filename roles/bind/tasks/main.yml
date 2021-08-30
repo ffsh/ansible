@@ -1,5 +1,5 @@
 - name: Install bind
-  apt:
+  ansible.builtin.apt:
     name: bind9
 - name: Adjust configuration options
   copy:
@@ -16,7 +16,7 @@
     owner: root
     group: bind
 - name: Install git
-  apt:
+  ansible.builtin.apt:
     name: git
 - name: Clone bind respository
   git:

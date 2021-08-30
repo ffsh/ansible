@@ -4,7 +4,7 @@
       - username: root
   pre_tasks:
   - name: Update apt cache
-    apt:
+    ansible.builtin.apt:
       update_cache: yes
   roles:
     - { role: network, tags: "network"}

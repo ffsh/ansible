@@ -1,8 +1,8 @@
 - name: Install network tools
-  apt:
+  ansible.builtin.apt:
     name: ['bridge-utils', 'ntp', 'net-tools', 'iptables', 'bmon']
 - name: Create network configuration
-  template:
+  ansible.builtin.template:
     src: templates/60-ffsh-init.cfg
     dest: /etc/network/interfaces.d/60-ffsh-init.cfg
     mode: '0644'

@@ -13,12 +13,12 @@
     create_home: no
 
 - name: Download node_exporter
-  get_url:
+  ansible.builtin.get_url:
     url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz"
     dest: /opt/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz
 
 - name: Unpack node_exporter
-  unarchive:
+  ansible.builtin.unarchive:
     src: /opt/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz
     dest: /opt
     remote_src: True
@@ -45,7 +45,7 @@
     group: prometheus
 
 - name: Adjust prometheus permissions
-  file:
+  ansible.builtin.file:
     path: /opt/node_exporter/node_exporter
     owner: prometheus
     group: prometheus
@@ -60,11 +60,11 @@
     state: restarted
 
 - name: Install nginx
-  apt:
+  ansible.builtin.apt:
     name: nginx
 
 - name: Copy nginx config
-  template:
+  ansible.builtin.template:
     src: templates/nginx-prometheus.conf
     dest: /etc/nginx/sites-available/
     mode: '0600'
@@ -72,7 +72,7 @@
     group: root
 
 - name: Enable nginx config
-  file:
+  ansible.builtin.file:
     src: /etc/nginx/sites-available/nginx-prometheus.conf
     dest: /etc/nginx/sites-enabled/nginx-prometheus.conf
     owner: root
@@ -80,7 +80,7 @@
     state: link
 
 - name: Delete default config
-  file:
+  ansible.builtin.file:
     dest: /etc/nginx/sites-enabled/default
     state: absent
 

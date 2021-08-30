@@ -1,8 +1,8 @@
 - name: Install radvd
-  apt:
+  ansible.builtin.apt:
     name: radvd
 - name: Configure radvd
-  template:
+  ansible.builtin.template:
     dest: /etc/radvd.conf
     src: templates/radvd.conf
     owner: root

@@ -1,5 +1,5 @@
 - name: Install admin tools
-  apt:
+  ansible.builtin.apt:
     name: ["netcat-openbsd", "jq", "htop"]
 - name: copy README.md
   copy:
@@ -9,7 +9,7 @@
     owner: root
     group: root
 - name: Copy fix-batman.sh
-  template:
+  ansible.builtin.template:
     src: templates/fix-batman.sh
     dest: /root/fix-batman.sh
     mode: '0740'

@@ -20,14 +20,14 @@
     owner: root
     group: root
 - name: Copy alias
-  template:
+  ansible.builtin.template:
     src: templates/alias.j2
     dest: /opt/ext-respondd/alias.json
     mode: '0644'
     owner: root
     group: root
 - name: Install python3-netifaces and ethtool
-  apt:
+  ansible.builtin.apt:
     name: ['python3-netifaces', 'ethtool']
 - name: Systemd set up respondd
   systemd:

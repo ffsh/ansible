@@ -1,5 +1,5 @@
 - name: Update apt cache
-  apt:
+  ansible.builtin.apt:
     update_cache: yes
     name: ['fastd']
   when: not ansible_check_mode
@@ -9,21 +9,21 @@
     system: yes
     create_home: no
 - name: Create directory
-  file:
+  ansible.builtin.file:
     path: /etc/fastd/ffsh/
     owner: root
     group: root
     mode: '0645'
     state: directory
 - name: Adjust fastd permissions
-  file:
+  ansible.builtin.file:
     path: /etc/fastd
     owner: root
     group: root
     mode: '0645'
     state: directory
 - name: Create fastd config
-  template:
+  ansible.builtin.template:
     src: templates/fastd.conf
     dest: /etc/fastd/ffsh/fastd.conf
     mode: '0600'
@@ -39,7 +39,7 @@
   notify:
     - Run systemd-tmpfiles
 - name: Install git
-  apt:
+  ansible.builtin.apt:
     name: git
 - name: Clone Gateway repository
   git:
@@ -53,12 +53,12 @@
     minute: "*/15"
     job: "cd /etc/fastd/ffsh/gateways && git pull -qpf"
 - name: Adjust permissions of gateway directory
-  file:
+  ansible.builtin.file:
     path: /etc/fastd/ffsh/gateways
     mode: '0765'
     state: directory
 - name: Copy iptaples script
-  template:
+  ansible.builtin.template:
     src: templates/iptables.sh
     dest: /etc/fastd/ffsh/iptables_ffsh.sh
     mode: '0700'

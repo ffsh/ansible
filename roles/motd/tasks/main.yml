@@ -1,6 +1,6 @@
 ---
 - name: install neofetch
-  apt:
+  ansible.builtin.apt:
     pkg: [ 'neofetch']
     state: present
   notify: First run neofetch
@@ -24,6 +24,6 @@
     group: root
     mode: '0744'
 - name: remove /etc/motd
-  file:
+  ansible.builtin.file:
     path: /etc/motd
     state: absent
