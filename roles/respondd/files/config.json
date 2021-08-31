@@ -1,7 +1,7 @@
 {
   "addr": "ff02::2:1001",
   "batman": "bat0",
-  "bridge": "br-ffsh",
+  "bridge": "",
   "mesh-vpn": [ "ffsh-mesh" ],
   "mesh-wlan": [],
   "fastd_socket": "/run/fastd/fastd-ffsh.socket",
