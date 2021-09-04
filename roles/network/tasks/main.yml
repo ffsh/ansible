@@ -1,11 +1,6 @@
 - name: Install network tools
   ansible.builtin.apt:
     name: ['bridge-utils', 'ntp', 'net-tools', 'iptables', 'bmon']
-- name: Create network configuration
-  ansible.builtin.template:
-    src: templates/60-ffsh-init.cfg
-    dest: /etc/network/interfaces.d/60-ffsh-init.cfg
-    mode: '0644'
 - name: Enable IP forwarding
   copy:
     src: templates/forwarding.conf
