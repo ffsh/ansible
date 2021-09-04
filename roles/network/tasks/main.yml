@@ -6,3 +6,7 @@
     src: templates/forwarding.conf
     dest: /etc/sysctl.d/forwarding.conf
     mode: '0644'
+- name: Migration Step remove network configuration
+  ansible.builtin.file:
+    path: /etc/network/interfaces.d/60-ffsh-init.cfg
+    state: absent
