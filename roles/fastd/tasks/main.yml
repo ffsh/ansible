@@ -1,8 +1,13 @@
+- name: Enable bullseye backports
+  lineinfile:
+    path: /etc/apt/sources.list
+    regexp: '# deb http://deb.debian.org/debian bullseye-backports main contrib non-free'
+    line: deb http://deb.debian.org/debian bullseye-backports main contrib non-free
 - name: Update apt cache
   ansible.builtin.apt:
     update_cache: yes
-    name: ['fastd']
-  when: not ansible_check_mode
+- name: Install fastd
+  ansible.builtin.command: apt install -t bullseye-backports fastd -y
 - name: Add ffsh system user
   user:
     name: ffsh

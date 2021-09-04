@@ -12,10 +12,12 @@
     group: root
     mode: '0644'
 - name: Adjust neofetch config
-  lineinfile:
-    path: /root/.config/neofetch/config.conf
-    regexp: 'image_source="auto"'
-    line: 'image_source="/root/.config/neofetch/ffsh-logo.txt"'
+  template:
+    src: templates/config.conf
+    dest: /root/.config/neofetch/config.conf
+    owner: root
+    group: root
+    mode: '0644'
 - name: Set motd header
   copy:
     src: files/00-header

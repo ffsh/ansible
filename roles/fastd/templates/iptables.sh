@@ -1,6 +1,6 @@
 #!/bin/sh
 
-/sbin/ip route add 10.144.0.0/16 dev br-ffsh src {{ ffsh_ipv4_address }} table 42
+/sbin/ip route add 10.144.0.0/16 dev bat0 src {{ ffsh_ipv4_address }} table 42
 
 # Reject forwarded outgoing packets on external WAN interface to private IP addresses
 /sbin/iptables -I FORWARD -d 10.0.0.0/8 -o {{ external_interface }} -j REJECT
