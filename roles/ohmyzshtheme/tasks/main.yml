@@ -1,4 +1,4 @@
-- name: Create tmpfiles.d
+- name: create theme
   copy:
     src: files/ffsh.zsh-theme
     dest: /root/.oh-my-zsh/custom/themes/ffsh.zsh-theme
