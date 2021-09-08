@@ -1,6 +1,8 @@
 options {
     directory "/var/cache/bind";
     forwarders {
+        9.9.9.9;
+        149.112.112.112;
         1.1.1.1;
         8.8.8.8;
         8.8.4.4;
