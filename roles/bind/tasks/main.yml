@@ -2,8 +2,8 @@
   ansible.builtin.apt:
     name: bind9
 - name: Adjust configuration options
-  copy:
-    src: files/named.conf.options
+  template:
+    src: templates/named.conf.options
     dest: /etc/bind/named.conf.options
     mode: '0640'
     owner: root

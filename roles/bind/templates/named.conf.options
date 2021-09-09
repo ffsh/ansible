@@ -9,5 +9,6 @@ options {
     };
     dnssec-validation no;
     auth-nxdomain no;
-    listen-on-v6 { any; };
+    listen-on { {{ ffsh_ipv4_address }}; };
+    listen-on-v6 { {{ ffsh_ipv6_address }}; };
 };
