@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en" class="h-100">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="Benjamin Brahmer and Bootstrap contributors">
+        <title>Gateway {{ inventory_hostname }}</title>
+        <!-- Bootstrap core CSS -->
+        <link href="bootstrap-{{ bootstrap_version }}-dist/css/bootstrap.min.css" rel="stylesheet">
+
+        <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+            font-size: 3.5rem;
+            }
+        }
+        </style>
+
+        
+        <!-- Custom styles for this template -->
+        <link href="cover.css" rel="stylesheet">
+    </head>
+  
+    <body class="d-flex h-100 text-center text-white bg-dark">
+        
+        <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+        <main class="px-3">
+            <h1>{{ inventory_hostname }}</h1>
+            <p class="lead">This is the gateway {{ inventory_hostname }} for Freifunk Südholstein reachable as <a href="https://freifunk-suedholstein.de">{{ inventory_hostname }}.freifunk-suedholstein.de</a>.</p>
+            <p class="lead">
+            <a href="https://freifunk-suedholstein.de/gateways" class="btn btn-lg btn-secondary fw-bold border-white bg-white">Learn more</a>
+            </p>
+        </main>
+
+        <footer class="mt-auto text-white-50">
+            <p>Hosted by <a href="https://freifunk-suedholstein.de" class="text-white">Freifunk Südholstein</a>.</p>
+        </footer>
+        </div>
+    </body>
+</html>

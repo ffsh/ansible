@@ -1,0 +1,79 @@
+- name: Install nginx and unzip
+  ansible.builtin.apt:
+    name: ["nginx", "unzip"]
+
+- name: Copy nginx config
+  ansible.builtin.template:
+    src: templates/gw-status.conf
+    dest: /etc/nginx/sites-available/
+    mode: '0600'
+    owner: root
+    group: root
+
+- name: Migration step 1 delete old nginx-config
+  ansible.builtin.file:
+    dest: /etc/nginx/sites-available/nginx-prometheus.conf
+    state: absent
+
+- name: Migration step 2 delete old nginx-config
+  ansible.builtin.file:
+    dest: /etc/nginx/sites-enabled/nginx-prometheus.conf
+    state: absent
+
+- name: Enable nginx gw-status config
+  ansible.builtin.file:
+    src: /etc/nginx/sites-available/gw-status.conf
+    dest: /etc/nginx/sites-enabled/gw-status.conf
+    owner: root
+    group: root
+    state: link
+
+- name: Delete default config
+  ansible.builtin.file:
+    dest: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Create directory for info page
+  ansible.builtin.file:
+    path: /var/www/gw-status
+    state: directory
+    owner: www-data
+    group: www-data
+
+- name: Dowload bootstrap
+  ansible.builtin.get_url:
+    url: "https://github.com/twbs/bootstrap/releases/download/v{{ bootstrap_version }}/bootstrap-{{ bootstrap_version }}-dist.zip"
+    dest: /var/www/gw-status/bootstrap-{{ bootstrap_version }}-dist.zip
+
+- name: Unpack bootstrap
+  ansible.builtin.unarchive:
+    src: /var/www/gw-status/bootstrap-{{ bootstrap_version }}-dist.zip
+    dest: /var/www/gw-status/
+    remote_src: True
+    mode: '0744'
+    owner: www-data
+    group: www-data
+
+- name: Delete archive
+  ansible.builtin.file:
+    dest: /var/www/gw-status/bootstrap-{{ bootstrap_version }}-dist.zip
+    state: absent
+
+- name: copy info page
+  ansible.builtin.template:
+    src: templates/index.html
+    dest: /var/www/gw-status/index.html
+    owner: www-data
+    group: www-data
+
+- name: copy css 
+  ansible.builtin.copy:
+    src: files/cover.css
+    dest: /var/www/gw-status/cover.css
+    owner: www-data
+    group: www-data
+
+- name: Restart nginx service
+  systemd:
+    name: nginx
+    state: restarted
