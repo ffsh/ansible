@@ -1,4 +1,4 @@
-- name: Create prometheus service
+- name: Create node_exporter service
   copy:
     src: files/node_exporter.service
     dest: /etc/systemd/system
@@ -6,7 +6,7 @@
     owner: root
     group: root
 
-- name: Add prometheus system user
+- name: Add prometheus system user for node_exporter
   user:
     name: prometheus
     system: yes
@@ -44,7 +44,7 @@
     owner: prometheus
     group: prometheus
 
-- name: Adjust prometheus permissions
+- name: Adjust node_exporter permissions
   ansible.builtin.file:
     path: /opt/node_exporter/node_exporter
     owner: prometheus
@@ -57,34 +57,4 @@
     daemon-reload: yes
     enabled: yes
     name: node_exporter
-    state: restarted
-
-- name: Install nginx
-  ansible.builtin.apt:
-    name: nginx
-
-- name: Copy nginx config
-  ansible.builtin.template:
-    src: templates/nginx-prometheus.conf
-    dest: /etc/nginx/sites-available/
-    mode: '0600'
-    owner: root
-    group: root
-
-- name: Enable nginx config
-  ansible.builtin.file:
-    src: /etc/nginx/sites-available/nginx-prometheus.conf
-    dest: /etc/nginx/sites-enabled/nginx-prometheus.conf
-    owner: root
-    group: root
-    state: link
-
-- name: Delete default config
-  ansible.builtin.file:
-    dest: /etc/nginx/sites-enabled/default
-    state: absent
-
-- name: Restart nginx service
-  systemd:
-    name: nginx
     state: restarted

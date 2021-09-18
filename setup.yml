@@ -17,6 +17,7 @@
     - { role: bind, tags: "dns"}
     - { role: respondd, tags: "respondd"}
     - { role: prometheus, tags: "node_exporter", node_exporter_version: "1.2.2"}
+    - { role: nginx, tags: "node_exporter, nginx", bootstrap_version: "5.1.1"}
     - { role: tools, tags: "admin-tools", batman_version: "2021.2"}
     - { role: motd, tags: "motd"}
     - { role: ohmyzsh, tags: "oh-my-zsh", oh_my_zsh_theme: ffsh}
