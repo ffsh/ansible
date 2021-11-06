@@ -9,6 +9,6 @@
 /sbin/iptables -I FORWARD -d 100.64.0.0/10 -o {{ external_interface }} -j REJECT
 /sbin/iptables -I FORWARD -d 169.254.0.0/16 -o {{ external_interface }} -j REJECT
 
-/sbin/iptables -t nat -I POSTROUTING -s 0/0 -d 0/0 -j MASQUERADE
+/sbin/iptables -t nat -I POSTROUTING -s 10.144.0.0/16 -d 0/0 -j MASQUERADE
 # IGMP/MLD segmentation
 echo 2 > /sys/class/net/bat0/brport/multicast_router
