@@ -69,6 +69,10 @@
     mode: '0700'
     owner: root
     group: root
+
+- name: Flush handlers
+  meta: flush_handlers
+
 - name: Enable sytemd service
   systemd:
       enabled: yes

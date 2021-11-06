@@ -4,6 +4,10 @@
     pkg: [ 'neofetch']
     state: present
   notify: First run neofetch
+
+- name: Flush handlers
+  meta: flush_handlers
+
 - name: Copy logo
   copy:
     src: files/ffsh-logo.txt
