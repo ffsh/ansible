@@ -8,7 +8,7 @@
       update_cache: yes
   roles:
     - { role: network, tags: "network"}
-    - { role: wireguard-exit, tags: "wireguard, exit"}
+    - { role: wireguardexit, tags: "wireguard, exit"}
     - { role: hostname, tags: "hostname"}
     - { role: fail2ban, tags: "fail2ban"}
     - { role: batman, tags: "batman-adv", batman_version: "2021.2"}
