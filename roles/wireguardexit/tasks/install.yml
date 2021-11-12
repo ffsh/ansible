@@ -8,3 +8,8 @@
     mode: '0600'
     owner: root
     group: root
+- name: Start and enable wireguard service
+  systemd:
+    enabled: yes
+    name: wg-quick@exit
+    state: started

@@ -1,2 +1,0 @@
-- include: install.yml
-  when: enable_wireguard_exit is defined
