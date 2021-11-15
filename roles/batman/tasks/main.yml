@@ -11,5 +11,5 @@
   changed_when: False
   check_mode: no
 
-- include: from_source.yml
+- ansible.builtin.include_tasks: from_source.yml
   when: installed_batman_version != batman_version

@@ -1,2 +1,3 @@
-- include: install.yml
+- name: Check if Wireguard exit should be installed 
+  ansible.builtin.include_tasks: install.yml
   when: enable_wireguard_exit is defined
