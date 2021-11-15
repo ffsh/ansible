@@ -2,4 +2,4 @@
 - name: Set the hostname
   ansible.builtin.hostname:
     name: "{{ inventory_hostname }}"
-    use: debian
+    use: systemd
