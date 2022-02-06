@@ -11,5 +11,6 @@
   changed_when: False
   check_mode: no
 
-- ansible.builtin.include_tasks: from_source.yml
+- name: batman-adv needs to be installed or upgraded
+  ansible.builtin.include_tasks: from_source.yml
   when: installed_batman_version != batman_version
