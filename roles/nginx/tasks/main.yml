@@ -63,6 +63,7 @@
   ansible.builtin.template:
     src: templates/index.html
     dest: /var/www/gw-status/index.html
+    mode: '0744'
     owner: www-data
     group: www-data
 
@@ -70,6 +71,7 @@
   ansible.builtin.copy:
     src: files/cover.css
     dest: /var/www/gw-status/cover.css
+    mode: '0744'
     owner: www-data
     group: www-data
 

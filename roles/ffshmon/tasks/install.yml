@@ -3,6 +3,7 @@
     repo: https://github.com/ffsh/ffshmon.git
     dest: /opt/ffshmon
     force: yes
+    version: main
 - name: trigger ffshmon regularly
   cron:
     name: "Execute ffshmon"
