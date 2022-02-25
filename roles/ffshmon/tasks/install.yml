@@ -1,8 +1,8 @@
 - name: Clone ffshmon repository
-    git:
-      repo: https://github.com/ffsh/bind.git
-      dest: /opt/ffshmon
-      force: yes
+  git:
+    repo: https://github.com/ffsh/ffshmon.git
+    dest: /opt/ffshmon
+    force: yes
 - name: trigger ffshmon regularly
   cron:
     name: "Execute ffshmon"
