@@ -7,4 +7,4 @@
   cron:
     name: "Execute ffshmon"
     minute: "*/30"
-    job: "python3 /opt/ffshmon/wireguard.py {{ ffshmon_mail }} ffshmon_pw"
+    job: "python3 /opt/ffshmon/wireguard.py {{ ffshmon_mail }} {{ ffshmon_pw }}"
