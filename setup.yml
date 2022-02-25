@@ -24,3 +24,4 @@
     - { role: ohmyzsh, tags: "oh-my-zsh", oh_my_zsh_theme: ffsh}
     - { role: ohmyzshtheme, tags: "oh-my-zsh-theme"}
     - { role: ssh, tags: "ssh keys", login_user: 'root'}
+    - { role: ffshmon, tags: "wireguard, monitor"}
