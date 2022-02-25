@@ -1,0 +1,10 @@
+- name: Clone ffshmon repository
+    git:
+      repo: https://github.com/ffsh/bind.git
+      dest: /opt/ffshmon
+      force: yes
+- name: trigger ffshmon regularly
+  cron:
+    name: "Execute ffshmon"
+    minute: "*/30"
+    job: "python3 /opt/ffshmon/wireguard.py {{ ffshmon_mail }} ffshmon_pw"
