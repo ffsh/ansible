@@ -8,6 +8,8 @@
     update_cache: yes
 - name: Install fastd
   ansible.builtin.command: apt install -t bullseye-backports fastd -y
+  register: result
+  changed_when: '"1 upgraded" in result.stdout'
 - name: Add ffsh system user
   user:
     name: ffsh
