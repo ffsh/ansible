@@ -11,7 +11,7 @@
     - { role: wireguardexit, tags: "wireguard, exit"}
     - { role: hostname, tags: "hostname"}
     - { role: fail2ban, tags: "fail2ban"}
-    - { role: batman, tags: "batman-adv", batman_version: "2022.0"}
+    - { role: batman, tags: "batman-adv", batman_version: "2022.1"}
     - { role: fastd, tags: "fastd", fastd_target: "fastd 21"}
     - { role: radvd, tags: "radvd"}
     - { role: dhcp, tags: "isc-dhcp4-server"}
