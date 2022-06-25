@@ -2,6 +2,14 @@
   ansible.builtin.apt:
     name: ["nginx", "unzip"]
 
+- name: Copy httpasswd
+  ansible.builtin.copy:
+    src: files/htpasswd
+    dest: /etc/nginx/htpasswd
+    mode: '0600'
+    owner: www-data
+    group: www-data
+
 - name: Copy nginx config
   ansible.builtin.template:
     src: templates/gw-status.conf
@@ -9,16 +17,6 @@
     mode: '0600'
     owner: root
     group: root
-
-- name: Migration step 1 delete old nginx-config
-  ansible.builtin.file:
-    dest: /etc/nginx/sites-available/nginx-prometheus.conf
-    state: absent
-
-- name: Migration step 2 delete old nginx-config
-  ansible.builtin.file:
-    dest: /etc/nginx/sites-enabled/nginx-prometheus.conf
-    state: absent
 
 - name: Enable nginx gw-status config
   ansible.builtin.file:
