@@ -1,0 +1,58 @@
+- name: Install certbot an plugin
+  ansible.builtin.apt:
+    pkg: ["certbot", "python3-certbot-nginx"]
+    state: "present"
+    notify: Register letsencrypt account
+
+## TODO
+
+## No Certificates 
+# brunsbach ➜  ~ certbot certificates
+# Saving debug log to /var/log/letsencrypt/letsencrypt.log
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# No certificates found.
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+## already registered:
+# brunsbach ➜  ~ certbot certificates                                          
+# Saving debug log to /var/log/letsencrypt/letsencrypt.log
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Found the following certs:
+#   Certificate Name: brunsbach.freifunk-suedholstein.de
+#     Serial Number: 40fee2299fc2da1d2bcbeda7a090a8470c1
+#     Key Type: RSA
+#     Domains: brunsbach.freifunk-suedholstein.de
+#     Expiry Date: 2022-09-23 13:35:57+00:00 (VALID: 89 days)
+#     Certificate Path: /etc/letsencrypt/live/brunsbach.freifunk-suedholstein.de/fullchain.pem
+#     Private Key Path: /etc/letsencrypt/live/brunsbach.freifunk-suedholstein.de/privkey.pem
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+
+
+## Register Cert
+# brunsbach ➜  ~ certbot certonly --nginx -d brunsbach.freifunk-suedholstein.de
+# Saving debug log to /var/log/letsencrypt/letsencrypt.log
+# Plugins selected: Authenticator nginx, Installer nginx
+# Requesting a certificate for brunsbach.freifunk-suedholstein.de
+# Performing the following challenges:
+# http-01 challenge for brunsbach.freifunk-suedholstein.de
+# Waiting for verification...
+# Cleaning up challenges
+
+# IMPORTANT NOTES:
+#  - Congratulations! Your certificate and chain have been saved at:
+#    /etc/letsencrypt/live/brunsbach.freifunk-suedholstein.de/fullchain.pem
+#    Your key file has been saved at:
+#    /etc/letsencrypt/live/brunsbach.freifunk-suedholstein.de/privkey.pem
+#    Your certificate will expire on 2022-09-23. To obtain a new or
+#    tweaked version of this certificate in the future, simply run
+#    certbot again. To non-interactively renew *all* of your
+#    certificates, run "certbot renew"
+#  - If you like Certbot, please consider supporting our work by:
+
+#    Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
+#    Donating to EFF:                    https://eff.org/donate-le
+
+###

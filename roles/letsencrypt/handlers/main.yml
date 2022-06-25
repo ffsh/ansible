@@ -1,0 +1,2 @@
+- name: Register letsencrypt account
+  ansible.builtin.command: certbot register --no-eff-email -m noc@freifunk-suedholstein.de --agree-tos
