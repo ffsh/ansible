@@ -17,8 +17,11 @@
     mode: '0644'
     owner: root
     group: root
+  notify: Restart and Reload certbot
+- name: Flush handlers
+  meta: flush_handlers
 - name: Check if certificate is registered
-  ansible.builtin.command: "certbot certificates | grep 'No certificates found.'"
+  ansible.builtin.shell: certbot certificates | grep 'No certificates found.'
   ignore_errors: True
   register: result
   changed_when: result.rc == 0
@@ -26,4 +29,6 @@
   notify: 
     - Register Certificate
     - Restart NGINX
+- name: Flush handlers
+  meta: flush_handlers
   
