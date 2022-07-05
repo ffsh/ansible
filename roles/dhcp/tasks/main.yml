@@ -24,7 +24,7 @@
     path: /etc/default/isc-dhcp-server
     regexp: 'INTERFACESv4=""'
     line: INTERFACESv4="bat0"
-- name: Creates directory
+- name: Create systemd directory
   file:
     path: /etc/systemd/system/isc-dhcp-server.service.d/
     state: directory

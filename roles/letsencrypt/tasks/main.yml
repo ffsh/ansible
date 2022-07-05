@@ -1,0 +1,34 @@
+- name: Install certbot and plugin
+  ansible.builtin.apt:
+    pkg: ["nginx", "certbot", "python3-certbot-nginx"]
+    state: "present"
+  notify: Register letsencrypt account
+- name: Create systemd directory
+  ansible.builtin.file:
+    path: /etc/systemd/system/certbot.service.d/
+    state: directory
+    mode: '0644'
+    owner: root
+    group: root
+- name: Update systemctl job with nginx flag
+  ansible.builtin.copy:
+    src: files/certbot.service
+    dest: /etc/systemd/system/certbot.service.d/override.conf
+    mode: '0644'
+    owner: root
+    group: root
+  notify: Restart and Reload certbot
+- name: Flush handlers
+  meta: flush_handlers
+- name: Check if certificate is registered
+  ansible.builtin.shell: certbot certificates | grep 'No certificates found.'
+  ignore_errors: True
+  register: result
+  changed_when: result.rc == 0
+  failed_when: '"zsh: command not found: certbot" in result.stdout'
+  notify: 
+    - Register Certificate
+    - Restart NGINX
+- name: Flush handlers
+  meta: flush_handlers
+  
