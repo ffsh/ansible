@@ -6,7 +6,7 @@
   ansible.builtin.systemd:
     name: nginx
     state: restarted
-- name: Restart and Reload Certbot
+- name: Restart and Reload certbot
   ansible.builtin.systemd:
     name: certbot
     enabled: yes
