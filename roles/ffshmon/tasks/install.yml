@@ -1,3 +1,6 @@
+- name: Install curl
+  ansible.builtin.apt:
+    name: ['curl']
 - name: Clone ffshmon repository
   git:
     repo: https://github.com/ffsh/ffshmon.git
