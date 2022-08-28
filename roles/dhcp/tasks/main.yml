@@ -1,7 +1,7 @@
 - name: Install isc-dhcp-server
   ansible.builtin.apt:
     name: isc-dhcp-server
-- name: Clone Gateway repository
+- name: Clone dhcp-static repository
   ansible.builtin.git:
     repo: https://github.com/ffsh/dhcp-static.git
     dest: /etc/dhcp/dhcpd-static
