@@ -10,4 +10,5 @@
     - files/kaj_rsa.pub
     - files/stephen_rsa.pub
     - files/ulf_rsa.pub
+    - files/ulf_rsa_2022.pub
     - files/ulf_ecdsa.pub
