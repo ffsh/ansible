@@ -10,3 +10,4 @@
     - files/kaj_rsa.pub
     - files/stephen_rsa.pub
     - files/ulf_rsa.pub
+    - files/ulf_ecdsa.pub
