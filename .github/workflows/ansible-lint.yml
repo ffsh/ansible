@@ -16,4 +16,4 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Lint Ansible Playbook
-      uses: ansible/ansible-lint-action@c00ea1b2ac047eaf7318275ac83a0cb846cea71a
+      uses: ansible/ansible-lint-action@416c1f0c86d14e184947f9e1386f6ab41c10d86c
