@@ -22,24 +22,24 @@
   when: not ansible_check_mode
 
 - name: Build and install batman-adv
-  command: "dkms install -m batman-adv -v {{ batman_version }} && modprobe batman-adv"
-  #notify: restart batman
+  ansible.builtin.command: "dkms install -m batman-adv -v {{ batman_version }} && modprobe batman-adv"
+  # notify: restart batman
   changed_when: false
   when: not ansible_check_mode
 
 - name: Add batman-adv to modules
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/modules
     line: batman-adv
   when: not ansible_check_mode
 
 - name: Check if batctl is already installed
-  stat:
+  ansible.builtin.stat:
     path: "/usr/local/sbin/batctl"
   register: batctl
 
 - name: Check batctl version
-  shell: |
+  ansible.builtin.shell: |
     set -o pipefail
     batctl -v | awk '{print $2}'
   args:
@@ -51,7 +51,7 @@
 
 # no error
 - name: Set batctl_version to stdout
-  set_fact:
+  ansible.builtin.set_fact:
     batctl_version: "{{ batctl_version.stdout }}"
   when: batctl.stat.exists
 
@@ -71,7 +71,7 @@
   when: batctl_version != batman_version and not ansible_check_mode
 
 - name: build and install batctl
-  shell: |
+  ansible.builtin.shell: |
     make
     make install
   args:
