@@ -9,7 +9,7 @@
     owner: root
     group: root
 - name: Start and enable wireguard service
-  systemd:
-    enabled: yes
+  ansible.builtin.systemd:
+    enabled: true
     name: wg-quick@exit
     state: started

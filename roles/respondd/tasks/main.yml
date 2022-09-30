@@ -2,7 +2,7 @@
   ansible.builtin.git:
     repo: https://github.com/ffggrz/ext-respondd.git
     dest: /opt/ext-respondd/
-    force: yes
+    force: true
     version: master
 - name: Copy systemd job
   ansible.builtin.copy:
@@ -29,8 +29,8 @@
   ansible.builtin.apt:
     name: ['python3-netifaces', 'ethtool']
 - name: Systemd set up respondd
-  systemd:
-    enabled: yes
-    daemon_reload: yes
+  ansible.builtin.systemd:
+    enabled: true
+    daemon_reload: true
     state: restarted
     name: respondd

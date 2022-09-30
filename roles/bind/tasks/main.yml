@@ -2,14 +2,14 @@
   ansible.builtin.apt:
     name: bind9
 - name: Adjust configuration options
-  template:
+  ansible.builtin.template:
     src: templates/named.conf.options
     dest: /etc/bind/named.conf.options
     mode: '0640'
     owner: root
     group: bind
 - name: Add local zones
-  copy:
+  ansible.builtin.copy:
     src: files/named.conf.local
     dest: /etc/bind/named.conf.local
     mode: '0640'
@@ -19,18 +19,18 @@
   ansible.builtin.apt:
     name: git
 - name: Clone bind respository
-  git:
+  ansible.builtin.git:
     repo: https://github.com/ffsh/bind.git
     dest: /etc/bind/zones
-    force: yes
+    force: true
     version: zones
 - name: Restart bind
-  systemd:
-    enabled: yes
+  ansible.builtin.systemd:
+    enabled: true
     state: restarted
     name: bind9
 - name: Update the bind dns zones via cron
-  cron:
+  ansible.builtin.cron:
     name: "Update dns zones"
     minute: "*/15"
     job: "cd /etc/bind/zones && git pull -qpf && systemctl reload bind9"

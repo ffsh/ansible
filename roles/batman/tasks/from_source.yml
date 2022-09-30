@@ -6,12 +6,13 @@
   ansible.builtin.get_url:
     url: "https://downloads.open-mesh.org/batman/releases/batman-adv-{{ batman_version }}/batman-adv-{{ batman_version }}.tar.gz"
     dest: /opt/batman-adv-{{ batman_version }}.tar.gz
+    mode: '0644'
 
 - name: Unpack batman-adv
   ansible.builtin.unarchive:
     src: /opt/batman-adv-{{ batman_version }}.tar.gz
     dest: /usr/src
-    remote_src: True
+    remote_src: true
   when: not ansible_check_mode
 
 - name: Configure DKMS
@@ -47,7 +48,7 @@
   when: batctl.stat.exists
   changed_when: false
   register: batctl_version
-  check_mode: no
+  check_mode: false
 
 # no error
 - name: Set batctl_version to stdout
@@ -59,6 +60,7 @@
   ansible.builtin.get_url:
     url: "https://downloads.open-mesh.org/batman/releases/batman-adv-{{ batman_version }}/batctl-{{ batman_version }}.tar.gz"
     dest: /opt/batctl-{{ batman_version }}.tar.gz
+    mode: '0644'
   when: batctl_version != batman_version and not ansible_check_mode
 
 # TODO what about the old version
@@ -67,10 +69,10 @@
   ansible.builtin.unarchive:
     src: /opt/batctl-{{ batman_version }}.tar.gz
     dest: /opt
-    remote_src: True
+    remote_src: true
   when: batctl_version != batman_version and not ansible_check_mode
 
-- name: build and install batctl
+- name: Build and install batctl
   ansible.builtin.shell: |
     make
     make install

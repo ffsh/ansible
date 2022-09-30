@@ -3,9 +3,9 @@
     users:
       - username: root
   pre_tasks:
-  - name: Update apt cache
-    ansible.builtin.apt:
-      update_cache: yes
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
   roles:
     - { role: network, tags: "network"}
     - { role: wireguardexit, tags: "wireguard, exit"}

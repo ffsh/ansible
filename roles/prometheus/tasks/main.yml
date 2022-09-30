@@ -1,5 +1,5 @@
 - name: Create node_exporter service
-  copy:
+  ansible.builtin.copy:
     src: files/node_exporter.service
     dest: /etc/systemd/system
     mode: '0600'
@@ -7,39 +7,43 @@
     group: root
 
 - name: Add prometheus system user for node_exporter
-  user:
+  ansible.builtin.user:
     name: prometheus
-    system: yes
-    create_home: no
+    system: true
+    create_home: false
 
 - name: Download node_exporter
   ansible.builtin.get_url:
-    url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz"
+    url: >
+      https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz
     dest: /opt/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz
+    mode: '0644'
+    owner: root
+    group: root
 
 - name: Unpack node_exporter
   ansible.builtin.unarchive:
     src: /opt/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz
     dest: /opt
-    remote_src: True
+    remote_src: true
     mode: '0644'
     owner: root
     group: root
   when: not ansible_check_mode
 
 - name: Stop node_exporter service
-  systemd:
-    daemon-reload: yes
-    enabled: yes
+  ansible.builtin.systemd:
+    daemon-reload: true
+    enabled: true
     name: node_exporter
     state: stopped
 
-- name: Move node_exporter-{{ node_exporter_version }}.linux-amd64
-  copy:
-    remote_src: True
+- name: Move node exporter to target directory
+  ansible.builtin.copy:
+    remote_src: true
     src: /opt/node_exporter-{{ node_exporter_version }}.linux-amd64/
     dest: /opt/node_exporter/
-    force: yes
+    force: true
     mode: '0744'
     owner: prometheus
     group: prometheus
@@ -53,8 +57,8 @@
     state: file
 
 - name: Start node_exporter service
-  systemd:
-    daemon-reload: yes
-    enabled: yes
+  ansible.builtin.systemd:
+    daemon-reload: true
+    enabled: true
     name: node_exporter
     state: restarted

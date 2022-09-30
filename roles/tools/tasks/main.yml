@@ -1,8 +1,8 @@
 - name: Install admin tools
   ansible.builtin.apt:
     name: ["netcat-openbsd", "jq", "htop", "rsync"]
-- name: copy README.md
-  copy:
+- name: Copy README.md
+  ansible.builtin.copy:
     src: files/README.md
     dest: /root/README.md
     mode: '0640'

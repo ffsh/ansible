@@ -2,7 +2,7 @@
   ansible.builtin.apt:
     name: ['bridge-utils', 'ntp', 'net-tools', 'iptables', 'bmon']
 - name: Enable IP forwarding
-  copy:
+  ansible.builtin.copy:
     src: templates/forwarding.conf
     dest: /etc/sysctl.d/forwarding.conf
     mode: '0644'

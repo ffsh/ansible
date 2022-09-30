@@ -43,12 +43,15 @@
   ansible.builtin.get_url:
     url: "https://github.com/twbs/bootstrap/releases/download/v{{ bootstrap_version }}/bootstrap-{{ bootstrap_version }}-dist.zip"
     dest: /var/www/gw-status/bootstrap-{{ bootstrap_version }}-dist.zip
+    mode: '0644'
+    owner: root
+    group: root
 
 - name: Unpack bootstrap
   ansible.builtin.unarchive:
     src: /var/www/gw-status/bootstrap-{{ bootstrap_version }}-dist.zip
     dest: /var/www/gw-status/
-    remote_src: True
+    remote_src: true
     mode: '0744'
     owner: www-data
     group: www-data
@@ -58,7 +61,7 @@
     dest: /var/www/gw-status/bootstrap-{{ bootstrap_version }}-dist.zip
     state: absent
 
-- name: copy info page
+- name: Copy info page
   ansible.builtin.template:
     src: templates/index.html
     dest: /var/www/gw-status/index.html
@@ -66,7 +69,7 @@
     owner: www-data
     group: www-data
 
-- name: copy css
+- name: Copy css
   ansible.builtin.copy:
     src: files/cover.css
     dest: /var/www/gw-status/cover.css
@@ -75,6 +78,6 @@
     group: www-data
 
 - name: Restart nginx service
-  systemd:
+  ansible.builtin.systemd:
     name: nginx
     state: restarted

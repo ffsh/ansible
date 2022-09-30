@@ -9,7 +9,7 @@
     group: root
     mode: '0644'
 - name: Restart radvd
-  systemd:
-    enabled: yes
+  ansible.builtin.systemd:
+    enabled: true
     state: restarted
     name: radvd

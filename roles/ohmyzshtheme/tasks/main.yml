@@ -1,5 +1,5 @@
-- name: create theme
-  copy:
+- name: Create theme
+  ansible.builtin.copy:
     src: files/ffsh.zsh-theme
     dest: /root/.oh-my-zsh/custom/themes/ffsh.zsh-theme
     mode: '0644'

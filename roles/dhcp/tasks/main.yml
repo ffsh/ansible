@@ -5,10 +5,10 @@
   ansible.builtin.git:
     repo: https://github.com/ffsh/dhcp-static.git
     dest: /etc/dhcp/dhcpd-static
-    force: yes
+    force: true
     version: master
 - name: Update the dhcp static file via cron
-  cron:
+  ansible.builtin.cron:
     name: "Update dhcp static"
     minute: "*/15"
     job: "cd /etc/dhcp/dhcpd-static && git pull -qpf"
@@ -20,27 +20,27 @@
     owner: root
     group: root
 - name: Change interface
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/default/isc-dhcp-server
     regexp: 'INTERFACESv4=""'
     line: INTERFACESv4="bat0"
 - name: Create systemd directory
-  file:
+  ansible.builtin.file:
     path: /etc/systemd/system/isc-dhcp-server.service.d/
     state: directory
     mode: '0644'
     owner: root
     group: root
 - name: Change dhcp service
-  copy:
+  ansible.builtin.copy:
     src: files/isc-dhcp-server.service
     dest: /etc/systemd/system/isc-dhcp-server.service.d/override.conf
     mode: '0644'
     owner: root
     group: root
 - name: Enable and restart service
-  systemd:
-      enabled: yes
-      daemon_reload: yes
-      state: restarted
-      name: isc-dhcp-server
+  ansible.builtin.systemd:
+    enabled: true
+    daemon_reload: true
+    state: restarted
+    name: isc-dhcp-server

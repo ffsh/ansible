@@ -1,3 +1,6 @@
 skip_list:
   - '306'
   - '204'
+exclude_paths:
+  - roles/ohmyzsh/
+  - .github/workflows/

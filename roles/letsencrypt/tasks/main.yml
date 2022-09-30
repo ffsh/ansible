@@ -19,16 +19,15 @@
     group: root
   notify: Restart and Reload certbot
 - name: Flush handlers
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers
 - name: Check if certificate is registered
   ansible.builtin.shell: certbot certificates | grep 'No certificates found.'
-  ignore_errors: True
+  ignore_errors: true
   register: result
   changed_when: result.rc == 0
   failed_when: '"zsh: command not found: certbot" in result.stdout'
-  notify: 
+  notify:
     - Register Certificate
     - Restart NGINX
 - name: Flush handlers
-  meta: flush_handlers
-  
+  ansible.builtin.meta: flush_handlers
