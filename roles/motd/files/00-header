@@ -1,3 +1,8 @@
 #!/bin/bash
 
 /usr/bin/neofetch --config "/root/.config/neofetch/config.conf"
+
+
+if [ -f /var/run/reboot-required ]; then
+  printf '*** System reboot required ***\n\n'
+fi
