@@ -1,6 +1,6 @@
 - name: Install admin tools
   ansible.builtin.apt:
-    name: ["netcat-openbsd", "jq", "htop", "rsync"]
+    name: ["netcat-openbsd", "jq", "htop", "rsync", "unattended-upgrades", "apt-listchanges"]
 - name: Copy README.md
   ansible.builtin.copy:
     src: files/README.md
