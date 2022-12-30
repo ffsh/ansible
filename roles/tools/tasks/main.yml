@@ -5,6 +5,8 @@
   ansible.builtin.shell: |
     echo unattended-upgrades unattended-upgrades/enable_auto_updates boolean true | debconf-set-selections
     dpkg-reconfigure -f noninteractive unattended-upgrades
+  register: my_output
+  changed_when: my_output.rc == 0
 - name: Copy README.md
   ansible.builtin.copy:
     src: files/README.md
