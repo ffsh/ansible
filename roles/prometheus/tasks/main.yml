@@ -31,6 +31,11 @@
     group: root
   when: not ansible_check_mode
 
+- name: Delete node_exporter archive
+  ansible.builtin.file:
+    path: /opt/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz
+    state: absent
+
 - name: Stop node_exporter service
   ansible.builtin.systemd:
     daemon-reload: true
@@ -47,6 +52,11 @@
     mode: '0744'
     owner: prometheus
     group: prometheus
+
+- name: Delete node_exporter directory
+  ansible.builtin.file:
+    path: /opt/node_exporter-{{ node_exporter_version }}.linux-amd64/
+    state: absent
 
 - name: Adjust node_exporter permissions
   ansible.builtin.file:

@@ -15,6 +15,11 @@
     remote_src: true
   when: not ansible_check_mode
 
+- name: Delete batman-adv archive
+  ansible.builtin.file:
+    path: /opt/batman-adv-{{ batman_version }}.tar.gz
+    state: absent
+
 - name: Configure DKMS
   ansible.builtin.template:
     src: dkms.conf
@@ -72,6 +77,11 @@
     remote_src: true
   when: batctl_version != batman_version and not ansible_check_mode
 
+- name: Delete batctl archive
+  ansible.builtin.file:
+    path: /opt/batctl-{{ batman_version }}.tar.gz
+    state: absent
+
 - name: Build and install batctl
   ansible.builtin.shell: |
     make
@@ -79,3 +89,8 @@
   args:
     chdir: /opt/batctl-{{ batman_version }}
   when: batctl_version != batman_version and not ansible_check_mode
+
+- name: Delete batctl direcotry
+  ansible.builtin.file:
+    path: /opt/batctl-{{ batman_version }}
+    state: absent
