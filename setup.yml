@@ -11,7 +11,7 @@
     - { role: wireguardexit, tags: "wireguard, exit"}
     - { role: hostname, tags: "hostname"}
     - { role: fail2ban, tags: "fail2ban"}
-    - { role: batman, tags: "batman-adv", batman_version: "2022.3"}
+    - { role: batman, tags: "batman-adv", batman_version: "2023.0"}
     - { role: fastd, tags: "fastd", fastd_target: "fastd 21"}
     - { role: radvd, tags: "radvd"}
     - { role: dhcp, tags: "isc-dhcp4-server"}
@@ -20,7 +20,7 @@
     - { role: prometheus, tags: "node_exporter", node_exporter_version: "1.5.0"}
     - { role: letsencrypt, tags: "letsencrypt"}
     - { role: nginx, tags: "node_exporter, nginx", bootstrap_version: "5.3.0-alpha1"}
-    - { role: tools, tags: "admin-tools", batman_version: "2022.3"}
+    - { role: tools, tags: "admin-tools", batman_version: "2023.0"}
     - { role: motd, tags: "motd"}
     - { role: ohmyzsh, tags: "oh-my-zsh", oh_my_zsh_theme: ffsh}
     - { role: ohmyzshtheme, tags: "oh-my-zsh-theme"}
