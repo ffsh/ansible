@@ -1,4 +1,5 @@
-- hosts: all
+- name: Deploy Gateway
+  hosts: all
   vars:
     users:
       - username: root
