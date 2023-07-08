@@ -1,10 +1,7 @@
-- name: Update apt cache
-  ansible.builtin.apt:
-    update_cache: true
 - name: Install fastd
-  ansible.builtin.command: apt install -t fastd -y
-  register: result
-  changed_when: '"1 upgraded" in result.stdout'
+  ansible.builtin.apt:
+    name: ['fastd']
+    update_cache: true
 - name: Add ffsh system user
   ansible.builtin.user:
     name: ffsh
