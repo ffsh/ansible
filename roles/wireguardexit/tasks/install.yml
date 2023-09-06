@@ -1,6 +1,6 @@
-- name: Install wireguard and resolvconf
+- name: Install wireguard and other software
   ansible.builtin.apt:
-    name: ["wireguard", "resolvconf"]
+    name: ["wireguard", "resolvconf", "git"]
 - name: Setup wireguard config
   ansible.builtin.template:
     src: templates/exit.conf
