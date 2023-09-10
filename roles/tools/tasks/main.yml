@@ -1,6 +1,6 @@
 - name: Install admin tools
   ansible.builtin.apt:
-    name: ["netcat-openbsd", "jq", "htop", "rsync", "unattended-upgrades", "apt-listchanges"]
+    name: ["netcat-openbsd", "jq", "htop", "rsync", "unattended-upgrades", "apt-listchanges", "iperf3", "pipx"]
 - name: Activate unattended-upgrades
   ansible.builtin.shell: |
     echo unattended-upgrades unattended-upgrades/enable_auto_updates boolean true | debconf-set-selections
