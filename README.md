@@ -27,6 +27,16 @@ ansible-vault create --vault-id fastd_key@prompt host_vars/$gatewayname.yml
 Enter
 ```
 fastd_secret: $yourkey
+# If you want to use a wireguard exit
+wireguard_interface: |-
+  [Interface]
+  ...
+wireguard_peer: |
+  [Peer]
+  ...
+ffshmon_mail: wg-mon@freifunk-suedholstein.de
+# Check KeePass
+ffshmon_pw: ...
 ```
 save and close the editor, done you added your secret :)
 
