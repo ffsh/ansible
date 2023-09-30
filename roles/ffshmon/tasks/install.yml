@@ -1,6 +1,11 @@
 - name: Install curl
   ansible.builtin.apt:
     name: ['curl']
+- name: Create log directory
+  ansible.builtin.file:
+    path: /var/log/ffshmon
+    state: directory
+    mode: '0755'
 - name: Clone ffshmon repository
   ansible.builtin.git:
     repo: https://github.com/ffsh/ffshmon.git
