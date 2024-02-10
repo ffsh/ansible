@@ -34,8 +34,10 @@ if not installed_modules:
 batman_modules = set()
 
 for module in installed_modules:
+    # for each found module check if it's a batman module and what version
     match = pattern.match(module)
     if match:
+        # Add the found module to the set as touple (module_name, module_version) match[0] would be the whole result
         batman_modules.add((match[1], match[2]))
 
 for module in batman_modules:
@@ -43,8 +45,10 @@ for module in batman_modules:
         module_version = module[1]
         try:
             if module_version != desired_version:
+                # remove module from dkms, this deltes that version from the dkms tree including (--all) all version for the different kernels
                 subprocess.call(["dkms", "remove", module_name, "-v", module_version, "--all"])
                 print(f"Uninstalled batman_adv version {module_version}")
+                # Delete the directory were ansible installs batman-adv
                 batman_folder = f"/usr/src/{module_name}-{module_version}"
                 delete_directory(batman_folder)
         except subprocess.CalledProcessError:
