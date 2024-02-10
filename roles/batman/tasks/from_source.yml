@@ -94,3 +94,8 @@
   ansible.builtin.file:
     path: /opt/batctl-{{ batman_version }}
     state: absent
+
+- name: Remove old batman-adv versions
+  ansible.builtin.script: files/cleanup.py {{ batman_version }}
+  args:
+    executable: python3

@@ -1,6 +1,6 @@
 - name: Set up public ssh keys for root
   ansible.posix.authorized_key:
-    user: '{{ login_user }}'
+    user: "{{ users[0]['username'] }}"
     state: present
     key: '{{ item }}'
   with_file:
