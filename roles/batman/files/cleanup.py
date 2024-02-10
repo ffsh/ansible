@@ -3,6 +3,14 @@
 import subprocess
 import sys
 import re
+import shutil
+
+def delete_directory(directory):
+    try:
+        shutil.rmtree(directory)
+        print("Directory deleted successfully!")
+    except OSError as error:
+        print("Error deleting directory:", error)
 
 # Retrieve the desired version from command line input
 desired_version = sys.argv[1]
@@ -33,6 +41,8 @@ for module in installed_modules:
             if module_version != desired_version:
                 subprocess.call(["dkms", "remove", module_name, "-v", module_version])
                 print(f"Uninstalled batman_adv version {module_version}")
+                batman_folder = f"/usr/src/{module_name}-{module_version}"
+                delete_directory(batman_folder)
         except subprocess.CalledProcessError:
             print(f"Error: Module '{module_name}' might not exist or is unavailable for removal.")
 
