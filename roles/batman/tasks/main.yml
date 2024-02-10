@@ -2,10 +2,9 @@
   ansible.builtin.apt:
     name: dkms
 - name: Check for currently installed batman-adv
-  ansible.builtin.shell: |
-    dkms status batman-adv | egrep 'batman-adv, ([0-9]+\.[0-9]+(\.[0-9]+)?), .*: installed' | cut -d, -f2 | awk '{$1=$1};1'
+  ansible.builtin.script: files/get_batman_version.py
   args:
-    executable: bash
+    executable: python3
   register: installed_batman_version
   when: batman_version is defined
   changed_when: false
