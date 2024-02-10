@@ -30,16 +30,20 @@ if not installed_modules:
     print("No installed DKMS modules found.")
     sys.exit(0)
 
-# Iterate through the installed modules and remove those that don't match the desired version
+# Iterate through modules add them to set, each module might be installed for multiple kernels, we only need it once
+batman_modules = set()
+
 for module in installed_modules:
     match = pattern.match(module)
     if match:
-        # Extract module name and version
-        module_name = match[1]
-        module_version = match[2]
+        batman_modules.add((match[1], match[2]))
+
+for module in batman_modules:
+        module_name = module[0]
+        module_version = module[1]
         try:
             if module_version != desired_version:
-                subprocess.call(["dkms", "remove", module_name, "-v", module_version])
+                subprocess.call(["dkms", "remove", module_name, "-v", module_version, "--all"])
                 print(f"Uninstalled batman_adv version {module_version}")
                 batman_folder = f"/usr/src/{module_name}-{module_version}"
                 delete_directory(batman_folder)
