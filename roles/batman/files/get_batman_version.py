@@ -13,5 +13,8 @@ dkms = subprocess.check_output(["dkms", "status", "batman-adv"]).decode("utf-8")
 # use regex to find installed version
 result = pattern.match(dkms)
 
-# print only the version, without newline otherwise ansible will store the newline
-print(result[2], end="")
+if result:
+    # print only the version, without newline otherwise ansible will store the newline
+    print(result[2], end="")
+else:
+    print("not_installed", end="")
