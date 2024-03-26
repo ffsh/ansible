@@ -104,3 +104,4 @@
   ansible.builtin.file:
     path: /var/run/reboot-required
     state: touch
+    mode: '0644'

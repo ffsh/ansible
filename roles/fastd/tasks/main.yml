@@ -1,7 +1,6 @@
 - name: Install fastd
   ansible.builtin.apt:
     name: ['fastd']
-    update_cache: true
 - name: Add ffsh system user
   ansible.builtin.user:
     name: ffsh

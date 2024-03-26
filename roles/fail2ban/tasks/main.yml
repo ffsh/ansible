@@ -1,7 +1,6 @@
 - name: Install fail2ban and rsyslog as dep
   ansible.builtin.apt:
     name: ['rsyslog', 'fail2ban']
-    update_cache: true
 - name: Copy fail2ban config
   ansible.builtin.copy:
     src: files/jail.local
