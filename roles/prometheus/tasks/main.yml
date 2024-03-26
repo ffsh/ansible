@@ -12,67 +12,17 @@
     system: true
     create_home: false
 
-- name: Detected Architecture
+- name: Check for currently installed node_exporter
+  ansible.builtin.script: files/get_node_exporter_version.py
+  args:
+    executable: python3
+  register: installed_node_exporter_version
+
+- name: Print node_exporter version and target
   ansible.builtin.debug:
-    var: go_arch
+    msg: "Currently installed node_exporter: {{ installed_node_exporter_version.stdout }} ,target is: {{ node_exporter_version }}"
 
-- name: Download node_exporter
-  ansible.builtin.get_url:
-    url: >
-      https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}.tar.gz
-    dest: /opt/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}.tar.gz
-    mode: '0644'
-    owner: root
-    group: root
+- name: Check if node_exporter-adv needs to be installed or upgraded
+  ansible.builtin.include_tasks: download.yml
+  when: installed_node_exporter_version.stdout != node_exporter_version
 
-- name: Unpack node_exporter
-  ansible.builtin.unarchive:
-    src: /opt/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}.tar.gz
-    dest: /opt
-    remote_src: true
-    mode: '0644'
-    owner: root
-    group: root
-  when: not ansible_check_mode
-
-- name: Delete node_exporter archive
-  ansible.builtin.file:
-    path: /opt/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}.tar.gz
-    state: absent
-
-- name: Stop node_exporter service
-  ansible.builtin.systemd:
-    daemon-reload: true
-    enabled: true
-    name: node_exporter
-    state: stopped
-
-- name: Move node exporter to target directory
-  ansible.builtin.copy:
-    remote_src: true
-    src: /opt/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}/
-    dest: /opt/node_exporter/
-    force: true
-    mode: '0744'
-    owner: prometheus
-    group: prometheus
-
-- name: Delete node_exporter directory
-  ansible.builtin.file:
-    path: /opt/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}/
-    state: absent
-
-- name: Adjust node_exporter permissions
-  ansible.builtin.file:
-    path: /opt/node_exporter/node_exporter
-    owner: prometheus
-    group: prometheus
-    mode: '0744'
-    state: file
-
-- name: Start node_exporter service
-  ansible.builtin.systemd:
-    daemon-reload: true
-    enabled: true
-    name: node_exporter
-    state: restarted

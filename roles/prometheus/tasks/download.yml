@@ -1,0 +1,64 @@
+- name: Detected Architecture
+  ansible.builtin.debug:
+    var: go_arch
+
+- name: Download node_exporter
+  ansible.builtin.get_url:
+    url: >
+      https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}.tar.gz
+    dest: /opt/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}.tar.gz
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Unpack node_exporter
+  ansible.builtin.unarchive:
+    src: /opt/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}.tar.gz
+    dest: /opt
+    remote_src: true
+    mode: '0644'
+    owner: root
+    group: root
+  when: not ansible_check_mode
+
+- name: Delete node_exporter archive
+  ansible.builtin.file:
+    path: /opt/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}.tar.gz
+    state: absent
+
+- name: Stop node_exporter service
+  ansible.builtin.systemd:
+    daemon-reload: true
+    enabled: true
+    name: node_exporter
+    state: stopped
+
+- name: Move node exporter to target directory
+  ansible.builtin.copy:
+    remote_src: true
+    src: /opt/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}/
+    dest: /opt/node_exporter/
+    force: true
+    mode: '0744'
+    owner: prometheus
+    group: prometheus
+
+- name: Delete node_exporter directory
+  ansible.builtin.file:
+    path: /opt/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}/
+    state: absent
+
+- name: Adjust node_exporter permissions
+  ansible.builtin.file:
+    path: /opt/node_exporter/node_exporter
+    owner: prometheus
+    group: prometheus
+    mode: '0744'
+    state: file
+
+- name: Start node_exporter service
+  ansible.builtin.systemd:
+    daemon-reload: true
+    enabled: true
+    name: node_exporter
+    state: restarted

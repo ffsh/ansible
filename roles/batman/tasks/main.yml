@@ -1,6 +1,7 @@
 - name: Install basic packages
   ansible.builtin.apt:
     name: dkms
+
 - name: Check for currently installed batman-adv
   ansible.builtin.script: files/get_batman_version.py
   args:
