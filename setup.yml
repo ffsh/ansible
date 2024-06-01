@@ -3,8 +3,8 @@
   vars:
     users:
       - username: root
-    batman_version: "2024.0"
-    node_exporter_version: "1.7.0"
+    batman_version: "2024.1"
+    node_exporter_version: "1.8.1"
     bootstrap_version: "5.3.3"
   pre_tasks:
     - name: Update apt cache
