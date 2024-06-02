@@ -8,7 +8,12 @@ import re
 pattern = re.compile(r"node_exporter, version (\d\.\d\.\d)")
 
 # check current node_exporter
-node_exporter = subprocess.check_output(["/opt/node_exporter/node_exporter", "--version"]).decode("utf-8")
+try:
+    node_exporter = subprocess.check_output(["/opt/node_exporter/node_exporter", "--version"]).decode("utf-8")
+except FileNotFoundError:
+    print("Node Exporter not installed")
+    node_exporter = ""
+
 
 # use regex to find installed version
 result = pattern.match(node_exporter)
