@@ -2,13 +2,11 @@
 [![Ansible Lint](https://github.com/ffsh/ansible/actions/workflows/ansible-lint.yml/badge.svg?branch=main)](https://github.com/ffsh/ansible/actions/workflows/ansible-lint.yml)
 
 This repository holds the Ansible playbook to deploy a ffsh gateway in the standard configuration.
-It is based on https://docs.freifunk-suedholstein.de/de/latest/gateway.html but changes were made where it was plausible.
+It is based on https://docs.freifunk-suedholstein.de/de/1.5/gateway.html but changes were made where it was plausible.
 
 ## requirements
-Clone the repository and update the submodules
-```
-git submodule update --init
-```
+- Clone the repository.
+- Ansible [installed](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#selecting-an-ansible-package-and-version-to-install)
 
 ## ssh-key
 As the login is done via ssh make sure that the ssh key is registered at your identity manager `ssh-add $keyfile`.
