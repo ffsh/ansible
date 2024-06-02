@@ -58,8 +58,14 @@ Run playbook on one host
 ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit $hostname
 ```
 
-Run only the roles with the specific tag:
+Run only the roles with the specific tag, to see which role is attached to which tag open `setup.yaml`:
 
 ```
 ansible-playbook --vault-id=fastd_key@prompt setup.yml --tags "ssh keys"
+```
+
+These can also be combined:
+
+```
+ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit $hostname --tags "oh-my-zsh"
 ```
