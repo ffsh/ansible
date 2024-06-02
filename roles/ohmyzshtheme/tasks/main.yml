@@ -1,7 +1,12 @@
 - name: Create theme
   ansible.builtin.copy:
     src: files/ffsh.zsh-theme
-    dest: /root/.oh-my-zsh/custom/themes/ffsh.zsh-theme
+    dest: /{{ users[0]['username'] }}/.oh-my-zsh/custom/themes/ffsh.zsh-theme
     mode: '0644'
     owner: root
     group: root
+- name: Activate theme
+  ansible.builtin.replace:
+    path: /{{ users[0]['username'] }}/.zshrc
+    regexp: ZSH_THEME="robbyrussell"
+    replace: ZSH_THEME="ffsh"

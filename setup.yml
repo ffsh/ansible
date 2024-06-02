@@ -26,7 +26,7 @@
     - { role: nginx, tags: "node_exporter, nginx", }
     - { role: tools, tags: "admin-tools"}
     - { role: motd, tags: "motd"}
-    - { role: ohmyzsh, tags: "oh-my-zsh", oh_my_zsh_theme: ffsh}
-    - { role: ohmyzshtheme, tags: "oh-my-zsh-theme"}
+    - { role: ohmyzsh, tags: "oh-my-zsh"}
+    - { role: ohmyzshtheme, tags: "oh-my-zsh"}
     - { role: ssh, tags: "ssh keys"}
     - { role: ffshmon, tags: "wireguard, ffshmon"}

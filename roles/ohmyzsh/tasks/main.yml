@@ -1,0 +1,23 @@
+- name: Install zsh
+  ansible.builtin.apt:
+    name: ['zsh']
+
+- name: Check if oh-my-zsh is already installed
+  ansible.builtin.stat:
+    path: "/{{ users[0]['username'] }}/.oh-my-zsh"
+  register: directory_info
+
+- name: Set variable if directory exists
+  set_fact:
+    directory_exists: "{{ directory_info.stat.exists }}"
+
+- name: Install oh-my-zsh
+  ansible.builtin.script: files/install.sh --unattended
+  args:
+    executable: sh
+  when: directory_exists != true
+
+- name: Print oh-my-zsh status
+  ansible.builtin.debug:
+    msg: "oh-my-zsh is already installed, if you want to re-install 'rm -rf ~/.oh-my-zsh'"
+  when: directory_exists == true
