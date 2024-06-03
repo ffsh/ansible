@@ -1,15 +1,19 @@
 - name: Install wireguard and other software
   ansible.builtin.apt:
-    name: ["wireguard", "resolvconf", "git"]
-- name: Setup wireguard config
-  ansible.builtin.template:
-    src: templates/exit.conf
-    dest: /etc/wireguard/exit.conf
-    mode: '0600'
-    owner: root
-    group: root
-- name: Start and enable wireguard service
+    name: ["wireguard", "resolvconf", "git", "python3-click"]
+
+- name: Clone wg-conf-gen repository
+  ansible.builtin.git:
+    repo: https://github.com/ffsh/wg-conf-gen.git
+    dest: /opt/wg-conf-gen
+    force: true
+    version: main
+
+- name: Run inital config generation
+  ansible.builtin.command: python3 /opt/wg-conf-gen/wg-conf-gen.py --pk {{ wg_pk }} --address {{ wg_address }} --country {{ wg_country }} --city {{ wg_city }} --device "{{ wg_device }}"
+
+- name: Re-start and enable wireguard service
   ansible.builtin.systemd:
     enabled: true
     name: wg-quick@exit
-    state: started
+    state: restarted
