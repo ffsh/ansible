@@ -13,13 +13,22 @@ As the login is done via ssh make sure that the ssh key is registered at your id
 That way Ansible will be able to automatically detect the right ssh key and connect to the server.
 
 ## hosts
-If you want to deploy to a new gateway you need to add it to the `hosts` file in the repo, just compare it to brunsbach and add your own details.
+If you want to deploy to a new gateway you need to add it to the `hosts.yml` file in the repo, just compare it to brunsbach and add your own details.
+
+If you set enable_wireguard_exit to true ansible will deploy wireguard and attempt to generate a mullvad config.
+
+## Mullvad
+This ansible script uses [wg-conf-gen](https://github.com/ffsh/wg-conf-gen) to generate a Mullvad wireguard configurration.
+
+The python script will call the Mullvad API with the details you provide in host_vars (see below).
+
+It will select a random gateway based on country and city.
 
 ### host_vars/$gatewayname.yml
 You also need to supply your fastd secret as an encrypted secret, you get the password via the NOC Team.
 
 To create a new fastd secret, execute the following, this will ask you for a password and open an editor.
-```
+```bash
 ansible-vault create --vault-id fastd_key@prompt host_vars/$gatewayname.yml
 ```
 
@@ -40,7 +49,7 @@ For available country and city check here: https://mullvad.net/de/servers
 
 Example config:
 
-```
+```yaml
 fastd_secret: 1234df132fssd...
 wg_device: Mellow Pony
 wg_pk: aDfkfdsgnn1232345...
@@ -53,30 +62,30 @@ ffshmon_pw: secretpassword
 save and close the editor, done you added your secret :)
 
 You can change the content any time by
-```
+```bash
 ansible-vault edit --vault-id fastd_key@prompt host_vars/$gatewayname.yml
 ```
 ## Usage
 
 Run playbook on all gateways listed in `hosts`:
 
-```
+```bash
 ansible-playbook --vault-id=fastd_key@prompt setup.yml
 ```
 
 Run playbook on one host
-```
+```bash
 ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit $hostname
 ```
 
 Run only the roles with the specific tag, to see which role is attached to which tag open `setup.yaml`:
 
-```
+```bash
 ansible-playbook --vault-id=fastd_key@prompt setup.yml --tags "ssh keys"
 ```
 
 These can also be combined:
 
-```
+```bash
 ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit $hostname --tags "oh-my-zsh"
 ```
