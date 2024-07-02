@@ -2,6 +2,42 @@
 ## This Freifunk gateway was configured via Ansible
 ##
 
+# Check Batman Status
+
+batctl -v
+
+## Fix broken batman-adv module
+
+Execute "fix-batman.sh" in /root.
+
+# Fastd
+
+## Stop fastd service to prevent clients from connecting
+
+systemctl stop fastd@ffsh.service
+
+## start
+
+systemctl stop fastd@ffsh.service
+
+# Wireguard
+
+Check status with command: wg
+
+Check connection via interface with curl
+
+curl --interface exit https://www.google.com
+
+If you get lot's of js, html and css it worked.
+
+## stop
+
+systemctl stop wg-quick@exit.service
+
+## start
+
+systemctl startp wg-quick@exit.service
+
 # Fastd status via nc & jq
 
 Search for a key, part of the key is enough:
