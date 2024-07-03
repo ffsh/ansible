@@ -30,6 +30,10 @@ curl --interface exit https://www.google.com
 
 If you get lot's of js, html and css it worked.
 
+## Regenerate config
+
+wg-conf-gen recreate
+
 ## stop
 
 systemctl stop wg-quick@exit.service
