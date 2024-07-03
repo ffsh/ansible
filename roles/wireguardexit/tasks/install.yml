@@ -10,7 +10,7 @@
     version: main
 
 - name: Run inital config generation
-  ansible.builtin.command: python3 /opt/wg-conf-gen/wg-conf-gen.py --pk {{ wg_pk }} --address {{ wg_address }} --country {{ wg_country }} --city {{ wg_city }} --device "{{ wg_device| default('Unkown') }}"
+  ansible.builtin.command: python3 /opt/wg-conf-gen/wg-conf-gen.py create --pk {{ wg_pk }} --address {{ wg_address }} --country {{ wg_country }} --city {{ wg_city }} --device "{{ wg_device| default('Unkown') }}"
 
 - name: Re-start and enable wireguard service
   ansible.builtin.systemd:
