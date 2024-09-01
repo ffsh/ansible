@@ -16,4 +16,4 @@
   ansible.builtin.cron:
     name: "Execute ffshmon"
     minute: "*/30"
-    job: "python3 /opt/ffshmon/wireguard.py --user {{ ffshmon_mail }} --password {{ ffshmon_pw }} --log /var/log/ffshmon/ffshmon.log"
+    job: "python3 /opt/ffshmon/wireguard.py check --user {{ ffshmon_mail }} --password {{ ffshmon_pw }} --log /var/log/ffshmon/ffshmon.log"
