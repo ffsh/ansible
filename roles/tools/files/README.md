@@ -26,9 +26,7 @@ Check status with command: wg
 
 Check connection via interface with curl
 
-curl --interface exit https://www.google.com
-
-If you get lot's of js, html and css it worked.
+curl --interface exit https://am.i.mullvad.net/json | jq
 
 ## Regenerate config
 
