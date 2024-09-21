@@ -8,16 +8,20 @@
   register: directory_info
 
 - name: Set variable if directory exists
-  set_fact:
+  ansible.builtin.set_fact:
     directory_exists: "{{ directory_info.stat.exists }}"
 
 - name: Install oh-my-zsh
-  ansible.builtin.script: files/install.sh --unattended
+  ansible.builtin.script: files/install.sh
   args:
     executable: sh
-  when: directory_exists != true
+  environment:
+    CHSH: "yes"
+    RUNZSH: "no"
+    KEEP_ZHRC: "no"
+  when: not directory_exists
 
 - name: Print oh-my-zsh status
   ansible.builtin.debug:
     msg: "oh-my-zsh is already installed, if you want to re-install 'rm -rf ~/.oh-my-zsh'"
-  when: directory_exists == true
+  when: directory_exists
