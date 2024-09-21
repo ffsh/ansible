@@ -4,7 +4,7 @@
     users:
       - username: root
     batman_version: "2024.2"
-    node_exporter_version: "1.8.1"
+    node_exporter_version: "1.8.2"
     bootstrap_version: "5.3.3"
   pre_tasks:
     - name: Update apt cache
@@ -13,6 +13,7 @@
   roles:
     - { role: network, tags: "network"}
     - { role: wireguardexit, tags: "wireguard, exit"}
+    - { role: ffshmon, tags: "wireguard, ffshmon"}
     - { role: hostname, tags: "hostname"}
     - { role: fail2ban, tags: "fail2ban"}
     - { role: batman, tags: "batman-adv"}
@@ -29,4 +30,3 @@
     - { role: ohmyzsh, tags: "oh-my-zsh"}
     - { role: ohmyzshtheme, tags: "oh-my-zsh"}
     - { role: ssh, tags: "ssh keys"}
-    - { role: ffshmon, tags: "wireguard, ffshmon"}
