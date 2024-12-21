@@ -5,7 +5,7 @@ After=network-online.target
 
 [Service]
 User=prometheus
-ExecStart=/opt/node_exporter/node_exporter -–collector.systemd –-collector.processes --web.listen-address=127.0.0.1:9100
+ExecStart=/opt/node_exporter/node_exporter --collector.systemd --collector.processes --web.listen-address=127.0.0.1:9100
 
 [Install]
 WantedBy=default.target

@@ -6,6 +6,10 @@
     owner: root
     group: root
 
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon-reload: true
+
 - name: Add prometheus system user for node_exporter
   ansible.builtin.user:
     name: prometheus
@@ -25,3 +29,10 @@
 - name: Check if node_exporter-adv needs to be installed or upgraded
   ansible.builtin.include_tasks: download.yml
   when: installed_node_exporter_version.stdout != node_exporter_version
+
+- name: Start node_exporter service
+  ansible.builtin.systemd:
+    daemon-reload: true
+    enabled: true
+    name: node_exporter
+    state: restarted

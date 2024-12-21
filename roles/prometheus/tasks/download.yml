@@ -55,10 +55,3 @@
     group: prometheus
     mode: '0744'
     state: file
-
-- name: Start node_exporter service
-  ansible.builtin.systemd:
-    daemon-reload: true
-    enabled: true
-    name: node_exporter
-    state: restarted
