@@ -25,4 +25,3 @@
 - name: Check if node_exporter-adv needs to be installed or upgraded
   ansible.builtin.include_tasks: download.yml
   when: installed_node_exporter_version.stdout != node_exporter_version
-
