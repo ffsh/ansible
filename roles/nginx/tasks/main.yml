@@ -39,13 +39,36 @@
     owner: www-data
     group: www-data
 
-- name: Dowload bootstrap
+- name: Scan for old bootstrap folders
+  ansible.builtin.find:
+    paths: /var/www/gw-status
+    patterns: 'bootstrap-*'
+    file_type: directory
+    recurse: no
+  register: bootstrap_files
+
+- name: Remove old bootstrap folders
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ bootstrap_files.files }}"
+  loop_control:
+    loop_var: item
+  when: "'bootstrap-' + bootstrap_version + '-dist' not in item.path"
+
+- name: Check if bootstrap is already downloaded
+  ansible.builtin.stat:
+    path: /var/www/gw-status/bootstrap-{{ bootstrap_version }}-dist
+  register: bootstrap_zip
+
+- name: Download bootstrap
   ansible.builtin.get_url:
     url: "https://github.com/twbs/bootstrap/releases/download/v{{ bootstrap_version }}/bootstrap-{{ bootstrap_version }}-dist.zip"
     dest: /var/www/gw-status/bootstrap-{{ bootstrap_version }}-dist.zip
     mode: '0644'
     owner: root
     group: root
+  when: not bootstrap_zip.stat.exists
 
 - name: Unpack bootstrap
   ansible.builtin.unarchive:
@@ -55,11 +78,13 @@
     mode: '0744'
     owner: www-data
     group: www-data
+  when: not bootstrap_zip.stat.exists
 
 - name: Delete archive
   ansible.builtin.file:
-    dest: /var/www/gw-status/bootstrap-{{ bootstrap_version }}-dist.zip
+    path: /var/www/gw-status/bootstrap-{{ bootstrap_version }}-dist.zip
     state: absent
+  when: not bootstrap_zip.stat.exists
 
 - name: Copy info page
   ansible.builtin.template:
