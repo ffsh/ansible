@@ -3,3 +3,4 @@ password
 key-file
 keyfile
 secret
+.ansible/
