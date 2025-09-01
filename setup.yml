@@ -3,9 +3,9 @@
   vars:
     users:
       - username: root
-    batman_version: "2025.0"
+    batman_version: "2025.2"
     node_exporter_version: "1.9.1"
-    bootstrap_version: "5.3.5"
+    bootstrap_version: "5.3.8"
   pre_tasks:
     - name: Update apt cache
       ansible.builtin.apt:
