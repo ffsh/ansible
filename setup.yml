@@ -3,7 +3,7 @@
   vars:
     users:
       - username: root
-    batman_version: "2025.2"
+    batman_version: "2025.5"
     node_exporter_version: "1.9.1"
     bootstrap_version: "5.3.8"
   pre_tasks:
