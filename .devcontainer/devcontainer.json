@@ -1,0 +1,24 @@
+{
+  "name": "ansible-dev",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "features": {},
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "redhat.ansible",
+        "redhat.vscode-yaml"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "files.trimTrailingWhitespace": true,
+        "yaml.validate": true,
+        "ansible.validation.lint.enabled": true
+      }
+    }
+  },
+  "postCreateCommand": "ansible --version && ansible-lint --version",
+  "remoteUser": "root"
+}

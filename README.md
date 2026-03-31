@@ -8,6 +8,32 @@ It is based on https://docs.freifunk-suedholstein.de/de/1.5/gateway.html but cha
 - Clone the repository.
 - Ansible [installed](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#selecting-an-ansible-package-and-version-to-install)
 
+## devcontainer
+This repository includes a devcontainer so you can run Ansible and ansible-lint in a reproducible environment.
+
+1. Open the repository in VS Code.
+2. Run `Dev Containers: Reopen in Container`.
+3. Wait for the build to finish. The container installs `ansible` and `ansible-lint`.
+
+Quick checks:
+
+```bash
+ansible --version
+ansible-lint --version
+```
+
+Run linting:
+
+```bash
+ansible-lint
+```
+
+Run the playbook:
+
+```bash
+ansible-playbook --vault-id=fastd_key@prompt setup.yml
+```
+
 ## ssh-key
 As the login is done via ssh make sure that the ssh key is registered at your identity manager `ssh-add $keyfile`.
 That way Ansible will be able to automatically detect the right ssh key and connect to the server.
