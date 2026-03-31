@@ -19,6 +19,13 @@
       }
     }
   },
+  "remoteEnv": {
+    "ANSIBLE_CONFIG": "${containerWorkspaceFolder}/ansible.cfg",
+    "LANG": "C.UTF-8",
+    "LC_ALL": "C.UTF-8",
+    "LANGUAGE": "C.UTF-8",
+    "SHELL": "/bin/zsh"
+  },
   "postCreateCommand": "ansible --version && ansible-lint --version",
   "remoteUser": "root"
 }
