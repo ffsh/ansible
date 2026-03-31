@@ -28,9 +28,13 @@
   when: not ansible_check_mode
 
 - name: Build and install batman-adv
-  ansible.builtin.command: "dkms install -m batman-adv -v {{ batman_version }} && modprobe batman-adv"
+  ansible.builtin.command: "dkms install -m batman-adv -v {{ batman_version }}"
   # notify: restart batman
   changed_when: false
+  when: not ansible_check_mode
+
+- name: Run modprobe for batman-adv
+  ansible.builtin.command: modprobe batman-adv
   when: not ansible_check_mode
 
 - name: Add batman-adv to modules
