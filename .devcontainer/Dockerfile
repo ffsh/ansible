@@ -10,6 +10,7 @@ RUN apt-get update \
         ca-certificates \
         curl \
         git \
+        git-lfs \
         openssh-client \
         python3 \
         python3-pip \
