@@ -18,7 +18,7 @@
   environment:
     CHSH: "yes"
     RUNZSH: "no"
-    KEEP_ZHRC: "no"
+    KEEP_ZSHRC: "no"
   when: not directory_exists
 
 - name: Print oh-my-zsh status
