@@ -99,7 +99,7 @@
 
 - name: Build and install batctl
   ansible.builtin.shell: |
-    make -j {{ ansible_processor_vcpus }}
+    make -j {{ ansible_facts["processor_vcpus"] }}
     make install
   args:
     chdir: /opt/batctl-{{ batman_version }}
