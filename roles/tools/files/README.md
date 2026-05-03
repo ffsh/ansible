@@ -18,7 +18,7 @@ systemctl stop fastd@ffsh.service
 
 ## start
 
-systemctl stop fastd@ffsh.service
+systemctl start fastd@ffsh.service
 
 # Wireguard
 
