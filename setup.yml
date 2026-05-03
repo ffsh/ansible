@@ -1,5 +1,6 @@
 - name: Deploy Gateway
   hosts: all
+  serial: "{{ deploy_serial | default(1) }}"
   vars:
     users:
       - username: root
@@ -43,3 +44,24 @@
     - {role: ohmyzsh, tags: "oh-my-zsh"}
     - {role: ohmyzshtheme, tags: "oh-my-zsh"}
     - {role: ssh, tags: "ssh keys"}
+
+  post_tasks:
+    - name: Check if reboot is required
+      ansible.builtin.stat:
+        path: /var/run/reboot-required
+      register: system_reboot_required
+      changed_when: false
+      tags:
+        - always
+
+    - name: Reboot if required
+      ansible.builtin.reboot:
+        msg: Reboot triggered by Ansible because /var/run/reboot-required exists.
+        reboot_timeout: 900
+        connect_timeout: 10
+        post_reboot_delay: 15
+      when:
+        - system_reboot_required.stat.exists
+        - not ansible_check_mode
+      tags:
+        - always

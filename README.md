@@ -106,6 +106,14 @@ Run playbook on all gateways listed in `hosts`:
 ansible-playbook --vault-id=fastd_key@prompt setup.yml
 ```
 
+By default, deployments run one gateway at a time (`serial: 1`).
+
+Special case: run all gateways at once (for example for fast static page updates):
+
+```bash
+ansible-playbook --vault-id=fastd_key@prompt setup.yml -e deploy_serial=100%
+```
+
 Run playbook on one host
 ```bash
 ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit $hostname
