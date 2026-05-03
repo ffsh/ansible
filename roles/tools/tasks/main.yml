@@ -1,23 +1,41 @@
 - name: Install admin tools
   ansible.builtin.apt:
-    name: ["netcat-openbsd", "jq", "htop", "rsync", "unattended-upgrades", "apt-listchanges", "iperf3", "pipx"]
+    name:
+      [
+        "netcat-openbsd",
+        "jq",
+        "htop",
+        "rsync",
+        "unattended-upgrades",
+        "apt-listchanges",
+        "iperf3",
+        "pipx",
+      ]
 - name: Activate unattended-upgrades
   ansible.builtin.shell: |
     echo unattended-upgrades unattended-upgrades/enable_auto_updates boolean true | debconf-set-selections
     dpkg-reconfigure -f noninteractive unattended-upgrades
-  register: my_output
-  changed_when: my_output.rc == 0
+  register: tools_unattended_upgrades
+  changed_when: tools_unattended_upgrades.rc == 0
 - name: Copy README.md
   ansible.builtin.copy:
     src: files/README.md
     dest: /root/README.md
-    mode: '0640'
+    mode: "0640"
     owner: root
     group: root
 - name: Copy fix-batman.sh
   ansible.builtin.template:
     src: templates/fix-batman.sh
     dest: /root/fix-batman.sh
-    mode: '0740'
+    mode: "0740"
+    owner: root
+    group: root
+
+- name: Copy gateway service helper
+  ansible.builtin.template:
+    src: templates/gw-services.sh
+    dest: /root/gw-services.sh
+    mode: "0740"
     owner: root
     group: root
