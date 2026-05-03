@@ -1,34 +1,38 @@
 ---
-- name: Install neofetch
+- name: Install fastfetch
   ansible.builtin.apt:
-    pkg: ['neofetch']
+    pkg: [ "fastfetch" ]
     state: present
-  notify: First run neofetch
 
-- name: Flush handlers
-  ansible.builtin.meta: flush_handlers
+- name: Create fastfetch config directory
+  ansible.builtin.file:
+    path: /root/.config/fastfetch
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
 
 - name: Copy logo
   ansible.builtin.copy:
     src: files/ffsh-logo.txt
-    dest: /root/.config/neofetch/ffsh-logo.txt
+    dest: /root/.config/fastfetch/ffsh-logo.txt
     owner: root
     group: root
-    mode: '0644'
-- name: Adjust neofetch config
+    mode: "0644"
+- name: Adjust fastfetch config
   ansible.builtin.template:
-    src: templates/config.conf
-    dest: /root/.config/neofetch/config.conf
+    src: templates/config.jsonc
+    dest: /root/.config/fastfetch/config.jsonc
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
 - name: Set motd header
   ansible.builtin.copy:
     src: files/00-header
     dest: /etc/update-motd.d/00-header
     owner: root
     group: root
-    mode: '0744'
+    mode: "0744"
 - name: Remove /etc/motd
   ansible.builtin.file:
     path: /etc/motd

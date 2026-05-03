@@ -1,2 +1,3 @@
-- name: First run neofetch
-  ansible.builtin.command: neofetch
+- name: First run fastfetch
+  ansible.builtin.command: fastfetch
+  changed_when: false
