@@ -1,12 +1,15 @@
 - name: Register letsencrypt account
   ansible.builtin.command: certbot register --no-eff-email -m noc@freifunk-suedholstein.de --agree-tos
+  changed_when: false
 - name: Restart NGINX
   ansible.builtin.systemd:
     name: nginx
     state: stopped
 - name: Register Certificate
   ansible.builtin.shell: >
-    certbot certonly --standalone -d {{ inventory_hostname }}.freifunk-suedholstein.de
+    certbot certonly --standalone -d {{ inventory_hostname
+    }}.freifunk-suedholstein.de
+  changed_when: false
 - name: Restart NGINX
   ansible.builtin.systemd:
     name: nginx

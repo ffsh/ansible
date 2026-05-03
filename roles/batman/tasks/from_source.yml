@@ -1,12 +1,21 @@
 - name: Install dependencies for batman-adv
   ansible.builtin.apt:
-    name: ['linux-headers-generic', 'libnl-3-dev', 'libnl-genl-3-dev', 'libcap-dev', 'pkg-config', 'build-essential']
+    name:
+      [
+        "linux-headers-generic",
+        "libnl-3-dev",
+        "libnl-genl-3-dev",
+        "libcap-dev",
+        "pkg-config",
+        "build-essential",
+      ]
 
 - name: Download batman source
   ansible.builtin.get_url:
-    url: "https://downloads.open-mesh.org/batman/releases/batman-adv-{{ batman_version }}/batman-adv-{{ batman_version }}.tar.gz"
+    url: "https://downloads.open-mesh.org/batman/releases/batman-adv-{{
+      batman_version }}/batman-adv-{{ batman_version }}.tar.gz"
     dest: /opt/batman-adv-{{ batman_version }}.tar.gz
-    mode: '0644'
+    mode: "0644"
 
 - name: Unpack batman-adv
   ansible.builtin.unarchive:
@@ -24,7 +33,7 @@
   ansible.builtin.template:
     src: dkms.conf
     dest: /usr/src/batman-adv-{{ batman_version }}/dkms.conf
-    mode: '0644'
+    mode: "0644"
   when: not ansible_check_mode
 
 - name: Build and install batman-adv
@@ -35,6 +44,7 @@
 
 - name: Run modprobe for batman-adv
   ansible.builtin.command: modprobe batman-adv
+  changed_when: false
   when: not ansible_check_mode
 
 - name: Add batman-adv to modules
@@ -46,7 +56,7 @@
 - name: Check if batctl is already installed
   ansible.builtin.stat:
     path: "/usr/local/sbin/batctl"
-  register: batctl
+  register: batman_batctl
 
 - name: Check batctl version
   ansible.builtin.shell: |
@@ -54,23 +64,24 @@
     batctl -v | awk '{print $2}'
   args:
     executable: bash
-  when: batctl.stat.exists
+  when: batman_batctl.stat.exists
   changed_when: false
-  register: batctl_version
+  register: batman_batctl_version_cmd
   check_mode: false
 
 # no error
 - name: Set batctl_version to stdout
   ansible.builtin.set_fact:
-    batctl_version: "{{ batctl_version.stdout }}"
-  when: batctl.stat.exists
+    batman_batctl_version: "{{ batman_batctl_version_cmd.stdout }}"
+  when: batman_batctl.stat.exists
 
 - name: Download batctl source
   ansible.builtin.get_url:
-    url: "https://downloads.open-mesh.org/batman/releases/batman-adv-{{ batman_version }}/batctl-{{ batman_version }}.tar.gz"
+    url: "https://downloads.open-mesh.org/batman/releases/batman-adv-{{
+      batman_version }}/batctl-{{ batman_version }}.tar.gz"
     dest: /opt/batctl-{{ batman_version }}.tar.gz
-    mode: '0644'
-  when: batctl_version != batman_version and not ansible_check_mode
+    mode: "0644"
+  when: batman_batctl_version != batman_version and not ansible_check_mode
 
 # TODO what about the old version
 
@@ -79,7 +90,7 @@
     src: /opt/batctl-{{ batman_version }}.tar.gz
     dest: /opt
     remote_src: true
-  when: batctl_version != batman_version and not ansible_check_mode
+  when: batman_batctl_version != batman_version and not ansible_check_mode
 
 - name: Delete batctl archive
   ansible.builtin.file:
@@ -92,7 +103,8 @@
     make install
   args:
     chdir: /opt/batctl-{{ batman_version }}
-  when: batctl_version != batman_version and not ansible_check_mode
+  changed_when: false
+  when: batman_batctl_version != batman_version and not ansible_check_mode
 
 - name: Delete batctl direcotry
   ansible.builtin.file:
@@ -108,4 +120,4 @@
   ansible.builtin.file:
     path: /var/run/reboot-required
     state: touch
-    mode: '0644'
+    mode: "0644"
