@@ -1,12 +1,12 @@
 - name: Install nginx and unzip
   ansible.builtin.apt:
-    name: ["nginx", "unzip"]
+    name: [ "nginx", "unzip" ]
 
 - name: Copy httpasswd
   ansible.builtin.copy:
     src: files/htpasswd
     dest: /etc/nginx/htpasswd
-    mode: '0600'
+    mode: "0600"
     owner: www-data
     group: www-data
 
@@ -14,7 +14,7 @@
   ansible.builtin.template:
     src: templates/gw-status.conf
     dest: /etc/nginx/sites-available/
-    mode: '0600'
+    mode: "0600"
     owner: root
     group: root
 
@@ -35,23 +35,23 @@
   ansible.builtin.file:
     path: /var/www/gw-status
     state: directory
-    mode: '0744'
+    mode: "0744"
     owner: www-data
     group: www-data
 
 - name: Scan for old bootstrap folders
   ansible.builtin.find:
     paths: /var/www/gw-status
-    patterns: 'bootstrap-*'
+    patterns: "bootstrap-*"
     file_type: directory
-    recurse: no
-  register: bootstrap_files
+    recurse: false
+  register: nginx_bootstrap_files
 
 - name: Remove old bootstrap folders
   ansible.builtin.file:
     path: "{{ item.path }}"
     state: absent
-  loop: "{{ bootstrap_files.files }}"
+  loop: "{{ nginx_bootstrap_files.files }}"
   loop_control:
     loop_var: item
   when: "'bootstrap-' + bootstrap_version + '-dist' not in item.path"
@@ -59,38 +59,39 @@
 - name: Check if bootstrap is already downloaded
   ansible.builtin.stat:
     path: /var/www/gw-status/bootstrap-{{ bootstrap_version }}-dist
-  register: bootstrap_zip
+  register: nginx_bootstrap_zip
 
 - name: Download bootstrap
   ansible.builtin.get_url:
-    url: "https://github.com/twbs/bootstrap/releases/download/v{{ bootstrap_version }}/bootstrap-{{ bootstrap_version }}-dist.zip"
+    url: "https://github.com/twbs/bootstrap/releases/download/v{{ bootstrap_version
+      }}/bootstrap-{{ bootstrap_version }}-dist.zip"
     dest: /var/www/gw-status/bootstrap-{{ bootstrap_version }}-dist.zip
-    mode: '0644'
+    mode: "0644"
     owner: root
     group: root
-  when: not bootstrap_zip.stat.exists
+  when: not nginx_bootstrap_zip.stat.exists
 
 - name: Unpack bootstrap
   ansible.builtin.unarchive:
     src: /var/www/gw-status/bootstrap-{{ bootstrap_version }}-dist.zip
     dest: /var/www/gw-status/
     remote_src: true
-    mode: '0744'
+    mode: "0744"
     owner: www-data
     group: www-data
-  when: not bootstrap_zip.stat.exists
+  when: not nginx_bootstrap_zip.stat.exists
 
 - name: Delete archive
   ansible.builtin.file:
     path: /var/www/gw-status/bootstrap-{{ bootstrap_version }}-dist.zip
     state: absent
-  when: not bootstrap_zip.stat.exists
+  when: not nginx_bootstrap_zip.stat.exists
 
 - name: Copy info page
   ansible.builtin.template:
     src: templates/index.html
     dest: /var/www/gw-status/index.html
-    mode: '0744'
+    mode: "0744"
     owner: www-data
     group: www-data
 
@@ -98,7 +99,7 @@
   ansible.builtin.copy:
     src: files/cover.css
     dest: /var/www/gw-status/cover.css
-    mode: '0744'
+    mode: "0744"
     owner: www-data
     group: www-data
 

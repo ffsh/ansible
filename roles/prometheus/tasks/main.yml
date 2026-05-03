@@ -2,7 +2,7 @@
   ansible.builtin.copy:
     src: files/node_exporter.service
     dest: /etc/systemd/system
-    mode: '0600'
+    mode: "0600"
     owner: root
     group: root
 
@@ -20,15 +20,17 @@
   ansible.builtin.script: files/get_node_exporter_version.py
   args:
     executable: python3
-  register: installed_node_exporter_version
+  register: prometheus_installed_node_exporter_version
 
 - name: Print node_exporter version and target
   ansible.builtin.debug:
-    msg: "Currently installed node_exporter: {{ installed_node_exporter_version.stdout }} ,target is: {{ node_exporter_version }}"
+    msg: "Currently installed node_exporter: {{
+      prometheus_installed_node_exporter_version.stdout }} ,target is: {{
+      node_exporter_version }}"
 
 - name: Check if node_exporter-adv needs to be installed or upgraded
   ansible.builtin.include_tasks: download.yml
-  when: installed_node_exporter_version.stdout != node_exporter_version
+  when: prometheus_installed_node_exporter_version.stdout != node_exporter_version
 
 - name: Start node_exporter service
   ansible.builtin.systemd:
