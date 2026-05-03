@@ -3,6 +3,9 @@
     "logo": {
         "type": "file",
         "source": "/root/.config/fastfetch/ffsh-logo.txt",
+        "color": {
+            "1": "magenta"
+        },
         "padding": {
             "top": 1,
             "left": 2,
@@ -10,7 +13,13 @@
         }
     },
     "display": {
-        "separator": " : "
+        "separator": " : ",
+        "color": {
+            "keys": "magenta",
+            "separator": "magenta",
+            "title": "magenta",
+            "output": "white"
+        }
     },
     "modules": [
         "title",

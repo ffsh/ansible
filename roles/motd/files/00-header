@@ -1,6 +1,6 @@
 #!/bin/bash
 
-/usr/bin/fastfetch --config "/root/.config/fastfetch/config.jsonc"
+/usr/bin/fastfetch --pipe false --config "/root/.config/fastfetch/config.jsonc"
 
 
 if [ -f /var/run/reboot-required ]; then
