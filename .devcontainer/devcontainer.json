@@ -1,10 +1,17 @@
 {
   "name": "ansible-dev",
-  "build": {
-    "dockerfile": "Dockerfile",
-    "context": ".."
+  "image": "mcr.microsoft.com/devcontainers/python:3.12-trixie",
+  "remoteUser": "vscode",
+  "updateRemoteUserUID": true,
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "installOhMyZsh": true,
+      "configureZshAsDefaultShell": true,
+      "username": "vscode",
+      "upgradePackages": false
+    }
   },
-  "features": {},
   "customizations": {
     "vscode": {
       "extensions": [
@@ -26,6 +33,5 @@
     "LANGUAGE": "C.UTF-8",
     "SHELL": "/bin/zsh"
   },
-  "postCreateCommand": "ansible --version && ansible-lint --version",
-  "remoteUser": "root"
+  "postCreateCommand": "python -m pip install --user ansible ansible-lint && ansible --version && ansible-lint --version"
 }
