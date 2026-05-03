@@ -1,5 +1,3 @@
-include "/etc/bind/zones.rfc1918";
-
 zone "stormarn.freifunk.net" {
      type master;
      file "/etc/bind/zones/db.net.freifunk.stormarn";
