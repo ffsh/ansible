@@ -1,27 +1,58 @@
 - name: Install zsh
   ansible.builtin.apt:
-    name: ['zsh']
+    name: [ "zsh", "git" ]
+    state: present
+
+- name: Set oh-my-zsh paths
+  ansible.builtin.set_fact:
+    ohmyzsh_user: "{{ users[0]['username'] }}"
+    ohmyzsh_home: "{{ '/root' if users[0]['username'] == 'root' else '/home/' ~
+      users[0]['username'] }}"
 
 - name: Check if oh-my-zsh is already installed
   ansible.builtin.stat:
-    path: "/{{ users[0]['username'] }}/.oh-my-zsh"
-  register: directory_info
+    path: "{{ ohmyzsh_home }}/.oh-my-zsh"
+  register: ohmyzsh_directory_info
 
 - name: Set variable if directory exists
   ansible.builtin.set_fact:
-    directory_exists: "{{ directory_info.stat.exists }}"
+    ohmyzsh_directory_exists: "{{ ohmyzsh_directory_info.stat.exists }}"
 
-- name: Install oh-my-zsh
-  ansible.builtin.script: files/install.sh
-  args:
-    executable: sh
-  environment:
-    CHSH: "yes"
-    RUNZSH: "no"
-    KEEP_ZSHRC: "no"
-  when: not directory_exists
+- name: Install oh-my-zsh repository
+  ansible.builtin.git:
+    repo: https://github.com/ohmyzsh/ohmyzsh.git
+    dest: "{{ ohmyzsh_home }}/.oh-my-zsh"
+    version: master
+    depth: 1
+  become: true
+  become_user: "{{ ohmyzsh_user }}"
+  when: not ohmyzsh_directory_exists
+
+- name: Create .zshrc from oh-my-zsh template
+  ansible.builtin.copy:
+    src: "{{ ohmyzsh_home }}/.oh-my-zsh/templates/zshrc.zsh-template"
+    dest: "{{ ohmyzsh_home }}/.zshrc"
+    remote_src: true
+    owner: "{{ ohmyzsh_user }}"
+    group: "{{ ohmyzsh_user }}"
+    mode: "0644"
+    force: false
+  when: not ohmyzsh_directory_exists
+
+- name: Set oh-my-zsh path in .zshrc
+  ansible.builtin.replace:
+    path: "{{ ohmyzsh_home }}/.zshrc"
+    regexp: "^export ZSH=.*$"
+    replace: "export ZSH=\"{{ ohmyzsh_home }}/.oh-my-zsh\""
+  when: not ohmyzsh_directory_exists
+
+- name: Set default shell to zsh
+  ansible.builtin.user:
+    name: "{{ ohmyzsh_user }}"
+    shell: /usr/bin/zsh
 
 - name: Print oh-my-zsh status
   ansible.builtin.debug:
-    msg: "oh-my-zsh is already installed, if you want to re-install 'rm -rf ~/.oh-my-zsh'"
-  when: directory_exists
+    msg: "oh-my-zsh is already installed, if you want to re-install 'rm -rf
+      ~/.oh-my-zsh'"
+  when: ohmyzsh_directory_exists

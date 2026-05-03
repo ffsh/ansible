@@ -1,12 +1,18 @@
+- name: Set oh-my-zsh theme paths
+  ansible.builtin.set_fact:
+    ohmyzshtheme_user: "{{ users[0]['username'] }}"
+    ohmyzshtheme_home: "{{ '/root' if users[0]['username'] == 'root' else '/home/' ~
+      users[0]['username'] }}"
+
 - name: Create theme
   ansible.builtin.copy:
     src: files/ffsh.zsh-theme
-    dest: /{{ users[0]['username'] }}/.oh-my-zsh/custom/themes/ffsh.zsh-theme
-    mode: '0644'
-    owner: root
-    group: root
+    dest: "{{ ohmyzshtheme_home }}/.oh-my-zsh/custom/themes/ffsh.zsh-theme"
+    mode: "0644"
+    owner: "{{ ohmyzshtheme_user }}"
+    group: "{{ ohmyzshtheme_user }}"
 - name: Activate theme
   ansible.builtin.replace:
-    path: /{{ users[0]['username'] }}/.zshrc
+    path: "{{ ohmyzshtheme_home }}/.zshrc"
     regexp: ZSH_THEME="robbyrussell"
     replace: ZSH_THEME="ffsh"
