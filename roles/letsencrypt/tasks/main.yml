@@ -1,6 +1,6 @@
 - name: Install certbot and plugin
   ansible.builtin.apt:
-    pkg: [ "nginx", "certbot", "python3-certbot-nginx" ]
+    pkg: ["nginx", "certbot", "python3-certbot-nginx"]
     state: "present"
   notify: Register letsencrypt account
 - name: Create systemd directory

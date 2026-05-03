@@ -1,6 +1,6 @@
 - name: Install zsh
   ansible.builtin.apt:
-    name: [ "zsh", "git" ]
+    name: ["zsh", "git"]
     state: present
 
 - name: Set oh-my-zsh paths

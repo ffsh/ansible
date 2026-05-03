@@ -1,6 +1,6 @@
 - name: Install wireguard and other software
   ansible.builtin.apt:
-    name: [ "wireguard", "resolvconf", "git", "python3-click" ]
+    name: ["wireguard", "resolvconf", "git", "python3-click"]
 
 - name: Clone wg-conf-gen repository
   ansible.builtin.git:
