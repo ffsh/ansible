@@ -6,6 +6,9 @@ ACTION="${1:-check}"
 
 FASTD_SVC="fastd@ffsh.service"
 WG_SVC="wg-quick@exit.service"
+BIND_SVC="bind9.service"
+CHRONY_SVC="chrony.service"
+NGINX_SVC="nginx.service"
 BAT_IF="bat0"
 WG_IF="exit"
 
@@ -33,6 +36,12 @@ fail() {
 
 info() {
   printf '[INFO] %s\n' "$1"
+}
+
+section() {
+  printf '\n%s----------------------------------------%s\n' "$C_YELLOW" "$C_RESET"
+  printf '%s[%s]%s\n' "$C_YELLOW" "$1" "$C_RESET"
+  printf '%s----------------------------------------%s\n' "$C_YELLOW" "$C_RESET"
 }
 
 add_failure() {
@@ -221,6 +230,30 @@ print_summary() {
     printf '    - Verify fastd key directory: ls -la /etc/fastd/ffsh/\n'
   fi
 
+  if [[ "$failure_str" =~ "bind9.service" ]]; then
+    printf '\n  %sBIND9 DNS service issue:%s\n' "$C_YELLOW" "$C_RESET"
+    printf '    - Restart service: systemctl restart bind9\n'
+    printf '    - Check logs: journalctl -u bind9 -n 50\n'
+    printf '    - Verify config: named-checkconf /etc/bind/named.conf\n'
+    printf '    - Test DNS: dig @localhost example.com\n'
+  fi
+
+  if [[ "$failure_str" =~ "chrony.service" ]]; then
+    printf '\n  %sChrony NTP service issue:%s\n' "$C_YELLOW" "$C_RESET"
+    printf '    - Restart service: systemctl restart chrony\n'
+    printf '    - Check logs: journalctl -u chrony -n 50\n'
+    printf '    - Check time sync: chronyc tracking\n'
+    printf '    - Verify config: cat /etc/chrony/chrony.conf\n'
+  fi
+
+  if [[ "$failure_str" =~ "nginx.service" ]]; then
+    printf '\n  %sNginx web server issue:%s\n' "$C_YELLOW" "$C_RESET"
+    printf '    - Restart service: systemctl restart nginx\n'
+    printf '    - Check logs: journalctl -u nginx -n 50\n'
+    printf '    - Test config: nginx -t\n'
+    printf '    - Verify port: netstat -tlnp | grep nginx\n'
+  fi
+
   if [[ "$failure_str" =~ "WireGuard" ]]; then
     printf '\n  %sWireGuard tunnel issue:%s\n' "$C_YELLOW" "$C_RESET"
     printf '    - Restart service: systemctl restart %s\n' "$WG_SVC"
@@ -251,6 +284,8 @@ print_summary() {
 check_status() {
   FAILURES=()
 
+  section "Mesh/BATMAN"
+
   if ! check_batman_neighbors; then
     add_failure "Batman neighbors via ffsh-mesh failed"
   fi
@@ -259,6 +294,8 @@ check_status() {
     add_failure "batctl/batman-adv version mismatch"
   fi
 
+  section "Core Services"
+
   if is_service_active "$FASTD_SVC"; then
     ok "Service $FASTD_SVC is active"
   else
@@ -266,7 +303,30 @@ check_status() {
     add_failure "$FASTD_SVC not running"
   fi
 
+  if is_service_active "$BIND_SVC"; then
+    ok "Service $BIND_SVC is active"
+  else
+    fail "Service $BIND_SVC is NOT active"
+    add_failure "$BIND_SVC not running"
+  fi
+
+  if is_service_active "$CHRONY_SVC"; then
+    ok "Service $CHRONY_SVC is active"
+  else
+    fail "Service $CHRONY_SVC is NOT active"
+    add_failure "$CHRONY_SVC not running"
+  fi
+
+  if is_service_active "$NGINX_SVC"; then
+    ok "Service $NGINX_SVC is active"
+  else
+    fail "Service $NGINX_SVC is NOT active"
+    add_failure "$NGINX_SVC not running"
+  fi
+
 {% if enable_wireguard_exit | default(false) %}
+  section "WireGuard Exit"
+
   if ! check_wg_latest_handshake; then
     add_failure "WireGuard handshake outdated or never connected"
   fi
@@ -282,6 +342,7 @@ check_status() {
     add_failure "$WG_SVC not running"
   fi
 {% else %}
+  section "WireGuard Exit"
   info "WireGuard exit is disabled for this host"
 {% endif %}
 
@@ -291,9 +352,9 @@ check_status() {
 
 restart_services() {
 {% if enable_wireguard_exit | default(false) %}
-  info "Restart order: $FASTD_SVC -> $WG_SVC"
+  info "Restart order: $FASTD_SVC -> $WG_SVC -> $BIND_SVC -> $CHRONY_SVC -> $NGINX_SVC"
 {% else %}
-  info "Restart order: $FASTD_SVC"
+  info "Restart order: $FASTD_SVC -> $BIND_SVC -> $CHRONY_SVC -> $NGINX_SVC"
 {% endif %}
 
   info "Restarting $FASTD_SVC"
@@ -303,6 +364,15 @@ restart_services() {
   info "Restarting $WG_SVC"
   systemctl restart "$WG_SVC"
 {% endif %}
+
+  info "Restarting $BIND_SVC"
+  systemctl restart "$BIND_SVC"
+
+  info "Restarting $CHRONY_SVC"
+  systemctl restart "$CHRONY_SVC"
+
+  info "Restarting $NGINX_SVC"
+  systemctl restart "$NGINX_SVC"
 
   info "Waiting 15 seconds for services to stabilize and batman to populate neighbors..."
   sleep 15
