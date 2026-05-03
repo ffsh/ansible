@@ -1,8 +1,15 @@
 - name: Install network tools
   ansible.builtin.apt:
-    name: ['bridge-utils', 'ntp', 'net-tools', 'iptables', 'bmon']
+    name: [ "bridge-utils", "chrony", "net-tools", "iptables", "bmon" ]
+
+- name: Ensure chrony is enabled and running
+  ansible.builtin.service:
+    name: chrony
+    enabled: true
+    state: started
+
 - name: Enable IP forwarding
   ansible.builtin.copy:
     src: templates/forwarding.conf
     dest: /etc/sysctl.d/forwarding.conf
-    mode: '0644'
+    mode: "0644"
