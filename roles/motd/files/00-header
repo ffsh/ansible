@@ -1,6 +1,6 @@
 #!/bin/bash
 
-/usr/bin/neofetch --config "/root/.config/neofetch/config.conf"
+/usr/bin/fastfetch --config "/root/.config/fastfetch/config.jsonc"
 
 
 if [ -f /var/run/reboot-required ]; then
