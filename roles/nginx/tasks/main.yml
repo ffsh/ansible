@@ -1,6 +1,6 @@
 - name: Install nginx and unzip
   ansible.builtin.apt:
-    name: [ "nginx", "unzip" ]
+    name: ["nginx", "unzip"]
 
 - name: Copy httpasswd
   ansible.builtin.copy:

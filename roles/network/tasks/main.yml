@@ -1,6 +1,6 @@
 - name: Install network tools
   ansible.builtin.apt:
-    name: [ "bridge-utils", "chrony", "net-tools", "iptables", "bmon" ]
+    name: ["bridge-utils", "chrony", "net-tools", "iptables", "bmon"]
 
 - name: Configure chrony for client NTP service
   ansible.builtin.template:
