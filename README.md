@@ -34,6 +34,13 @@ Run the playbook:
 ansible-playbook --vault-id=fastd_key@prompt setup.yml
 ```
 
+If you run into ssh issues try running:
+
+```bash
+ssh root@$gatewayIP
+```
+this allows you to interactively accept key changes.
+
 ## ssh-key
 As the login is done via ssh make sure that the ssh key is registered at your identity manager `ssh-add $keyfile`.
 That way Ansible will be able to automatically detect the right ssh key and connect to the server.
