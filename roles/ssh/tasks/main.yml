@@ -4,6 +4,7 @@
     state: present
     key: '{{ item }}'
   with_file:
+    - files/benjamin_ed25519.pub
     - files/benjamin_rsa.pub
     - files/felix_imac_rsa.pub
     - files/felix_ipad_rsa.pub
