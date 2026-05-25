@@ -6,7 +6,7 @@
   ansible.builtin.get_url:
     url: >-
       https://github.com/prometheus/node_exporter/releases/download/v{{
-      node_exporter_version }}/ node_exporter-{{ node_exporter_version
+      node_exporter_version }}/node_exporter-{{ node_exporter_version
       }}.linux-{{ prometheus_go_arch }}.tar.gz
     dest: /opt/node_exporter-{{ node_exporter_version }}.linux-{{ prometheus_go_arch
       }}.tar.gz
