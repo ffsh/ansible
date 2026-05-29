@@ -48,6 +48,10 @@ add_failure() {
   FAILURES+=("$1")
 }
 
+has_batctl() {
+  command -v batctl >/dev/null 2>&1
+}
+
 format_age() {
   local sec="$1"
   if (( sec < 60 )); then
@@ -216,6 +220,14 @@ print_summary() {
     printf '    - Check batman interface: ip link show bat0\n'
   fi
 
+  if [[ "$failure_str" =~ "batctl not installed" ]]; then
+    printf '\n  %sCRITICAL: batctl missing on gateway:%s\n' "$C_RED" "$C_RESET"
+    printf '    - batctl is required for BATMAN health checks and troubleshooting\n'
+    printf '    - Install it via Ansible from your control machine:\n'
+    printf '      ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit <gateway> --tags "batctl"\n'
+    printf '    - Re-run validation on gateway: %s check\n' "$(basename "$0")"
+  fi
+
   if [[ "$failure_str" =~ "Version mismatch" ]]; then
     printf '\n  %sbatman-adv version mismatch:%s\n' "$C_YELLOW" "$C_RESET"
     printf '    - Option 1: Rebuild DKMS module: /root/fix-batman.sh\n'
@@ -286,12 +298,17 @@ check_status() {
 
   section "Mesh/BATMAN"
 
-  if ! check_batman_neighbors; then
-    add_failure "Batman neighbors via ffsh-mesh failed"
-  fi
+  if ! has_batctl; then
+    fail "batctl not installed"
+    add_failure "batctl not installed"
+  else
+    if ! check_batman_neighbors; then
+      add_failure "Batman neighbors via ffsh-mesh failed"
+    fi
 
-  if ! check_batctl_version; then
-    add_failure "batctl/batman-adv version mismatch"
+    if ! check_batctl_version; then
+      add_failure "batctl/batman-adv version mismatch"
+    fi
   fi
 
   section "Core Services"
