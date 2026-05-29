@@ -1,0 +1,68 @@
+- name: Install dependencies for batctl
+  ansible.builtin.apt:
+    name:
+      [
+        "libnl-3-dev",
+        "libnl-genl-3-dev",
+        "libcap-dev",
+        "pkg-config",
+        "build-essential",
+      ]
+
+- name: Check if batctl is already installed
+  ansible.builtin.stat:
+    path: /usr/local/sbin/batctl
+  register: batctl_installed
+
+- name: Check batctl version
+  ansible.builtin.shell: |
+    set -o pipefail
+    batctl -v | awk '{print $2}'
+  args:
+    executable: bash
+  when: batctl_installed.stat.exists
+  changed_when: false
+  register: batctl_version_cmd
+  check_mode: false
+
+- name: Set batctl version fact
+  ansible.builtin.set_fact:
+    batctl_version_installed: "{{ batctl_version_cmd.stdout | default('') }}"
+
+- name: Print batctl version and target
+  ansible.builtin.debug:
+    msg: "Currently installed batctl: {{ batctl_version_installed | default('not_installed') }} ,target is: {{ batman_version }}"
+
+- name: Download batctl source
+  ansible.builtin.get_url:
+    url: "https://downloads.open-mesh.org/batman/releases/batman-adv-{{
+      batman_version }}/batctl-{{ batman_version }}.tar.gz"
+    dest: /opt/batctl-{{ batman_version }}.tar.gz
+    mode: "0644"
+  when: batctl_version_installed != batman_version and not ansible_check_mode
+
+- name: Unpack batctl
+  ansible.builtin.unarchive:
+    src: /opt/batctl-{{ batman_version }}.tar.gz
+    dest: /opt
+    remote_src: true
+  when: batctl_version_installed != batman_version and not ansible_check_mode
+
+- name: Delete batctl archive
+  ansible.builtin.file:
+    path: /opt/batctl-{{ batman_version }}.tar.gz
+    state: absent
+
+- name: Build and install batctl
+  ansible.builtin.shell: |
+    make -j {{ ansible_facts["processor_vcpus"] }}
+    make install
+  args:
+    chdir: /opt/batctl-{{ batman_version }}
+  changed_when: false
+  when: batctl_version_installed != batman_version and not ansible_check_mode
+
+- name: Delete batctl directory
+  ansible.builtin.file:
+    path: /opt/batctl-{{ batman_version }}
+    state: absent
