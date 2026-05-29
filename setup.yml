@@ -31,6 +31,7 @@
     - {role: hostname, tags: "hostname"}
     - {role: fail2ban, tags: "fail2ban"}
     - {role: batman, tags: "batman-adv"}
+    - {role: batctl, tags: "batctl"}
     - {role: fastd, tags: "fastd"}
     - {role: radvd, tags: "radvd"}
     - {role: dhcp, tags: "isc-dhcp4-server"}
