@@ -1,7 +1,7 @@
 # Ansible
 [![Ansible Lint](https://github.com/ffsh/ansible/actions/workflows/ansible-lint.yml/badge.svg?branch=main)](https://github.com/ffsh/ansible/actions/workflows/ansible-lint.yml)
 
-This repository holds the Ansible playbook to deploy a ffsh gateway in the standard configuration.
+This repository holds the Ansible playbook to deploy a ffsh gateway in the standard configuration and to provision batman-only service hosts.
 It is based on https://docs.freifunk-suedholstein.de/de/1.5/gateway.html but changes were made where it was plausible.
 
 ## requirements
@@ -47,6 +47,8 @@ That way Ansible will be able to automatically detect the right ssh key and conn
 
 ## hosts
 If you want to deploy to a new gateway you need to add it to the `hosts.yml` file in the repo, just compare it to brunsbach and add your own details.
+
+If you want to add a batman-only service host, add it to the `services` group in `hosts.yml`. These hosts only receive the `batman` and `batctl` roles.
 
 If you set enable_wireguard_exit to true ansible will deploy wireguard and attempt to generate a mullvad config.
 
@@ -103,10 +105,16 @@ ansible-vault edit --vault-id fastd_key@prompt host_vars/$gatewayname.yml
 Run playbook on all gateways listed in `hosts`:
 
 ```bash
-ansible-playbook --vault-id=fastd_key@prompt setup.yml
+ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit gateways
 ```
 
-By default, deployments run one gateway at a time (`serial: 1`).
+Run the batman-only service hosts:
+
+```bash
+ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit services
+```
+
+By default, deployments run one host at a time (`serial: 1`).
 
 Special case: run all gateways at once (for example for fast static page updates):
 
@@ -117,6 +125,11 @@ ansible-playbook --vault-id=fastd_key@prompt setup.yml -e deploy_serial=100%
 Run playbook on one host
 ```bash
 ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit $hostname
+```
+
+Run only the batman and batctl roles for a specific service host:
+```bash
+ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit $hostname --tags "batman-adv,batctl"
 ```
 
 Run only the roles with the specific tag, to see which role is attached to which tag open `setup.yaml`:
