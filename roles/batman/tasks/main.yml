@@ -13,9 +13,13 @@
 
 - name: Print batman version and target
   ansible.builtin.debug:
-    msg: "Currently installed batman: {{ batman_installed_version.stdout }} ,target
-      is: {{ batman_version }}"
+    msg: >-
+      Currently installed batman: {{ batman_installed_version.stdout |
+      default('not_installed') }}, target is: {{ batman_version |
+      default('unknown') }}
 
 - name: Check if batman-adv needs to be installed or upgraded
   ansible.builtin.include_tasks: from_source.yml
-  when: batman_installed_version.stdout != batman_version
+  when:
+    - batman_version is defined
+    - (batman_installed_version.stdout | default('')) != batman_version
