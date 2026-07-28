@@ -1,40 +1,16 @@
-- name: Create node_exporter service
-  ansible.builtin.copy:
-    src: files/node_exporter.service
-    dest: /etc/systemd/system
-    mode: "0600"
+- name: Install Prometheus
+  ansible.builtin.apt:
+    name: prometheus
+    state: present
+    update_cache: true
+- name: Configure Prometheus
+  ansible.builtin.template:
+    src: prometheus.yml.j2
+    dest: /etc/prometheus/prometheus.yml
     owner: root
     group: root
-
-- name: Reload systemd
+    mode: "0644"
+- name: Restart Prometheus
   ansible.builtin.systemd:
-    daemon-reload: true
-
-- name: Add prometheus system user for node_exporter
-  ansible.builtin.user:
     name: prometheus
-    system: true
-    create_home: false
-
-- name: Check for currently installed node_exporter
-  ansible.builtin.script: files/get_node_exporter_version.py
-  args:
-    executable: python3
-  register: prometheus_installed_node_exporter_version
-
-- name: Print node_exporter version and target
-  ansible.builtin.debug:
-    msg: "Currently installed node_exporter: {{
-      prometheus_installed_node_exporter_version.stdout }} ,target is: {{
-      node_exporter_version }}"
-
-- name: Check if node_exporter-adv needs to be installed or upgraded
-  ansible.builtin.include_tasks: download.yml
-  when: prometheus_installed_node_exporter_version.stdout != node_exporter_version
-
-- name: Start node_exporter service
-  ansible.builtin.systemd:
-    daemon-reload: true
-    enabled: true
-    name: node_exporter
     state: restarted

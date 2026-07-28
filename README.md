@@ -108,10 +108,16 @@ Run playbook on all gateways listed in `hosts`:
 ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit gateways
 ```
 
-Run the batman-only service hosts:
+Run the batman-only service hosts (web-server map-server):
 
 ```bash
 ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit services
+```
+
+Run the monitoring host:
+
+```bash
+ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit monitoring
 ```
 
 By default, deployments run one host at a time (`serial: 1`).
