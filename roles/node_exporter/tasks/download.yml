@@ -1,14 +1,14 @@
 - name: Detected Architecture
   ansible.builtin.debug:
-    var: prometheus_go_arch
+    var: node_exporter_go_arch
 
 - name: Download node_exporter
   ansible.builtin.get_url:
     url: >-
       https://github.com/prometheus/node_exporter/releases/download/v{{
       node_exporter_version }}/node_exporter-{{ node_exporter_version
-      }}.linux-{{ prometheus_go_arch }}.tar.gz
-    dest: /opt/node_exporter-{{ node_exporter_version }}.linux-{{ prometheus_go_arch
+      }}.linux-{{ node_exporter_go_arch }}.tar.gz
+    dest: /opt/node_exporter-{{ node_exporter_version }}.linux-{{ node_exporter_go_arch
       }}.tar.gz
     mode: "0644"
     owner: root
@@ -16,7 +16,7 @@
 
 - name: Unpack node_exporter
   ansible.builtin.unarchive:
-    src: /opt/node_exporter-{{ node_exporter_version }}.linux-{{ prometheus_go_arch
+    src: /opt/node_exporter-{{ node_exporter_version }}.linux-{{ node_exporter_go_arch
       }}.tar.gz
     dest: /opt
     remote_src: true
@@ -27,7 +27,7 @@
 
 - name: Delete node_exporter archive
   ansible.builtin.file:
-    path: /opt/node_exporter-{{ node_exporter_version }}.linux-{{ prometheus_go_arch
+    path: /opt/node_exporter-{{ node_exporter_version }}.linux-{{ node_exporter_go_arch
       }}.tar.gz
     state: absent
 
@@ -41,7 +41,7 @@
 - name: Move node exporter to target directory
   ansible.builtin.copy:
     remote_src: true
-    src: /opt/node_exporter-{{ node_exporter_version }}.linux-{{ prometheus_go_arch
+    src: /opt/node_exporter-{{ node_exporter_version }}.linux-{{ node_exporter_go_arch
       }}/
     dest: /opt/node_exporter/
     force: true
@@ -51,7 +51,7 @@
 
 - name: Delete node_exporter directory
   ansible.builtin.file:
-    path: /opt/node_exporter-{{ node_exporter_version }}.linux-{{ prometheus_go_arch
+    path: /opt/node_exporter-{{ node_exporter_version }}.linux-{{ node_exporter_go_arch
       }}/
     state: absent
 

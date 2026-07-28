@@ -1,0 +1,40 @@
+- name: Create node_exporter service
+  ansible.builtin.copy:
+    src: files/node_exporter.service
+    dest: /etc/systemd/system
+    mode: "0600"
+    owner: root
+    group: root
+
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon-reload: true
+
+- name: Add prometheus system user for node_exporter
+  ansible.builtin.user:
+    name: prometheus
+    system: true
+    create_home: false
+
+- name: Check for currently installed node_exporter
+  ansible.builtin.script: files/get_node_exporter_version.py
+  args:
+    executable: python3
+  register: node_exporter_installed_version
+
+- name: Print node_exporter version and target
+  ansible.builtin.debug:
+    msg: "Currently installed node_exporter: {{
+      node_exporter_installed_version.stdout }} ,target is: {{
+      node_exporter_version }}"
+
+- name: Check if node_exporter needs to be installed or upgraded
+  ansible.builtin.include_tasks: download.yml
+  when: node_exporter_installed_version.stdout != node_exporter_version
+
+- name: Start node_exporter service
+  ansible.builtin.systemd:
+    daemon-reload: true
+    enabled: true
+    name: node_exporter
+    state: restarted
