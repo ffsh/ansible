@@ -15,7 +15,7 @@
 
 - name: Install firmware release helper script
   ansible.builtin.template:
-    src: templates/firmware-release.sh
+    src: firmware-release.sh
     dest: "{{ firmware_release_script_path }}"
     owner: root
     group: root

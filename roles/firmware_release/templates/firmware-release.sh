@@ -59,7 +59,7 @@ spinner() {
     sleep 0.1
   done
 
-  wait "$pid"
+  wait "$pid" || return 1
   printf '\r%-80s\r' ""
 }
 
@@ -86,13 +86,6 @@ ensure_layout() {
     fi
   done
 
-  if [[ -L "$ROOT_DIR/testing" ]]; then
-    rm -f "$ROOT_DIR/testing"
-  fi
-
-  if [[ -L "$ROOT_DIR/rc" ]]; then
-    rm -f "$ROOT_DIR/rc"
-  fi
 }
 
 write_testing_version() {
@@ -281,7 +274,12 @@ promote() {
   current_tag="$(read_stage_version "stable")"
   next_tag="$(read_stage_version "testing")"
 
-  if [[ -n "$current_tag" && "$current_tag" != "stable" ]]; then
+  if [[ -z "$next_tag" ]]; then
+    err "Missing $SAFE_SPACE/testing/.release-version"
+    return 1
+  fi
+
+  if [[ -n "$current_tag" ]]; then
     local cur_major cur_minor cur_patch cur_extra
     local next_major next_minor next_patch next_extra
 
@@ -290,7 +288,7 @@ promote() {
 
     if [[ "$cur_major" != "$next_major" || "$cur_minor" != "$next_minor" ]]; then
       warn "Major/minor changed: $current_tag -> $next_tag"
-      if ! ask_confirmation "Bigger change detected. Archive copy created and proceed?"; then
+      if ! ask_confirmation "Bigger change detected. Have you created an archive copy and want to proceed?"; then
         err "Promotion cancelled"
         return 1
       fi
@@ -299,11 +297,6 @@ promote() {
 
   if ! ask_confirmation "Are you sure you want to promote testing to stable?"; then
     err "Promotion cancelled"
-    return 1
-  fi
-
-  if [[ -z "$next_tag" ]]; then
-    err "Missing $SAFE_SPACE/testing/.release-version"
     return 1
   fi
 
