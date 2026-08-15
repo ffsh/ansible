@@ -1,0 +1,22 @@
+- name: Skip firmware release helper on non-target hosts
+  ansible.builtin.meta: end_role
+  when: inventory_hostname != firmware_release_target_host
+
+- name: Install firmware release helper dependencies
+  ansible.builtin.apt:
+    name:
+      - curl
+      - jq
+      - tar
+      - gzip
+      - bzip2
+      - xz-utils
+      - unzip
+
+- name: Install firmware release helper script
+  ansible.builtin.template:
+    src: templates/firmware-release.sh
+    dest: "{{ firmware_release_script_path }}"
+    owner: root
+    group: root
+    mode: "0750"
