@@ -1,0 +1,5 @@
+firmware_release_owner: ffsh
+firmware_release_repo: site
+firmware_release_root: /var/www/firmware
+firmware_release_script_path: /root/firmware-release.sh
+firmware_release_target_host: web-ffsh
