@@ -12,6 +12,18 @@
       - bzip2
       - xz-utils
       - unzip
+      - git
+
+- name: Configure Git safe directories for firmware release paths
+  ansible.builtin.command:
+    argv:
+      - git
+      - config
+      - --global
+      - --add
+      - safe.directory
+      - "{{ firmware_release_root }}"
+  changed_when: false
 
 - name: Install firmware release helper script
   ansible.builtin.template:

@@ -66,7 +66,7 @@
       tags:
         - always
 
-- name: Deploy batman-only
+- name: Services Deployment
   hosts: services
   serial: "{{ deploy_serial | default(1) }}"
   vars_files:
@@ -144,9 +144,9 @@
   #     tags:
   #       - always
 
-    # - name: Update apt cache
-    #   ansible.builtin.apt:
-    #     update_cache: true
+  # - name: Update apt cache
+  #   ansible.builtin.apt:
+  #     update_cache: true
   roles:
     - {role: prometheus, tags: "prometheus"}
 
