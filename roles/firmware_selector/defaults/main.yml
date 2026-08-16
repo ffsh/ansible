@@ -1,0 +1,3 @@
+firmware_selector_target_host: web-ffsh
+firmware_selector_repository: https://github.com/freifunk-gluon/gluon-firmware-selector.git
+firmware_selector_path: /var/www/firmware-selector
