@@ -1,0 +1,21 @@
+- name: Skip firmware selector on non-target hosts
+  ansible.builtin.meta: end_role
+  when: inventory_hostname != firmware_selector_target_host
+
+- name: Install firmware selector dependency
+  ansible.builtin.apt:
+    name: git
+
+- name: Clone or update firmware selector
+  ansible.builtin.git:
+    repo: "{{ firmware_selector_repository }}"
+    dest: "{{ firmware_selector_path }}"
+    update: true
+
+- name: Install firmware selector configuration
+  ansible.builtin.template:
+    src: firmware-selector-config.js
+    dest: "{{ firmware_selector_path }}/firmware-selector-config.js"
+    owner: root
+    group: root
+    mode: "0644"

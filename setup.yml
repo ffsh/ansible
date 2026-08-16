@@ -95,6 +95,7 @@
     - {role: batman, tags: "batman-adv"}
     - {role: batctl, tags: "batctl"}
     - {role: firmware_release, tags: "firmware-release"}
+    - {role: firmware_selector, tags: "firmware-selector"}
 
   post_tasks:
     - name: Check if reboot is required
