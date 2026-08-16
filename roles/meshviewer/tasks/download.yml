@@ -1,0 +1,42 @@
+---
+- name: Download meshviewer release
+  ansible.builtin.get_url:
+    url: "https://github.com/{{ meshviewer_release_repo }}/releases/download/v{{ meshviewer_version }}/meshviewer-build.zip"
+    dest: "/tmp/meshviewer-{{ meshviewer_version }}.zip"
+    mode: "0644"
+
+- name: Clear previous meshviewer installation
+  ansible.builtin.file:
+    path: "{{ meshviewer_install_dir }}"
+    state: absent
+
+- name: Recreate meshviewer install directory
+  ansible.builtin.file:
+    path: "{{ meshviewer_install_dir }}"
+    state: directory
+    owner: "{{ meshviewer_owner }}"
+    group: "{{ meshviewer_group }}"
+    mode: "0755"
+
+- name: Unpack meshviewer
+  ansible.builtin.unarchive:
+    src: "/tmp/meshviewer-{{ meshviewer_version }}.zip"
+    dest: "{{ meshviewer_install_dir }}"
+    remote_src: true
+    owner: "{{ meshviewer_owner }}"
+    group: "{{ meshviewer_group }}"
+  when: not ansible_check_mode
+
+- name: Record installed meshviewer version
+  ansible.builtin.copy:
+    content: "{{ meshviewer_version }}"
+    dest: "{{ meshviewer_version_file }}"
+    owner: "{{ meshviewer_owner }}"
+    group: "{{ meshviewer_group }}"
+    mode: "0644"
+  when: not ansible_check_mode
+
+- name: Delete meshviewer archive
+  ansible.builtin.file:
+    path: "/tmp/meshviewer-{{ meshviewer_version }}.zip"
+    state: absent

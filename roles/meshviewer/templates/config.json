@@ -1,0 +1,21 @@
+{{ {
+  "dataPath": meshviewer_data_path,
+  "siteName": meshviewer_site_name,
+  "maxAge": meshviewer_max_age,
+  "nodeZoom": meshviewer_node_zoom,
+  "grafana": meshviewer_grafana,
+  "mapLayers": meshviewer_map_layers,
+  "fixedCenter": meshviewer_fixed_center,
+  "domainNames": meshviewer_domain_names,
+  "nodeInfos": meshviewer_node_infos,
+  "nodeCharts": meshviewer_node_charts,
+  "globalInfos": meshviewer_global_infos,
+  "globalCharts": meshviewer_global_charts,
+  "linkList": meshviewer_link_list,
+  "devicePictures": meshviewer_device_pictures_url,
+  "devicePicturesSource": meshviewer_device_pictures_source,
+  "devicePicturesLicense": meshviewer_device_pictures_license,
+  "deprecation_text": meshviewer_deprecation_text,
+  "deprecation_enabled": meshviewer_deprecation_enabled,
+  "eol_text": meshviewer_eol_text
+} | to_nice_json }}

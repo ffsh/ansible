@@ -96,6 +96,7 @@
     - {role: batctl, tags: "batctl"}
     - {role: firmware_release, tags: "firmware-release"}
     - {role: firmware_selector, tags: "firmware-selector"}
+    - {role: meshviewer, tags: "meshviewer"}
 
   post_tasks:
     - name: Check if reboot is required
