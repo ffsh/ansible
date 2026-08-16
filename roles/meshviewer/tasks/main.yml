@@ -47,7 +47,7 @@
 
 - name: Install meshviewer configuration
   ansible.builtin.template:
-    src: config.json
+    src: config.json.j2
     dest: "{{ meshviewer_install_dir }}/config.json"
     owner: "{{ meshviewer_owner }}"
     group: "{{ meshviewer_group }}"
