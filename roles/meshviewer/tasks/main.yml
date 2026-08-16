@@ -1,0 +1,88 @@
+---
+- name: Skip meshviewer on non-target hosts
+  ansible.builtin.meta: end_role
+  when: inventory_hostname != meshviewer_target_host
+
+- name: Install meshviewer dependencies
+  ansible.builtin.apt:
+    name:
+      - unzip
+      - git
+
+- name: Create meshviewer install directory
+  ansible.builtin.file:
+    path: "{{ meshviewer_install_dir }}"
+    state: directory
+    owner: "{{ meshviewer_owner }}"
+    group: "{{ meshviewer_group }}"
+    mode: "0755"
+
+- name: Create device-pictures directory
+  ansible.builtin.file:
+    path: "{{ meshviewer_device_pictures_dir }}"
+    state: directory
+    owner: "{{ meshviewer_owner }}"
+    group: "{{ meshviewer_group }}"
+    mode: "0755"
+
+- name: Check currently installed meshviewer version
+  ansible.builtin.slurp:
+    src: "{{ meshviewer_version_file }}"
+  register: meshviewer_installed_version_raw
+  failed_when: false
+
+# slurp fails silently (registered above) when no release has been installed yet
+- name: Set meshviewer installed version fact
+  ansible.builtin.set_fact:
+    meshviewer_installed_version: "{{ (meshviewer_installed_version_raw.content | b64decode) if meshviewer_installed_version_raw.content
+      is defined else '' }}"
+
+- name: Print meshviewer version and target
+  ansible.builtin.debug:
+    msg: "Currently installed meshviewer: {{ meshviewer_installed_version }}, target is: {{ meshviewer_version }}"
+
+- name: Check if meshviewer needs to be installed or upgraded
+  ansible.builtin.include_tasks: download.yml
+  when: meshviewer_installed_version != meshviewer_version
+
+- name: Install meshviewer configuration
+  ansible.builtin.template:
+    src: config.json
+    dest: "{{ meshviewer_install_dir }}/config.json"
+    owner: "{{ meshviewer_owner }}"
+    group: "{{ meshviewer_group }}"
+    mode: "0644"
+
+- name: Configure Git safe directory for device-pictures
+  ansible.builtin.command:
+    argv:
+      - git
+      - config
+      - --global
+      - --add
+      - safe.directory
+      - "{{ meshviewer_device_pictures_dir }}"
+  changed_when: false
+
+- name: Clone or update device-pictures
+  ansible.builtin.git:
+    repo: "{{ meshviewer_device_pictures_repo }}"
+    dest: "{{ meshviewer_device_pictures_dir }}"
+    version: main
+    update: true
+
+- name: Adjust device-pictures ownership
+  ansible.builtin.file:
+    path: "{{ meshviewer_device_pictures_dir }}"
+    state: directory
+    owner: "{{ meshviewer_owner }}"
+    group: "{{ meshviewer_group }}"
+    recurse: true
+
+- name: Schedule weekly device-pictures update
+  ansible.builtin.cron:
+    name: update device-pictures
+    weekday: "{{ meshviewer_cron_weekday }}"
+    hour: "{{ meshviewer_cron_hour }}"
+    minute: "{{ meshviewer_cron_minute }}"
+    job: "cd {{ meshviewer_device_pictures_dir }} && git pull -qpf"

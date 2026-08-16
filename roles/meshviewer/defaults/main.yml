@@ -1,0 +1,155 @@
+---
+meshviewer_target_host: map-ffsh
+meshviewer_owner: www-data
+meshviewer_group: www-data
+
+meshviewer_release_repo: freifunk/meshviewer
+meshviewer_install_dir: /var/www/map/meshviewer
+meshviewer_version_file: "{{ meshviewer_install_dir }}/.meshviewer_version"
+
+meshviewer_device_pictures_repo: https://github.com/freifunk/device-pictures.git
+meshviewer_device_pictures_dir: /var/www/map/device-pictures
+
+meshviewer_data_path:
+  - https://map.freifunk-suedholstein.de/data/
+meshviewer_site_name: Freifunk Südholstein
+meshviewer_max_age: 21
+meshviewer_node_zoom: 19
+
+meshviewer_grafana:
+  url: /_grafana
+  orgId: 1
+
+meshviewer_map_layers:
+  - name: OpenStreetMap
+    url: "https://tiles.freifunk-suedholstein.de/{z}/{x}/{y}.png"
+    config:
+      type: osm
+      maxZoom: 19
+      attribution: >-
+        <a href='https://github.com/freifunk/meshviewer/issues'
+        target='_blank'>Report Bug</a> | Map data &copy; <a
+        href"http://openstreetmap.org">OpenStreetMap</a> contributor
+  - name: Esri.WorldImagery
+    url: "//server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+    config:
+      maxZoom: 20
+      attribution: >-
+        Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX,
+        GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User
+        Community
+
+meshviewer_fixed_center:
+  - [53.9286, 9.3356]
+  - [53.3743, 10.7308]
+
+meshviewer_domain_names:
+  - domain: ffrz
+    name: Lauenburg
+  - domain: ffod
+    name: Stormarn
+  - domain: ffsh
+    name: Südholstein
+
+meshviewer_node_infos: []
+
+meshviewer_node_charts:
+  - name: Clientstatistik
+    datasourceUid: "000000001"
+    datasourceType: influxdb
+    query: >-
+      SELECT mean("clients.total") AS "Clients" FROM "node" WHERE ("nodeid"
+      =~ /^$node$/) AND $timeFilter GROUP BY time($interval) fill(null)
+    from: now-7d
+    to: now-1m
+    maxDataPoints: 300
+    series:
+      - name: Clients
+        color: "#73BF69"
+  - name: Trafficstatistik
+    datasourceUid: "000000001"
+    datasourceType: influxdb
+    query: >-
+      SELECT non_negative_derivative(first("traffic.forward.bytes"), 2m) * 8
+      / 120 AS "Traffic IN", non_negative_derivative(first("traffic.tx.bytes"),
+      2m) * 8 / 120 AS "Traffic OUT", non_negative_derivative(first("traffic.forward.bytes"),
+      2m) * 8 / 120 AS "Traffic FORWARD" FROM "node" WHERE ("nodeid" =~ /^$node$/)
+      AND $timeFilter GROUP BY time($interval) fill(null)
+    format: ".2~s"
+    unitSuffix: bit/s
+    from: now-7d
+    to: now-1m
+    maxDataPoints: 300
+    series:
+      - name: Traffic IN
+        color: "#73BF69"
+      - name: Traffic OUT
+        color: "#F2495C"
+      - name: Traffic FORWARD
+        color: "#5794F2"
+  - name: Airtime 2.4GHz & 5GHz
+    datasourceUid: "000000001"
+    datasourceType: influxdb
+    query: >-
+      SELECT last("airtime11g.chan_util") AS "2.4GHz", last("airtime11a.chan_util")
+      AS "5GHz" FROM "node" WHERE ("nodeid" =~ /^$node$/) AND $timeFilter GROUP
+      BY time(5m) fill(null)
+    format: .2f
+    unitSuffix: "%"
+    from: now-7d
+    to: now-1m
+    maxDataPoints: 300
+    series:
+      - name: 2.4GHz
+        color: "#FF9830"
+      - name: 5GHz
+        color: "#56A64B"
+
+meshviewer_global_infos: []
+
+meshviewer_global_charts:
+  - name: Knoten und Clients
+    datasourceUid: "000000001"
+    datasourceType: influxdb
+    query: >-
+      SELECT mean("clients.total") AS "Clients", mean("nodes") AS "Knoten",
+      mean("gateways") AS "Gateways" FROM "global" WHERE $timeFilter GROUP
+      BY time($interval) fill(previous)
+    from: now-7d
+    to: now-1m
+    maxDataPoints: 300
+    series:
+      - name: Clients
+        color: "#73BF69"
+      - name: Knoten
+        color: "#5794F2"
+      - name: Gateways
+        color: "#F2CC0C"
+
+meshviewer_link_list:
+  - title: Homepage
+    href: https://www.freifunk-suedholstein.de
+  - title: Impressum
+    href: https://www.freifunk-suedholstein.de/impressum/
+  - title: Datenschutz
+    href: https://www.freifunk-suedholstein.de/datenschutz/
+
+meshviewer_device_pictures_url: "https://map.freifunk-suedholstein.de/pictures-svg/{MODEL_NORMALIZED}.svg"
+meshviewer_device_pictures_source: >-
+  <a href='https://github.com/freifunk/device-pictures'>https://github.com/freifunk/device-pictures</a>
+meshviewer_device_pictures_license: CC-BY-NC-SA 4.0
+
+meshviewer_deprecation_text: >-
+  <p>Achtung! Dieses Gerät verfügt über wenig Speicher, daher wird es bald keine
+  Updates mehr erhalten!</p><p>Tritt gerne über unsere Webseite mit uns in
+  Kontakt um dich auszutauschen: <a href='https://freifunk-suedholstein.de'>https://freifunk-suedholstein.de</a></p>
+meshviewer_deprecation_enabled: true
+
+meshviewer_eol_text: >-
+  <p>Dieses Gerät ist veraltet und wird keine Updates mehr erhalten!</p><p>Tritt
+  gerne über unsere Webseite mit uns in Kontakt um dich auszutauschen: <a
+  href='https://freifunk-suedholstein.de'>https://freifunk-suedholstein.de</a></p>
+
+meshviewer_cron_weekday: "0"
+meshviewer_cron_hour: "3"
+meshviewer_cron_minute: "0"
