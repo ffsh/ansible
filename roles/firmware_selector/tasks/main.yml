@@ -10,6 +10,7 @@
   ansible.builtin.git:
     repo: "{{ firmware_selector_repository }}"
     dest: "{{ firmware_selector_path }}"
+    version: main
     update: true
 
 - name: Install firmware selector configuration
