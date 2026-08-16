@@ -1,0 +1,10 @@
+/var/log/ffshmon/ffshmon.log {
+    daily
+    rotate 7
+    compress
+    delaycompress
+    missingok
+    notifempty
+    copytruncate
+    create 0640 ffshmon ffshmon
+}

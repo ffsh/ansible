@@ -39,6 +39,14 @@ scrape_configs:
     static_configs:
       - targets: ["beste.freifunk-suedholstein.de", "brunsbach.freifunk-suedholstein.de", "trave.freifunk-suedholstein.de"]
 
+  - job_name: "ffshmon"
+
+    metrics_path: /ffshmon/metrics
+    scheme: https
+
+    static_configs:
+      - targets: ["beste.freifunk-suedholstein.de", "brunsbach.freifunk-suedholstein.de", "trave.freifunk-suedholstein.de"]
+
   - job_name: "services"
 
     metrics_path: stats/metrics

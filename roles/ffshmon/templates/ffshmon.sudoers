@@ -1,0 +1,5 @@
+ffshmon ALL=(root) NOPASSWD: /usr/bin/systemctl stop fastd@ffsh.service
+ffshmon ALL=(root) NOPASSWD: /usr/bin/systemctl show -p SubState fastd@ffsh.service
+ffshmon ALL=(root) NOPASSWD: /usr/bin/systemctl stop wg-quick@exit.service
+ffshmon ALL=(root) NOPASSWD: /usr/bin/systemctl restart wg-quick@exit.service
+ffshmon ALL=(root) NOPASSWD: /usr/bin/python3 /opt/wg-conf-gen/wg-conf-gen.py recreate

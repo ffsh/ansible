@@ -1,0 +1,5 @@
+- name: Restart ffshmon service
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: ffshmon
+    state: restarted
