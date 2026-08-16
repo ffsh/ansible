@@ -1,0 +1,20 @@
+[Unit]
+Description=ffshmon WireGuard health monitor
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/ffshmon
+User=ffshmon
+Group=ffshmon
+ExecStart=/opt/ffshmon/.venv/bin/python /opt/ffshmon/wireguard.py serve --user {{ ffshmon_mail }} --password {{ ffshmon_pw }} --log /var/log/ffshmon/ffshmon.log --loglevel WARNING --host 127.0.0.1 --port 8000 --interval 300
+Restart=on-failure
+ProtectHome=true
+PrivateTmp=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectClock=true
+
+[Install]
+WantedBy=multi-user.target

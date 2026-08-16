@@ -1,19 +1,89 @@
-- name: Install curl
+- name: Install ffshmon dependencies
   ansible.builtin.apt:
-    name: ['curl']
+    name: ["curl", "python3-venv", "python3-pip", "sudo", "logrotate"]
+- name: Add ffshmon system user
+  ansible.builtin.user:
+    name: ffshmon
+    system: true
+    create_home: false
+    shell: /usr/sbin/nologin
 - name: Create log directory
   ansible.builtin.file:
     path: /var/log/ffshmon
     state: directory
-    mode: '0755'
+    owner: ffshmon
+    group: ffshmon
+    mode: "0755"
+- name: Create ffshmon log file
+  ansible.builtin.file:
+    path: /var/log/ffshmon/ffshmon.log
+    state: touch
+    owner: ffshmon
+    group: ffshmon
+    mode: "0640"
+    access_time: preserve
+    modification_time: preserve
+  notify:
+    - Restart ffshmon service
+- name: Allow root to manage ffshmon repository
+  ansible.builtin.blockinfile:
+    path: /etc/gitconfig
+    create: true
+    owner: root
+    group: root
+    mode: "0644"
+    block: |
+      [safe]
+          directory = /opt/ffshmon
+    marker: "# {mark} ANSIBLE MANAGED FFSHMON SAFE DIRECTORY"
 - name: Clone ffshmon repository
   ansible.builtin.git:
     repo: https://github.com/ffsh/ffshmon.git
     dest: /opt/ffshmon
     force: true
     version: main
-- name: Trigger ffshmon regularly
-  ansible.builtin.cron:
-    name: "Execute ffshmon"
-    minute: "*/30"
-    job: "python3 /opt/ffshmon/wireguard.py check --user {{ ffshmon_mail }} --password {{ ffshmon_pw }} --log /var/log/ffshmon/ffshmon.log"
+- name: Install ffshmon Python dependencies
+  ansible.builtin.pip:
+    requirements: /opt/ffshmon/requirements.txt
+    virtualenv: /opt/ffshmon/.venv
+    virtualenv_command: python3 -m venv
+- name: Adjust ffshmon permissions
+  ansible.builtin.file:
+    path: /opt/ffshmon
+    owner: ffshmon
+    group: ffshmon
+    recurse: true
+    state: directory
+- name: Configure ffshmon sudo permissions
+  ansible.builtin.template:
+    src: templates/ffshmon.sudoers
+    dest: /etc/sudoers.d/ffshmon
+    owner: root
+    group: root
+    mode: "0440"
+    validate: "visudo -cf %s"
+- name: Configure ffshmon log rotation
+  ansible.builtin.template:
+    src: templates/ffshmon.logrotate
+    dest: /etc/logrotate.d/ffshmon
+    owner: root
+    group: root
+    mode: "0644"
+- name: Install ffshmon service
+  ansible.builtin.template:
+    src: templates/ffshmon.service
+    dest: /etc/systemd/system/ffshmon.service
+    owner: root
+    group: root
+    mode: "0600"
+  notify:
+    - Restart ffshmon service
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Enable ffshmon service
+  ansible.builtin.systemd:
+    enabled: true
+    state: started
+    name: ffshmon
