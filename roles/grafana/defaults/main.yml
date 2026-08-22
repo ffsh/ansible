@@ -1,3 +1,6 @@
 grafana_apt_key_url: https://apt.grafana.com/gpg.key
 grafana_apt_keyring: /etc/apt/keyrings/grafana.gpg
 grafana_apt_repository: "deb [signed-by={{ grafana_apt_keyring }}] https://apt.grafana.com stable main"
+grafana_dashboard_source_directory: "{{ role_path }}/files/dashboards"
+grafana_dashboard_directory: /var/lib/grafana/dashboards
+grafana_dashboard_provisioning_file: /etc/grafana/provisioning/dashboards/ansible.yml

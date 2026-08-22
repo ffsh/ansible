@@ -39,3 +39,31 @@
     name: grafana-server
     enabled: true
     state: started
+
+- name: Create Grafana dashboard directory
+  ansible.builtin.file:
+    path: "{{ grafana_dashboard_directory }}"
+    state: directory
+    owner: grafana
+    group: grafana
+    mode: "0755"
+
+- name: Configure Grafana dashboard provider
+  ansible.builtin.template:
+    src: dashboard-provider.yml.j2
+    dest: "{{ grafana_dashboard_provisioning_file }}"
+    owner: root
+    group: grafana
+    mode: "0640"
+  notify: Restart Grafana
+
+- name: Install Grafana dashboards
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ grafana_dashboard_directory }}/{{ item | basename }}"
+    owner: grafana
+    group: grafana
+    mode: "0644"
+  with_fileglob:
+    - "{{ grafana_dashboard_source_directory }}/*.json"
+  notify: Restart Grafana

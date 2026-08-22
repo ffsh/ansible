@@ -1,0 +1,12 @@
+apiVersion: 1
+
+providers:
+  - name: Ansible
+    orgId: 1
+    folder: FFSH
+    type: file
+    disableDeletion: false
+    allowUiUpdates: true
+    updateIntervalSeconds: 30
+    options:
+      path: {{ grafana_dashboard_directory }}
