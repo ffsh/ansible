@@ -1,0 +1,41 @@
+- name: Install prerequisites for Grafana repository
+  ansible.builtin.apt:
+    name: gnupg
+    state: present
+
+- name: Create APT keyrings directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Download Grafana repository signing key
+  ansible.builtin.get_url:
+    url: "{{ grafana_apt_key_url }}"
+    dest: /tmp/grafana.gpg.key
+    mode: "0644"
+
+- name: Convert Grafana repository signing key
+  ansible.builtin.command:
+    cmd: "gpg --dearmor --output {{ grafana_apt_keyring }} /tmp/grafana.gpg.key"
+    creates: "{{ grafana_apt_keyring }}"
+
+- name: Configure Grafana APT repository
+  ansible.builtin.apt_repository:
+    repo: "{{ grafana_apt_repository }}"
+    filename: grafana
+    state: present
+    update_cache: true
+
+- name: Install Grafana
+  ansible.builtin.apt:
+    name: grafana
+    state: present
+
+- name: Enable and start Grafana
+  ansible.builtin.systemd:
+    name: grafana-server
+    enabled: true
+    state: started
