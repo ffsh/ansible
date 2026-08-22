@@ -150,6 +150,7 @@
   #   ansible.builtin.apt:
   #     update_cache: true
   roles:
+    - {role: blackbox_exporter, tags: "blackbox-exporter"}
     - {role: prometheus, tags: "prometheus"}
 
   post_tasks:
