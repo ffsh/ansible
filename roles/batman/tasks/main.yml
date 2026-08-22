@@ -2,6 +2,15 @@
   ansible.builtin.apt:
     name: dkms
 
+- name: Copy batman repair helper
+  ansible.builtin.template:
+    src: fix-batman.sh
+    dest: /root/fix-batman.sh
+    mode: "0740"
+    owner: root
+    group: root
+  when: batman_version is defined
+
 - name: Check for currently installed batman-adv
   ansible.builtin.script: files/get_batman_version.py
   args:

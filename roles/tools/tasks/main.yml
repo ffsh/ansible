@@ -24,14 +24,6 @@
     mode: "0640"
     owner: root
     group: root
-- name: Copy fix-batman.sh
-  ansible.builtin.template:
-    src: templates/fix-batman.sh
-    dest: /root/fix-batman.sh
-    mode: "0740"
-    owner: root
-    group: root
-
 - name: Copy gateway service helper
   ansible.builtin.template:
     src: templates/gw-services.sh
