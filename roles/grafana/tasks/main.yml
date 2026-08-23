@@ -67,3 +67,9 @@
   with_fileglob:
     - "{{ grafana_dashboard_source_directory }}/*.json"
   notify: Restart Grafana
+
+- name: Remove superseded wireguard-dashboard (replaced by status-dashboard)
+  ansible.builtin.file:
+    path: "{{ grafana_dashboard_directory }}/wireguard-dashboard.json"
+    state: absent
+  notify: Restart Grafana
