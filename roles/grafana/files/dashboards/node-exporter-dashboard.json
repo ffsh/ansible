@@ -28023,7 +28023,7 @@
       "timezone": "browser",
       "to": "now"
     },
-    "title": "Node Exporter Full",
+    "title": "Node Exporter Full (v1.0.0)",
     "variables": [
       {
         "kind": "DatasourceVariable",
