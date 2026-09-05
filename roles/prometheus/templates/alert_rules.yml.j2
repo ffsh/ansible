@@ -9,3 +9,12 @@ groups:
         annotations:
           summary: "Blackbox probe failed for {{ '{{ $labels.instance }}' }}"
           description: "The {{ '{{ $labels.job }}' }} probe for {{ '{{ $labels.instance }}' }} has failed for more than 5 minutes."
+
+      - alert: WireguardDown
+        expr: wireguard_up{interface="exit"} == 0 or up{job="ffshmon"} == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "WireGuard exit is down on {{ '{{ $labels.target }}' }}"
+          description: "The WireGuard exit connection on {{ '{{ $labels.target }}' }} has been down for more than 5 minutes."

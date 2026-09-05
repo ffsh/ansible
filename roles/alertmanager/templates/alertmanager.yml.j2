@@ -15,19 +15,36 @@ receivers:
         chat_id: {{ vault_secrets.alertmanager.telegram_chat_id }}
         send_resolved: true
         message: |
-          {% raw %}{{ if eq .Status "firing" }}
-          THE {{ range .Alerts }}{{ .Labels.target }}{{ end }} SERVER HAS LEFT THE BUILDING
+          {% raw %}{{ if eq .Status "firing" }}{{ range .Alerts }}
+          {{ if eq .Labels.alertname "WireguardDown" }}
+          THE {{ .Labels.target }} WIREGUARD TUNNEL HAS LEFT THE BUILDING
 
-          The HTTPS check for {{ range .Alerts }}{{ .Labels.target }}{{ end }} has failed for over 5 minutes.
+          The WireGuard exit connection on {{ .Labels.target }} has been down for over 5 minutes.
+
+          The tunnel may be offline, unreachable, or taking an unscheduled holiday.
+
+          Severity: {{ .Labels.severity }}
+          Check: {{ .Labels.job }}
+          {{ else }}
+          THE {{ .Labels.target }} SERVER HAS LEFT THE BUILDING
+
+          The HTTPS check for {{ .Labels.target }} has failed for over 5 minutes.
 
           The server may be offline, unreachable, or contemplating its life choices.
 
-          Severity: {{ range .Alerts }}{{ .Labels.severity }}{{ end }}
-          Check: {{ range .Alerts }}{{ .Labels.job }}{{ end }}
+          Severity: {{ .Labels.severity }}
+          Check: {{ .Labels.job }}
+          {{ end }}{{ end }}{{ else }}{{ range .Alerts }}
+          {{ if eq .Labels.alertname "WireguardDown" }}
+          {{ .Labels.target }} WIREGUARD IS BACK
+
+          The WireGuard exit connection on {{ .Labels.target }} is responding normally again.
+
+          The tunnel has returned from its brief adventure.
           {{ else }}
-          {{ range .Alerts }}{{ .Labels.target }} IS BACK
+          {{ .Labels.target }} IS BACK
 
           The HTTPS check for {{ .Labels.target }} is responding normally again.
 
           The server has returned from its brief adventure.
-          {{ end }}{{ end }}{% endraw %}
+          {{ end }}{{ end }}{{ end }}{% endraw %}
