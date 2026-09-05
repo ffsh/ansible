@@ -43,37 +43,75 @@ section() {
   say "📦 $1"
 }
 
-spinner() {
-  local pid="$1"
-  local text="$2"
-  local completed="$3"
-  local total="$4"
-  local progress_file="$5"
-  local -a frames=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
-  local frame=0
-  local percent=0
+read_progress_percent() {
+  local progress_file="$1"
+  tr '\r' '\n' < "$progress_file" | grep -oE '[0-9]+(\.[0-9]+)?%' | tail -n 1 | cut -d. -f1 | tr -d '%' || true
+}
+
+# Waits on multiple background download pids at once, rendering one progress line per download.
+multi_spinner() {
+  local -n _pids="$1"
+  local -n _names="$2"
+  local -n _progress_files="$3"
+  local n="${#_pids[@]}"
 
   if ! is_tty; then
-    wait "$pid"
-    return
+    local failed=0
+    local i
+    for ((i = 0; i < n; i++)); do
+      if wait "${_pids[i]}"; then
+        ok "Downloaded ${_names[i]}"
+      else
+        err "Failed to download ${_names[i]}"
+        failed=1
+      fi
+    done
+    return $failed
   fi
 
-  while kill -0 "$pid" 2>/dev/null; do
+  local -a frames=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
+  local -a percent done_flag
+  local i frame=0
+  for ((i = 0; i < n; i++)); do
+    percent[i]=0
+    done_flag[i]=false
+    printf '\n'
+  done
+
+  while true; do
+    local running=0
     local live_percent
-    live_percent="$(tr '\r' '\n' < "$progress_file" | grep -oE '[0-9]+(\.[0-9]+)?%' | tail -n 1 | cut -d. -f1 | tr -d '%' || true)"
-    if [[ "$live_percent" =~ ^[0-9]+$ ]]; then
-      percent="$live_percent"
-    elif [[ "$total" -gt 0 ]]; then
-      percent=$((completed * 100 / total))
-    fi
-    printf '\r\033[K%s %s [%3d%%]' "${frames[frame]}" "$text" "$percent"
+    printf '\033[%dA' "$n"
+    for ((i = 0; i < n; i++)); do
+      if [[ "${done_flag[i]}" == false ]]; then
+        if kill -0 "${_pids[i]}" 2>/dev/null; then
+          running=$((running + 1))
+          live_percent="$(read_progress_percent "${_progress_files[i]}")"
+          [[ "$live_percent" =~ ^[0-9]+$ ]] && percent[i]="$live_percent"
+          printf '\r\033[K%s Downloading %s [%3d%%]\n' "${frames[frame]}" "${_names[i]}" "${percent[i]}"
+        else
+          done_flag[i]=true
+          percent[i]=100
+          printf '\r\033[K✓ Downloading %s [100%%]\n' "${_names[i]}"
+        fi
+      else
+        printf '\r\033[K✓ Downloading %s [100%%]\n' "${_names[i]}"
+      fi
+    done
     frame=$(( (frame + 1) % 10 ))
+    [[ "$running" -eq 0 ]] && break
     sleep 0.1
   done
 
-  wait "$pid" || return 1
-  percent=100
-  printf '\r\033[K%s %s [%3d%%]\n' '✓' "$text" 100
+  local failed=0
+  for ((i = 0; i < n; i++)); do
+    if ! wait "${_pids[i]}"; then
+      err "Failed to download ${_names[i]}"
+      cat "${_progress_files[i]}" >&2
+      failed=1
+    fi
+  done
+  return $failed
 }
 
 ensure_layout() {
@@ -171,6 +209,7 @@ download_assets() {
 
   mkdir -p "$TMP_DIR/downloads"
 
+  local -a dl_names=() dl_urls=() dl_outputs=()
   local asset_index=0
   for entry in "${assets[@]}"; do
     local json
@@ -178,14 +217,12 @@ download_assets() {
     local url
     local expected_size
     local output
-    local progress_file
 
     json="$(printf '%s' "$entry" | base64 -d)"
     name="$(jq -r '.name' <<<"$json")"
     url="$(jq -r '.browser_download_url' <<<"$json")"
     expected_size="$(jq -r '.size // 0' <<<"$json")"
     output="$TMP_DIR/downloads/$name"
-    progress_file="$TMP_DIR/downloads/$name.progress"
 
     if [[ -f "$output" && "$expected_size" -gt 0 ]]; then
       local current_size
@@ -198,18 +235,46 @@ download_assets() {
       fi
     fi
 
-    : > "$progress_file"
-    (
+    dl_names+=("$name")
+    dl_urls+=("$url")
+    dl_outputs+=("$output")
+    asset_index=$((asset_index + 1))
+  done
+
+  local max_parallel="${FIRMWARE_RELEASE_PARALLEL_DOWNLOADS:-4}"
+  local total="${#dl_names[@]}"
+  local start=0
+  while [[ "$start" -lt "$total" ]]; do
+    local end=$((start + max_parallel))
+    [[ "$end" -gt "$total" ]] && end="$total"
+
+    local -a batch_pids=() batch_names=() batch_progress=()
+    local i
+    for ((i = start; i < end; i++)); do
+      local name="${dl_names[i]}"
+      local url="${dl_urls[i]}"
+      local output="${dl_outputs[i]}"
+      local progress_file="$output.progress"
+
+      : > "$progress_file"
       curl -fL --continue-at - --retry 5 --retry-all-errors --retry-delay 2 \
-        --progress-bar --stderr "$progress_file" "$url" -o "$output"
-    ) &
-    if ! spinner "$!" "Downloading $name" "$asset_index" "$assets_count" "$progress_file"; then
-      cat "$progress_file" >&2
-      rm -f "$progress_file"
+        --progress-bar --stderr "$progress_file" "$url" -o "$output" &
+      batch_pids+=("$!")
+      batch_names+=("$name")
+      batch_progress+=("$progress_file")
+    done
+
+    if ! multi_spinner batch_pids batch_names batch_progress; then
+      for progress_file in "${batch_progress[@]}"; do
+        rm -f "$progress_file"
+      done
       return 1
     fi
-    rm -f "$progress_file"
-    asset_index=$((asset_index + 1))
+    for progress_file in "${batch_progress[@]}"; do
+      rm -f "$progress_file"
+    done
+
+    start="$end"
   done
 }
 
@@ -379,12 +444,6 @@ promote() {
     rm -f "$ROOT_DIR/rc"
   elif [[ -e "$ROOT_DIR/rc" ]]; then
     rm -rf "$ROOT_DIR/rc"
-  fi
-
-  if [[ -L "$ROOT_DIR/testing" ]]; then
-    rm -f "$ROOT_DIR/testing"
-  elif [[ -e "$ROOT_DIR/testing" ]]; then
-    rm -rf "$ROOT_DIR/testing"
   fi
 
   if [[ -L "$ROOT_DIR/stable" ]]; then
