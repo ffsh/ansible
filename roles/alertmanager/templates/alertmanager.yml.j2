@@ -14,3 +14,20 @@ receivers:
       - bot_token: {{ vault_secrets.alertmanager.telegram_bot_token | to_json }}
         chat_id: {{ vault_secrets.alertmanager.telegram_chat_id }}
         send_resolved: true
+        message: |
+          {% raw %}{{ if eq .Status "firing" }}
+          THE {{ range .Alerts }}{{ .Labels.target }}{{ end }} SERVER HAS LEFT THE BUILDING
+
+          The HTTPS check for {{ range .Alerts }}{{ .Labels.target }}{{ end }} has failed for over 5 minutes.
+
+          The server may be offline, unreachable, or contemplating its life choices.
+
+          Severity: {{ range .Alerts }}{{ .Labels.severity }}{{ end }}
+          Check: {{ range .Alerts }}{{ .Labels.job }}{{ end }}
+          {{ else }}
+          {{ range .Alerts }}{{ .Labels.target }} IS BACK
+
+          The HTTPS check for {{ .Labels.target }} is responding normally again.
+
+          The server has returned from its brief adventure.
+          {{ end }}{{ end }}{% endraw %}

@@ -37,6 +37,7 @@ scrape_configs:
       - targets: ["{{ hostvars[target].blackbox_http_url }}"]
         labels:
           instance: "{{ target }}"
+          target: "{{ target }}"
 {% endfor %}
 
     relabel_configs:
