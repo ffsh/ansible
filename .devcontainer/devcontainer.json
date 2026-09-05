@@ -4,12 +4,12 @@
   "remoteUser": "vscode",
   "updateRemoteUserUID": true,
   "features": {
-    "ghcr.io/devcontainers/features/common-utils:2": {
-      "installZsh": true,
-      "installOhMyZsh": true,
-      "configureZshAsDefaultShell": true,
-      "username": "vscode"
-    }
+    // "ghcr.io/devcontainers/features/common-utils:2.5.9": {
+    //   "installZsh": true,
+    //   "installOhMyZsh": true,
+    //   "configureZshAsDefaultShell": true,
+    //   "username": "vscode"
+    // }
   },
   "customizations": {
     "vscode": {

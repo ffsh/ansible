@@ -120,6 +120,18 @@ Run the monitoring host:
 ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit monitoring
 ```
 
+Alertmanager is available through an SSH tunnel because it listens on localhost
+on the monitoring host:
+
+```bash
+ssh -N -L 9093:127.0.0.1:9093 root@$monitoringIP
+```
+
+Then open `http://127.0.0.1:9093` in your browser.
+
+The Alertmanager role installs the official release, including the web UI and
+the `amtool` command-line utility. The debian package does not contain the web UI so we go with this.
+
 By default, deployments run one host at a time (`serial: 1`).
 
 Special case: run all gateways at once (for example for fast static page updates):

@@ -3,6 +3,13 @@
     name: prometheus
     state: present
     update_cache: true
+- name: Configure Prometheus alert rules
+  ansible.builtin.template:
+    src: alert_rules.yml.j2
+    dest: /etc/prometheus/alert_rules.yml
+    owner: root
+    group: root
+    mode: "0644"
 - name: Configure Prometheus
   ansible.builtin.template:
     src: prometheus.yml.j2

@@ -1,0 +1,5 @@
+- name: Restart alertmanager
+  ansible.builtin.systemd:
+    name: prometheus-alertmanager
+    daemon_reload: true
+    state: restarted
