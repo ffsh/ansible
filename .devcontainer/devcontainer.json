@@ -1,6 +1,6 @@
 {
   "name": "ansible-dev",
-  "image": "mcr.microsoft.com/devcontainers/python:3.12-trixie",
+  "image": "mcr.microsoft.com/devcontainers/python:1-3.12-bookworm",
   "remoteUser": "vscode",
   "updateRemoteUserUID": true,
   "features": {
@@ -8,8 +8,7 @@
       "installZsh": true,
       "installOhMyZsh": true,
       "configureZshAsDefaultShell": true,
-      "username": "vscode",
-      "upgradePackages": false
+      "username": "vscode"
     }
   },
   "customizations": {
