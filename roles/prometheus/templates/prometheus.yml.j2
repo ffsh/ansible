@@ -65,7 +65,11 @@ scrape_configs:
     scheme: https
 
     static_configs:
-      - targets: ["beste.freifunk-suedholstein.de", "brunsbach.freifunk-suedholstein.de", "trave.freifunk-suedholstein.de"]
+{% for target in groups['gateways'] %}
+      - targets: ["{{ target }}.freifunk-suedholstein.de"]
+        labels:
+          target: "{{ target }}"
+{% endfor %}
 
   - job_name: "services"
 
