@@ -132,6 +132,8 @@
       ansible.builtin.include_vars:
         file: group_vars/secrets.yml
         name: vault_secrets
+      tags:
+        - always
   # pre_tasks:
   #   - name: Abort if target OS is not Ubuntu 24.04
   #     ansible.builtin.assert:
@@ -152,6 +154,7 @@
   roles:
     - {role: blackbox_exporter, tags: "blackbox-exporter"}
     - {role: grafana, tags: "grafana"}
+    - {role: alertmanager, tags: "alertmanager"}
     - {role: prometheus, tags: "prometheus"}
 
   post_tasks:

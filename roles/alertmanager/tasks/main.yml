@@ -1,0 +1,94 @@
+- name: Stop Debian Alertmanager service
+  ansible.builtin.systemd:
+    name: prometheus-alertmanager
+    state: stopped
+  failed_when: false
+
+- name: Remove Debian Alertmanager package
+  ansible.builtin.apt:
+    name: prometheus-alertmanager
+    state: absent
+
+- name: Remove Debian Alertmanager UI and systemd drop-in
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /usr/share/prometheus/alertmanager
+    - /etc/systemd/system/prometheus-alertmanager.service.d
+
+- name: Create Alertmanager user
+  ansible.builtin.user:
+    name: prometheus
+    system: true
+    create_home: false
+
+- name: Create Alertmanager directories
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner | default('prometheus') }}"
+    group: "{{ item.group | default('prometheus') }}"
+    mode: "{{ item.mode | default('0755') }}"
+  loop:
+    - path: /etc/prometheus
+      owner: root
+      group: root
+    - path: /var/lib/prometheus/alertmanager
+
+- name: Download official Alertmanager release
+  ansible.builtin.get_url:
+    url: "https://github.com/prometheus/alertmanager/releases/download/v{{ alertmanager_version }}/alertmanager-{{ alertmanager_version }}.linux-amd64.tar.gz"
+    dest: "/tmp/alertmanager-{{ alertmanager_version }}.linux-amd64.tar.gz"
+    checksum: "sha256:{{ alertmanager_checksum }}"
+    mode: "0644"
+
+- name: Extract official Alertmanager release
+  ansible.builtin.unarchive:
+    src: "/tmp/alertmanager-{{ alertmanager_version }}.linux-amd64.tar.gz"
+    dest: /opt
+    remote_src: true
+    creates: "/opt/alertmanager-{{ alertmanager_version }}.linux-amd64/alertmanager"
+
+- name: Point Alertmanager installation at selected release
+  ansible.builtin.file:
+    src: "/opt/alertmanager-{{ alertmanager_version }}.linux-amd64"
+    dest: /opt/alertmanager
+    state: link
+    force: true
+  notify: Restart alertmanager
+
+- name: Link Alertmanager command-line tools
+  ansible.builtin.file:
+    src: "/opt/alertmanager/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    state: link
+    force: true
+  loop:
+    - alertmanager
+    - amtool
+
+- name: Configure Alertmanager
+  ansible.builtin.template:
+    src: alertmanager.yml.j2
+    dest: /etc/prometheus/alertmanager.yml
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart alertmanager
+
+- name: Install Alertmanager systemd service
+  ansible.builtin.template:
+    src: prometheus-alertmanager.service.j2
+    dest: /etc/systemd/system/prometheus-alertmanager.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart alertmanager
+
+- name: Enable and start Alertmanager
+  ansible.builtin.systemd:
+    name: prometheus-alertmanager
+    daemon_reload: true
+    enabled: true
+    state: started

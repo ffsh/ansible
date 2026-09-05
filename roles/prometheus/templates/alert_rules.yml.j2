@@ -1,0 +1,11 @@
+groups:
+  - name: blackbox
+    rules:
+      - alert: ProbeFailed
+        expr: probe_success == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Blackbox probe failed for {{ '{{ $labels.instance }}' }}"
+          description: "The {{ '{{ $labels.job }}' }} probe for {{ '{{ $labels.instance }}' }} has failed for more than 5 minutes."
