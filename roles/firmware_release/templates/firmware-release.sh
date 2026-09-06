@@ -4,6 +4,7 @@ set -euo pipefail
 OWNER="{{ firmware_release_owner }}"
 REPO="{{ firmware_release_repo }}"
 ROOT_DIR="{{ firmware_release_root }}"
+{% raw %}
 API_BASE="https://api.github.com/repos/${OWNER}/${REPO}/releases"
 
 TMP_DIR=""
@@ -509,3 +510,4 @@ main() {
 }
 
 main "$@"
+{% endraw %}
