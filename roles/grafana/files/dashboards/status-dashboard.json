@@ -264,7 +264,7 @@
                       "kind": "DataQuery",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "probe_success{job=\"blackbox-http\"}",
+                        "expr": "probe_success{job=~\"blackbox-(http|dns)\"}",
                         "format": "time_series",
                         "instant": false,
                         "legendFormat": "{{instance}}",
@@ -381,7 +381,7 @@
                       "kind": "DataQuery",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "probe_success{job=\"blackbox-http\"}",
+                        "expr": "probe_success{job=~\"blackbox-(http|dns)\"}",
                         "legendFormat": "{{instance}}",
                         "range": false
                       },
@@ -546,7 +546,7 @@
       "timezone": "browser",
       "to": "now"
     },
-    "title": "Freifunk Status (v1.0.0)",
+    "title": "Freifunk Status (v1.0.1)",
     "variables": []
   }
 }
