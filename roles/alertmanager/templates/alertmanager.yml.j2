@@ -25,6 +25,15 @@ receivers:
 
           Severity: {{ .Labels.severity }}
           Check: {{ .Labels.job }}
+          {{ else if eq .Labels.job "blackbox-dns" }}
+          THE DNS SERVER HAS LEFT THE BUILDING
+
+          The DNS check for {{ .Labels.target }} against {{ .Labels.instance }} has failed for over 5 minutes.
+
+          The DNS server may be offline, unreachable, or unable to answer queries.
+
+          Severity: {{ .Labels.severity }}
+          Check: {{ .Labels.job }}
           {{ else }}
           THE {{ .Labels.target }} SERVER HAS LEFT THE BUILDING
 
@@ -41,6 +50,12 @@ receivers:
           The WireGuard exit connection on {{ .Labels.target }} is responding normally again.
 
           The tunnel has returned from its brief adventure.
+          {{ else if eq .Labels.job "blackbox-dns" }}
+          DNS IS BACK
+
+          The DNS check for {{ .Labels.target }} against {{ .Labels.instance }} is responding normally again.
+
+          The DNS server has returned from its brief adventure.
           {{ else }}
           {{ .Labels.target }} IS BACK
 
