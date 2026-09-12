@@ -209,7 +209,7 @@
         "from": "now-6h",
         "to": "now"
     },
-    "title": "BIND DNS",
+    "title": "BIND DNS (v1.0.0)",
     "uid": "bind-dns",
     "version": 1
 }
