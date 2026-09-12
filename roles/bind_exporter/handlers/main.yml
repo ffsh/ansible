@@ -1,0 +1,5 @@
+- name: Restart bind_exporter
+  ansible.builtin.systemd:
+    name: bind_exporter
+    daemon_reload: true
+    state: restarted

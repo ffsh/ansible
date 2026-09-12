@@ -50,6 +50,27 @@ If you want to deploy to a new gateway you need to add it to the `hosts.yml` fil
 
 If you want to add a batman-only service host, add it to the `services` group in `hosts.yml`. These hosts only receive the `batman` and `batctl` roles.
 
+The standalone DNS host belongs to the `dns` group. The DNS play only installs
+node_exporter and bind_exporter; it does not manage the existing BIND service,
+zones, or listening addresses.
+
+Before deploying the exporters, configure the DNS host's manually managed BIND
+instance to expose its statistics channel on localhost at
+`http://127.0.0.1:8053/`, then reload BIND and verify its statistics endpoint.
+The bind_exporter service reads the BIND PID file at
+`/run/named/named.pid`. Allow the monitoring host to reach TCP/UDP port 53 and
+TCP ports 9100 and 9119 as appropriate for the blackbox DNS probe and exporter
+scrapes; restrict exporter access to the monitoring host.
+
+Deploy the DNS exporters with:
+
+```bash
+ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit bind --tags node_exporter,bind_exporter
+```
+
+The monitoring host probes `freifunk-suedholstein.de` as an `A` record against
+the DNS host and exposes the result as the `blackbox-dns` Prometheus job.
+
 If you set enable_wireguard_exit to true ansible will deploy wireguard and attempt to generate a mullvad config.
 
 ## Mullvad

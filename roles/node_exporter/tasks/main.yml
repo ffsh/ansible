@@ -1,10 +1,11 @@
 - name: Create node_exporter service
-  ansible.builtin.copy:
-    src: files/node_exporter.service
+  ansible.builtin.template:
+    src: node_exporter.service
     dest: /etc/systemd/system
     mode: "0600"
     owner: root
     group: root
+  notify: Restart node_exporter
 
 - name: Reload systemd
   ansible.builtin.systemd:

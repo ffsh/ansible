@@ -1,0 +1,47 @@
+- name: Create prometheus system user for bind_exporter
+  ansible.builtin.user:
+    name: prometheus
+    system: true
+    create_home: false
+
+- name: Download bind_exporter
+  ansible.builtin.get_url:
+    url: >-
+      https://github.com/prometheus-community/bind_exporter/releases/download/v{{
+      bind_exporter_version }}/bind_exporter-{{ bind_exporter_version }}.linux-amd64.tar.gz
+    dest: /tmp/bind_exporter-{{ bind_exporter_version }}.linux-amd64.tar.gz
+    checksum: "sha256:{{ bind_exporter_checksum }}"
+    mode: "0644"
+
+- name: Extract bind_exporter
+  ansible.builtin.unarchive:
+    src: /tmp/bind_exporter-{{ bind_exporter_version }}.linux-amd64.tar.gz
+    dest: /opt
+    remote_src: true
+    creates: /opt/bind_exporter-{{ bind_exporter_version }}.linux-amd64/bind_exporter
+
+- name: Install bind_exporter binary
+  ansible.builtin.copy:
+    remote_src: true
+    src: /opt/bind_exporter-{{ bind_exporter_version }}.linux-amd64/bind_exporter
+    dest: /usr/local/bin/bind_exporter
+    owner: prometheus
+    group: prometheus
+    mode: "0755"
+  notify: Restart bind_exporter
+
+- name: Install bind_exporter service
+  ansible.builtin.template:
+    src: bind_exporter.service
+    dest: /etc/systemd/system/bind_exporter.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart bind_exporter
+
+- name: Enable and start bind_exporter
+  ansible.builtin.systemd:
+    name: bind_exporter
+    daemon_reload: true
+    enabled: true
+    state: started

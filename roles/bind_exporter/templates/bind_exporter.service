@@ -1,0 +1,13 @@
+[Unit]
+Description=Prometheus BIND exporter
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=prometheus
+Group=prometheus
+ExecStart=/usr/local/bin/bind_exporter --web.listen-address={{ bind_exporter_listen_address }} --bind.stats-url={{ bind_exporter_stats_url }} --bind.pid-file={{ bind_exporter_pid_file }}
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
