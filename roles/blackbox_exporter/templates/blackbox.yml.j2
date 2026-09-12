@@ -4,3 +4,11 @@ modules:
     timeout: 10s
     http:
       follow_redirects: true
+  dns_a:
+    prober: dns
+    timeout: 5s
+    dns:
+      query_name: freifunk-suedholstein.de
+      query_type: A
+      transport_protocol: udp
+      preferred_ip_protocol: ip4

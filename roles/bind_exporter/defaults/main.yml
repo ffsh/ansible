@@ -1,0 +1,3 @@
+bind_exporter_listen_address: "127.0.0.1:9119"
+bind_exporter_stats_url: "http://127.0.0.1:8053/"
+bind_exporter_pid_file: "/run/named/named.pid"

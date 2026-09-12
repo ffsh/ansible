@@ -48,6 +48,44 @@ scrape_configs:
       - target_label: __address__
         replacement: 127.0.0.1:9115
 
+  - job_name: "blackbox-dns"
+
+    metrics_path: /probe
+    params:
+      module: [dns_a]
+
+    static_configs:
+      - targets: ["116.203.153.15:53"]
+        labels:
+          instance: "bind"
+          target: "freifunk-suedholstein.de"
+
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 127.0.0.1:9115
+
+  - job_name: "dns-node-exporter"
+
+    static_configs:
+{% for target in groups['dns'] %}
+      - targets: ["{{ hostvars[target].ansible_ssh_host }}:9100"]
+        labels:
+          target: "{{ target }}"
+{% endfor %}
+
+  - job_name: "dns-bind-exporter"
+
+    static_configs:
+{% for target in groups['dns'] %}
+      - targets: ["{{ hostvars[target].ansible_ssh_host }}:9119"]
+        labels:
+          target: "{{ target }}"
+{% endfor %}
+
   - job_name: "gateways"
 
     metrics_path: stats/metrics

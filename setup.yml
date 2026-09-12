@@ -177,3 +177,28 @@
         - not ansible_check_mode
       tags:
         - always
+
+- name: Deploy DNS exporters
+  hosts: dns
+  serial: "{{ deploy_serial | default(1) }}"
+  vars_files:
+    - group_vars/versions.yml
+  vars:
+    users:
+      - username: root
+  pre_tasks:
+    - name: Abort if target OS is not Debian 13
+      ansible.builtin.assert:
+        that:
+          - ansible_facts["distribution"] == "Debian"
+          - ansible_facts["distribution_major_version"] == "13"
+        fail_msg: >-
+          Unsupported target OS: {{ ansible_facts["distribution"] }} {{
+          ansible_facts["distribution_version"] }}. This playbook supports
+          Debian 13 only.
+        success_msg: "Target OS check passed: Debian 13"
+      tags:
+        - always
+  roles:
+    - {role: node_exporter, tags: "node_exporter"}
+    - {role: bind_exporter, tags: "bind_exporter"}
