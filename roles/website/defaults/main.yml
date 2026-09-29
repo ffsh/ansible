@@ -7,5 +7,7 @@ website_default_http_redirect: true
 website_default_tls: true
 website_default_ssl_dhparam: /etc/nginx/dhparam.pem
 website_default_email: noc@freifunk-suedholstein.de
+website_auto_issue_tls: false
+website_deploy_user: {}
 
 website_vhosts: []

@@ -29,6 +29,26 @@ website_vhosts:
     cors_enabled: true
     cors_allow_all: true
 
+  - name: beta.freifunk-suedholstein.de
+    root: /var/www/web-beta
+    index: index.html
+    type: static
+    tls: true
+    redirect_http_to_https: true
+    autoindex: false
+    cors_enabled: false
+    cors_allow_all: false
+
+website_deploy_user:
+  username: beta-deploy
+  group: www-data
+  groups:
+    - www-data
+  shell: /bin/bash
+  web_root: /var/www/web-beta
+  web_root_mode: "0775"
+  ssh_key: "{{ vault_website_beta_deploy_public_key | default('') }}"
+
 website_nginx_sites_available_dir: /etc/nginx/sites-available
 website_nginx_sites_enabled_dir: /etc/nginx/sites-enabled
 website_php_fpm_socket: /var/run/php/php8.3-fpm.sock
