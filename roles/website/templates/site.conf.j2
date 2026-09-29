@@ -50,6 +50,9 @@ server {
     {% endif %}
 
     location / {
+        expires 0;
+        add_header Cache-Control "no-cache" always;
+
         {% if item.cors_enabled | default(false) %}
         {% if item.cors_allow_all | default(false) %}
         add_header 'Access-Control-Allow-Origin' '*' always;
@@ -89,10 +92,13 @@ server {
         fastcgi_intercept_errors on;
         include snippets/fastcgi-php.conf;
         fastcgi_pass unix:{{ item.php_fpm_socket | default(website_default_php_fpm_socket) }};
+        expires 0;
+        add_header Cache-Control "no-cache" always;
     }
 
-    location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
-        expires max;
+    location ~* \.(jpg|jpeg|png|webp|avif|gif|svg|ico|css|js|woff2?|ttf|eot)$ {
+        expires 1M;
+        add_header Cache-Control "public, max-age=31536000, immutable" always;
         log_not_found off;
     }
 

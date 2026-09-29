@@ -8,6 +8,45 @@
       - python3-certbot-nginx
     state: present
 
+- name: Ensure deployment user exists when configured
+  ansible.builtin.user:
+    name: "{{ website_deploy_user.username }}"
+    state: present
+    create_home: true
+    shell: "{{ website_deploy_user.shell | default('/bin/bash') }}"
+    group: "{{ website_deploy_user.group | default('www-data') }}"
+    groups: "{{ website_deploy_user.groups | default(['www-data']) }}"
+    append: true
+  when:
+    - website_deploy_user is defined
+    - website_deploy_user.username is defined
+    - website_deploy_user.username | length > 0
+
+- name: Ensure beta deployment directory exists and is writable
+  ansible.builtin.file:
+    path: "{{ website_deploy_user.web_root }}"
+    state: directory
+    owner: "{{ website_deploy_user.username }}"
+    group: "{{ website_deploy_user.group | default('www-data') }}"
+    mode: "{{ website_deploy_user.web_root_mode | default('0775') }}"
+  when:
+    - website_deploy_user is defined
+    - website_deploy_user.web_root is defined
+    - website_deploy_user.web_root | length > 0
+
+- name: Install deploy SSH key for the deployment user
+  ansible.posix.authorized_key:
+    user: "{{ website_deploy_user.username }}"
+    state: present
+    key: "{{ website_deploy_user.ssh_key }}"
+    exclusive: false
+    manage_dir: true
+  when:
+    - website_deploy_user is defined
+    - website_deploy_user.username is defined
+    - website_deploy_user.ssh_key is defined
+    - website_deploy_user.ssh_key | length > 0
+
 - name: Ensure all website document roots exist
   ansible.builtin.file:
     path: "{{ item.root }}"
@@ -15,6 +54,41 @@
     owner: www-data
     group: www-data
     mode: "0755"
+  loop: "{{ website_vhosts }}"
+  loop_control:
+    loop_var: item
+
+- name: Check whether a certificate already exists for each configured vhost
+  ansible.builtin.stat:
+    path: "/etc/letsencrypt/live/{{ item.name }}/fullchain.pem"
+  register: website_cert_stat
+  loop: "{{ website_vhosts }}"
+  loop_control:
+    loop_var: item
+
+- name: Obtain TLS certificates for configured vhosts when explicitly enabled
+  ansible.builtin.command: >-
+    certbot certonly --standalone --non-interactive --agree-tos --email {{ website_default_email }}
+    {% for domain in (item.aliases | default([]) + [item.name]) %}
+    -d {{ domain }}
+    {% endfor %}
+  args:
+    creates: "/etc/letsencrypt/live/{{ item.name }}/fullchain.pem"
+  loop: "{{ website_vhosts }}"
+  loop_control:
+    loop_var: item
+  when:
+    - item.tls | default(true)
+    - website_auto_issue_tls | bool
+    - not website_cert_stat.results | selectattr('item.name', 'equalto', item.name) | map(attribute='stat.exists') | first
+
+- name: Fail before enabling TLS vhosts when the certificate is missing
+  ansible.builtin.assert:
+    that:
+      - not (item.tls | default(true)) or (website_cert_stat.results | selectattr('item.name', 'equalto', item.name) | map(attribute='stat.exists') | first)
+    fail_msg: >-
+      No certificate exists for {{ item.name }}. Issue the certificate manually or set
+      website_auto_issue_tls=true for automatic issuance.
   loop: "{{ website_vhosts }}"
   loop_control:
     loop_var: item
@@ -45,19 +119,6 @@
   ansible.builtin.file:
     path: "{{ website_nginx_sites_enabled_dir }}/default"
     state: absent
-
-- name: Obtain TLS certificates for configured vhosts
-  ansible.builtin.command: >-
-    certbot certonly --nginx --non-interactive --agree-tos --email {{ website_default_email }}
-    {% for domain in (item.aliases | default([]) + [item.name]) %}
-    -d {{ domain }}
-    {% endfor %}
-  args:
-    creates: "/etc/letsencrypt/live/{{ item.name }}/fullchain.pem"
-  loop: "{{ website_vhosts }}"
-  loop_control:
-    loop_var: item
-  when: item.tls | default(true)
 
 - name: Validate nginx configuration
   ansible.builtin.command: nginx -t
