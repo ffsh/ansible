@@ -75,6 +75,13 @@
     users:
       - username: root
   pre_tasks:
+    - name: Load shared deployment secrets
+      ansible.builtin.include_vars:
+        file: group_vars/secrets.yml
+        name: vault_secrets
+      tags:
+        - always
+
     - name: Abort if target OS is not Ubuntu 24.04
       ansible.builtin.assert:
         that:
