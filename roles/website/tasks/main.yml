@@ -4,55 +4,60 @@
       - nginx
       - php8.3-fpm
       - php8.3-cli
+      - certbot
+      - python3-certbot-nginx
     state: present
 
-- name: Ensure website directories exist
+- name: Ensure all website document roots exist
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: "{{ item.root }}"
     state: directory
     owner: www-data
     group: www-data
     mode: "0755"
-  loop:
-    - "{{ website_main_root }}"
-    - "{{ website_firmware_root }}"
+  loop: "{{ website_vhosts }}"
+  loop_control:
+    loop_var: item
 
-- name: Copy main website nginx config
+- name: Ensure nginx site configuration files exist
   ansible.builtin.template:
-    src: main-site.conf.j2
-    dest: "{{ website_nginx_sites_available_dir }}/ffsh-main.conf"
+    src: site.conf.j2
+    dest: "{{ website_nginx_sites_available_dir }}/{{ item.name | replace('.', '-') }}.conf"
     owner: root
     group: root
     mode: "0644"
+  loop: "{{ website_vhosts }}"
+  loop_control:
+    loop_var: item
   notify: Reload nginx
 
-- name: Copy firmware nginx config
-  ansible.builtin.template:
-    src: firmware.conf.j2
-    dest: "{{ website_nginx_sites_available_dir }}/ffsh-firmware.conf"
-    owner: root
-    group: root
-    mode: "0644"
-  notify: Reload nginx
-
-- name: Enable main website nginx site
+- name: Enable nginx website config files
   ansible.builtin.file:
-    src: "{{ website_nginx_sites_available_dir }}/ffsh-main.conf"
-    dest: "{{ website_nginx_sites_enabled_dir }}/ffsh-main.conf"
+    src: "{{ website_nginx_sites_available_dir }}/{{ item.name | replace('.', '-') }}.conf"
+    dest: "{{ website_nginx_sites_enabled_dir }}/{{ item.name | replace('.', '-') }}.conf"
     state: link
     force: true
-
-- name: Enable firmware nginx site
-  ansible.builtin.file:
-    src: "{{ website_nginx_sites_available_dir }}/ffsh-firmware.conf"
-    dest: "{{ website_nginx_sites_enabled_dir }}/ffsh-firmware.conf"
-    state: link
-    force: true
+  loop: "{{ website_vhosts }}"
+  loop_control:
+    loop_var: item
 
 - name: Disable default nginx config
   ansible.builtin.file:
     path: "{{ website_nginx_sites_enabled_dir }}/default"
     state: absent
+
+- name: Obtain TLS certificates for configured vhosts
+  ansible.builtin.command: >-
+    certbot certonly --nginx --non-interactive --agree-tos --email {{ website_default_email }}
+    {% for domain in (item.aliases | default([]) + [item.name]) %}
+    -d {{ domain }}
+    {% endfor %}
+  args:
+    creates: "/etc/letsencrypt/live/{{ item.name }}/fullchain.pem"
+  loop: "{{ website_vhosts }}"
+  loop_control:
+    loop_var: item
+  when: item.tls | default(true)
 
 - name: Validate nginx configuration
   ansible.builtin.command: nginx -t

@@ -1,20 +1,35 @@
-website_main_server_name: freifunk-suedholstein.de
-website_main_server_aliases:
-  - www.freifunk-suedholstein.de
-website_main_root: /var/www/web
-website_main_index: index.php
+website_vhosts:
+  - name: freifunk-suedholstein.de
+    aliases:
+      - www.freifunk-suedholstein.de
+    root: /var/www/web
+    index: index.php
+    type: php
+    tls: true
+    redirect_http_to_https: true
+    autoindex: true
+    stats_proxy: http://127.0.0.1:9100/
+    cors_enabled: true
+    cors_allowed_origins:
+      - localhost
+      - www.freifunk-suedholstein.de
+      - freifunk-suedholstein.de
+    php_fpm_socket: /var/run/php/php8.3-fpm.sock
 
-website_firmware_server_name: firmware.freifunk-suedholstein.de
-website_firmware_server_aliases:
-  - firmware.ffshev.de
-  - fw.ffshev.de
-website_firmware_root: /var/www/firmware
+  - name: firmware.freifunk-suedholstein.de
+    aliases:
+      - firmware.ffshev.de
+      - fw.ffshev.de
+    root: /var/www/firmware
+    index: index.html
+    type: static
+    tls: true
+    redirect_http_to_https: false
+    autoindex: true
+    cors_enabled: true
+    cors_allow_all: true
 
 website_nginx_sites_available_dir: /etc/nginx/sites-available
 website_nginx_sites_enabled_dir: /etc/nginx/sites-enabled
 website_php_fpm_socket: /var/run/php/php8.3-fpm.sock
-
-website_main_cert: /etc/letsencrypt/live/{{ website_main_server_name }}/fullchain.pem
-website_main_key: /etc/letsencrypt/live/{{ website_main_server_name }}/privkey.pem
-website_firmware_cert: /etc/letsencrypt/live/{{ website_firmware_server_name }}/fullchain.pem
-website_firmware_key: /etc/letsencrypt/live/{{ website_firmware_server_name }}/privkey.pem
+website_default_email: noc@freifunk-suedholstein.de

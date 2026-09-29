@@ -1,0 +1,127 @@
+{% set server_names = [item.name] + (item.aliases | default([])) %}
+{% set cert_path = '/etc/letsencrypt/live/' + item.name %}
+{% set use_default_server = item.default_server | default(false) %}
+
+{% if item.redirect_http_to_https | default(true) %}
+server {
+    listen 80{% if use_default_server %} default_server{% endif %};
+    listen [::]:80{% if use_default_server %} default_server{% endif %};
+
+    server_name {{ server_names | join(' ') }};
+    access_log off;
+
+    return 301 https://$host$request_uri;
+}
+{% endif %}
+
+server {
+    {% if item.tls | default(true) %}
+    listen 443 ssl http2{% if use_default_server %} default_server{% endif %};
+    listen [::]:443 ssl http2{% if use_default_server %} default_server{% endif %};
+    {% else %}
+    listen 80{% if use_default_server %} default_server{% endif %};
+    listen [::]:80{% if use_default_server %} default_server{% endif %};
+    {% endif %}
+
+    server_name {{ server_names | join(' ') }};
+    root {{ item.root }};
+    index {{ item.index | default('index.php') }};
+
+    autoindex {{ 'on' if item.autoindex | default(false) else 'off' }};
+    access_log off;
+
+    {% if item.type | default('static') == 'php' %}
+    location = /favicon.ico {
+        log_not_found off;
+        access_log off;
+    }
+
+    location = /robots.txt {
+        allow all;
+        log_not_found off;
+        access_log off;
+    }
+    {% endif %}
+
+    {% if item.stats_proxy is defined %}
+    location /stats/ {
+        proxy_pass {{ item.stats_proxy }};
+    }
+    {% endif %}
+
+    location / {
+        {% if item.cors_enabled | default(false) %}
+        {% if item.cors_allow_all | default(false) %}
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS' always;
+        add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range' always;
+        {% else %}
+        set $cors '';
+        if ($http_origin ~ '^https?://(localhost|{{ item.cors_allowed_origins | default([]) | join('|') | regex_replace('\.', '\\.') }})') {
+            set $cors 'true';
+        }
+
+        if ($cors = 'true') {
+            add_header 'Access-Control-Allow-Origin' "$http_origin" always;
+            add_header 'Access-Control-Allow-Credentials' 'true' always;
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS' always;
+            add_header 'Access-Control-Allow-Headers' 'Accept,Authorization,Cache-Control,Content-Type,DNT,If-Modified-Since,Keep-Alive,Origin,User-Agent,X-Requested-With' always;
+        }
+        {% endif %}
+
+        if ($request_method = 'OPTIONS') {
+            add_header 'Access-Control-Max-Age' 1728000;
+            add_header 'Content-Type' 'text/plain charset=UTF-8';
+            add_header 'Content-Length' 0;
+            return 204;
+        }
+        {% endif %}
+
+        {% if item.type | default('static') == 'php' %}
+        try_files $uri $uri/ /index.php$is_args$args;
+        {% else %}
+        try_files $uri $uri/ =404;
+        {% endif %}
+    }
+
+    {% if item.type | default('static') == 'php' %}
+    location ~ \.php$ {
+        fastcgi_intercept_errors on;
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:{{ item.php_fpm_socket | default(website_default_php_fpm_socket) }};
+    }
+
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+        expires max;
+        log_not_found off;
+    }
+
+    location ~ ^/wp-json/ {
+        rewrite ^/wp-json/(.*?)$ /?rest_route=/$1 last;
+    }
+    {% endif %}
+
+    {% if item.tls | default(true) %}
+    ssl_certificate {{ cert_path }}/fullchain.pem;
+    ssl_certificate_key {{ cert_path }}/privkey.pem;
+    ssl_session_timeout 1d;
+    ssl_session_cache shared:SSL:50m;
+    ssl_session_tickets off;
+
+    ssl_dhparam {{ website_default_ssl_dhparam }};
+
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers on;
+
+    add_header Strict-Transport-Security max-age=15768000;
+
+    ssl_stapling on;
+    ssl_stapling_verify on;
+    {% endif %}
+
+    {% if item.type | default('static') == 'php' %}
+    add_header 'X-Frame-Options' 'DENY';
+    add_header 'Content-Security-Policy' 'frame-ancestors https://{{ item.name }};';
+    {% endif %}
+}
