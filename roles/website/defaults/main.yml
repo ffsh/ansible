@@ -1,0 +1,19 @@
+website_main_server_name: example.org
+website_main_server_aliases:
+  - www.example.org
+website_main_root: /var/www/site
+website_main_index: index.php
+
+website_firmware_server_name: firmware.example.org
+website_firmware_server_aliases:
+  - firmware.example.net
+website_firmware_root: /var/www/firmware
+
+website_nginx_sites_available_dir: /etc/nginx/sites-available
+website_nginx_sites_enabled_dir: /etc/nginx/sites-enabled
+website_php_fpm_socket: /var/run/php/php8.3-fpm.sock
+
+website_main_cert: /etc/letsencrypt/live/{{ website_main_server_name }}/fullchain.pem
+website_main_key: /etc/letsencrypt/live/{{ website_main_server_name }}/privkey.pem
+website_firmware_cert: /etc/letsencrypt/live/{{ website_firmware_server_name }}/fullchain.pem
+website_firmware_key: /etc/letsencrypt/live/{{ website_firmware_server_name }}/privkey.pem

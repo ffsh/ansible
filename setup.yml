@@ -96,6 +96,7 @@
     - {role: batctl, tags: "batctl"}
     - {role: firmware_release, tags: "firmware-release"}
     - {role: firmware_selector, tags: "firmware-selector"}
+    - {role: website, tags: "website"}
     - {role: meshviewer, tags: "meshviewer"}
 
   post_tasks:

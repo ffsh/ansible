@@ -1,0 +1,60 @@
+- name: Install nginx and PHP runtime
+  ansible.builtin.apt:
+    pkg:
+      - nginx
+      - php8.3-fpm
+      - php8.3-cli
+    state: present
+
+- name: Ensure website directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: "0755"
+  loop:
+    - "{{ website_main_root }}"
+    - "{{ website_firmware_root }}"
+
+- name: Copy main website nginx config
+  ansible.builtin.template:
+    src: main-site.conf.j2
+    dest: "{{ website_nginx_sites_available_dir }}/ffsh-main.conf"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload nginx
+
+- name: Copy firmware nginx config
+  ansible.builtin.template:
+    src: firmware.conf.j2
+    dest: "{{ website_nginx_sites_available_dir }}/ffsh-firmware.conf"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload nginx
+
+- name: Enable main website nginx site
+  ansible.builtin.file:
+    src: "{{ website_nginx_sites_available_dir }}/ffsh-main.conf"
+    dest: "{{ website_nginx_sites_enabled_dir }}/ffsh-main.conf"
+    state: link
+    force: true
+
+- name: Enable firmware nginx site
+  ansible.builtin.file:
+    src: "{{ website_nginx_sites_available_dir }}/ffsh-firmware.conf"
+    dest: "{{ website_nginx_sites_enabled_dir }}/ffsh-firmware.conf"
+    state: link
+    force: true
+
+- name: Disable default nginx config
+  ansible.builtin.file:
+    path: "{{ website_nginx_sites_enabled_dir }}/default"
+    state: absent
+
+- name: Validate nginx configuration
+  ansible.builtin.command: nginx -t
+  changed_when: false
+  notify: Reload nginx
