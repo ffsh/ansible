@@ -34,6 +34,19 @@
     - website_deploy_user.web_root is defined
     - website_deploy_user.web_root | length > 0
 
+- name: Ensure beta deployment directory contents are writable for deploy user and web group
+  ansible.builtin.file:
+    path: "{{ website_deploy_user.web_root }}"
+    state: directory
+    recurse: true
+    owner: "{{ website_deploy_user.username }}"
+    group: "{{ website_deploy_user.group | default('www-data') }}"
+    mode: "u=rwX,g=rwX,o=rX"
+  when:
+    - website_deploy_user is defined
+    - website_deploy_user.web_root is defined
+    - website_deploy_user.web_root | length > 0
+
 - name: Install deploy SSH key for the deployment user
   ansible.posix.authorized_key:
     user: "{{ website_deploy_user.username }}"
@@ -51,9 +64,9 @@
   ansible.builtin.file:
     path: "{{ item.root }}"
     state: directory
-    owner: www-data
-    group: www-data
-    mode: "0755"
+    owner: "{{ item.owner | default('www-data') }}"
+    group: "{{ item.group | default('www-data') }}"
+    mode: "{{ item.mode | default('0755') }}"
   loop: "{{ website_vhosts }}"
   loop_control:
     loop_var: item

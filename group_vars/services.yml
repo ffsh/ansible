@@ -31,6 +31,9 @@ website_vhosts:
 
   - name: beta.freifunk-suedholstein.de
     root: /var/www/web-beta
+    owner: beta-deploy
+    group: www-data
+    mode: "0775"
     index: index.html
     type: static
     tls: true
@@ -47,7 +50,7 @@ website_deploy_user:
   shell: /bin/bash
   web_root: /var/www/web-beta
   web_root_mode: "0775"
-  ssh_key: "{{ vault_website_beta_deploy_public_key | default('') }}"
+  ssh_key: "{{ vault_secrets.vault_website_beta_deploy_public_key | default('') }}"
 
 website_nginx_sites_available_dir: /etc/nginx/sites-available
 website_nginx_sites_enabled_dir: /etc/nginx/sites-enabled
