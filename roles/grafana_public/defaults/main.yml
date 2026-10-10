@@ -1,0 +1,14 @@
+---
+grafana_public_apt_key_url: https://apt.grafana.com/gpg.key
+grafana_public_apt_keyring: /etc/apt/keyrings/grafana.gpg
+grafana_public_apt_repository: "deb [signed-by={{ grafana_public_apt_keyring }}] https://apt.grafana.com stable main"
+
+grafana_public_domain: grafana.freifunk-suedholstein.de
+grafana_public_root_url: "https://{{ grafana_public_domain }}/"
+grafana_public_http_addr: 127.0.0.1
+grafana_public_http_port: 3000
+grafana_public_cert_file: "/etc/letsencrypt/live/{{ grafana_public_domain }}/fullchain.pem"
+grafana_public_cert_key: "/etc/letsencrypt/live/{{ grafana_public_domain }}/privkey.pem"
+
+grafana_public_nginx_sites_available_dir: /etc/nginx/sites-available
+grafana_public_nginx_sites_enabled_dir: /etc/nginx/sites-enabled

@@ -1,0 +1,86 @@
+---
+- name: Skip public Grafana on non-map hosts
+  ansible.builtin.meta: end_role
+  when: inventory_hostname != "map-ffsh"
+
+- name: Install prerequisites for Grafana repository
+  ansible.builtin.apt:
+    name: gnupg
+    state: present
+
+- name: Create APT keyrings directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Download Grafana repository signing key
+  ansible.builtin.get_url:
+    url: "{{ grafana_public_apt_key_url }}"
+    dest: /tmp/grafana-public.gpg.key
+    mode: "0644"
+
+- name: Convert Grafana repository signing key
+  ansible.builtin.command:
+    cmd: "gpg --dearmor --output {{ grafana_public_apt_keyring }} /tmp/grafana-public.gpg.key"
+    creates: "{{ grafana_public_apt_keyring }}"
+
+- name: Configure Grafana APT repository
+  ansible.builtin.apt_repository:
+    repo: "{{ grafana_public_apt_repository }}"
+    filename: grafana-public
+    state: present
+    update_cache: true
+
+- name: Install Grafana
+  ansible.builtin.apt:
+    name: grafana
+    state: present
+
+- name: Ensure Grafana service is enabled and running
+  ansible.builtin.systemd:
+    name: grafana-server
+    enabled: true
+    state: started
+
+- name: Configure Grafana public instance
+  ansible.builtin.template:
+    src: grafana.ini.j2
+    dest: /etc/grafana/grafana.ini
+    owner: root
+    group: grafana
+    mode: "0640"
+  notify: Restart Grafana
+
+- name: Ensure nginx vhost directory exists
+  ansible.builtin.file:
+    path: "{{ grafana_public_nginx_sites_available_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Configure Grafana nginx vhost
+  ansible.builtin.template:
+    src: grafana.conf.j2
+    dest: "{{ grafana_public_nginx_sites_available_dir }}/{{ grafana_public_domain | replace('.', '-') }}.conf"
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Reload nginx
+
+- name: Enable Grafana nginx vhost
+  ansible.builtin.file:
+    src: "{{ grafana_public_nginx_sites_available_dir }}/{{ grafana_public_domain | replace('.', '-') }}.conf"
+    dest: "{{ grafana_public_nginx_sites_enabled_dir }}/{{ grafana_public_domain | replace('.', '-') }}.conf"
+    state: link
+    force: true
+
+- name: Validate nginx configuration
+  ansible.builtin.command: nginx -t
+  changed_when: false
+  notify:
+    - Reload nginx

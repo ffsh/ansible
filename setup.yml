@@ -104,6 +104,7 @@
     - {role: firmware_release, tags: "firmware-release"}
     - {role: firmware_selector, tags: "firmware-selector"}
     - {role: website, tags: "website"}
+    - {role: grafana_public, tags: "grafana-public"}
     - {role: meshviewer, tags: "meshviewer"}
 
   post_tasks:
