@@ -1,0 +1,22 @@
+##################### Grafana Configuration #####################
+[paths]
+[server]
+http_addr = {{ grafana_public_http_addr }}
+http_port = {{ grafana_public_http_port }}
+domain = {{ grafana_public_domain }}
+root_url = {{ grafana_public_root_url }}
+
+[database]
+;type = sqlite3
+;path = grafana.db
+
+[security]
+allow_embedding = true
+
+[users]
+allow_sign_up = false
+
+[auth.anonymous]
+enabled = true
+org_name = Freifunk Südholstein
+org_role = Viewer

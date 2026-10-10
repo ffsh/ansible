@@ -16,6 +16,7 @@ meshviewer_site_name: Freifunk Südholstein
 meshviewer_max_age: 21
 meshviewer_node_zoom: 19
 
+# Grafana is proxied through the meshviewer nginx config to prevent cors issues
 meshviewer_grafana:
   url: /_grafana
   orgId: 1
