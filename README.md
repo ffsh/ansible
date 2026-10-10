@@ -1,7 +1,7 @@
 # Ansible
 [![Ansible Lint](https://github.com/ffsh/ansible/actions/workflows/ansible-lint.yml/badge.svg?branch=main)](https://github.com/ffsh/ansible/actions/workflows/ansible-lint.yml)
 
-This repository holds the Ansible playbook to deploy a ffsh gateway in the standard configuration and to provision batman-only service hosts.
+This repository holds the Ansible playbook to deploy a ffsh gateway in the standard configuration and to provision dedicated service hosts.
 It is based on https://docs.freifunk-suedholstein.de/de/1.5/gateway.html but changes were made where it was plausible.
 
 ## requirements
@@ -48,7 +48,10 @@ That way Ansible will be able to automatically detect the right ssh key and conn
 ## hosts
 If you want to deploy to a new gateway you need to add it to the `hosts.yml` file in the repo, just compare it to brunsbach and add your own details.
 
-If you want to add a batman-only service host, add it to the `services` group in `hosts.yml`. These hosts only receive the `batman` and `batctl` roles.
+If you want to add a service host, place it in the dedicated service group in `hosts.yml`:
+
+- `services_map` for the map stack (`batman`, `batctl`, `grafana_public`, `meshviewer`)
+- `services_web` for the web stack (`batman`, `batctl`, `website`, `firmware_release`, `firmware_selector`)
 
 The standalone DNS host belongs to the `dns` group. The DNS play only installs
 node_exporter and bind_exporter; it does not manage the existing BIND service,
@@ -129,10 +132,22 @@ Run playbook on all gateways listed in `hosts`:
 ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit gateways
 ```
 
-Run the batman-only service hosts (web-server map-server):
+Run both service hosts:
 
 ```bash
-ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit services
+ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit "services_map:services_web"
+```
+
+Run only the map service host:
+
+```bash
+ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit services_map
+```
+
+Run only the web service host:
+
+```bash
+ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit services_web
 ```
 
 Run the monitoring host:

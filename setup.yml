@@ -66,8 +66,67 @@
       tags:
         - always
 
-- name: Services Deployment
-  hosts: services
+- name: Services Deployment (map)
+  hosts: services_map
+  serial: "{{ deploy_serial | default(1) }}"
+  vars_files:
+    - group_vars/versions.yml
+  vars:
+    users:
+      - username: root
+  pre_tasks:
+    - name: Load shared deployment secrets
+      ansible.builtin.include_vars:
+        file: group_vars/secrets.yml
+        name: vault_secrets
+      tags:
+        - always
+
+    - name: Abort if target OS is not Ubuntu 24.04
+      ansible.builtin.assert:
+        that:
+          - ansible_facts["distribution"] == "Ubuntu"
+          - ansible_facts["distribution_version"] == "24.04"
+        fail_msg: >-
+          Unsupported target OS: {{ ansible_facts["distribution"] }} {{
+          ansible_facts["distribution_version"] }}. This playbook supports
+          Ubuntu 24.04 only.
+        success_msg: "Target OS check passed: Ubuntu 24.04"
+      tags:
+        - always
+
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+  roles:
+    - {role: batman, tags: "batman-adv"}
+    - {role: batctl, tags: "batctl"}
+    - {role: grafana_public, tags: "grafana-public"}
+    - {role: meshviewer, tags: "meshviewer"}
+
+  post_tasks:
+    - name: Check if reboot is required
+      ansible.builtin.stat:
+        path: /var/run/reboot-required
+      register: system_reboot_required
+      changed_when: false
+      tags:
+        - always
+
+    - name: Reboot if required
+      ansible.builtin.reboot:
+        msg: Reboot triggered by Ansible because /var/run/reboot-required exists.
+        reboot_timeout: 900
+        connect_timeout: 10
+        post_reboot_delay: 15
+      when:
+        - system_reboot_required.stat.exists
+        - not ansible_check_mode
+      tags:
+        - always
+
+- name: Services Deployment (web)
+  hosts: services_web
   serial: "{{ deploy_serial | default(1) }}"
   vars_files:
     - group_vars/versions.yml
@@ -104,8 +163,6 @@
     - {role: firmware_release, tags: "firmware-release"}
     - {role: firmware_selector, tags: "firmware-selector"}
     - {role: website, tags: "website"}
-    - {role: grafana_public, tags: "grafana-public"}
-    - {role: meshviewer, tags: "meshviewer"}
 
   post_tasks:
     - name: Check if reboot is required

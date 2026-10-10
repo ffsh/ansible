@@ -17,7 +17,7 @@ This project provisions Freifunk Südholstein gateways and related services. The
 
 - README.md: deployment, usage, and vault guidance
 - setup.yml: main playbook with gateway, service, and monitoring roles
-- hosts.yml: inventory for gateways, services, and monitoring hosts
+- hosts.yml: inventory for gateways, split service groups, and monitoring hosts
 - group_vars/versions.yml: shared software versions
 - group_vars/secrets.yml: shared encrypted vars
 - host_vars/: host-specific secret and config values
@@ -26,7 +26,8 @@ This project provisions Freifunk Südholstein gateways and related services. The
 ## Host groups
 
 - gateways: complete production router deployment
-- services: lightweight service-only hosts
+- services_map: map service host roles
+- services_web: web service host roles
 - monitoring: Prometheus/Grafana stack
 
 ## Typical workflow
@@ -34,7 +35,9 @@ This project provisions Freifunk Südholstein gateways and related services. The
 ```bash
 ansible-playbook --vault-id=fastd_key@prompt setup.yml
 ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit gateways
-ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit services
+ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit "services_map:services_web"
+ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit services_map
+ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit services_web
 ansible-playbook --vault-id=fastd_key@prompt setup.yml --check
 ansible-lint
 ```
