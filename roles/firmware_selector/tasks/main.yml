@@ -1,7 +1,3 @@
-- name: Skip firmware selector on non-target hosts
-  ansible.builtin.meta: end_role
-  when: inventory_hostname != firmware_selector_target_host
-
 - name: Install firmware selector dependency
   ansible.builtin.apt:
     name: git

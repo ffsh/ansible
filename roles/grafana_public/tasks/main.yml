@@ -1,8 +1,3 @@
----
-- name: Skip public Grafana on non-map hosts
-  ansible.builtin.meta: end_role
-  when: inventory_hostname != "map-ffsh"
-
 - name: Install prerequisites for Grafana repository
   ansible.builtin.apt:
     name: gnupg

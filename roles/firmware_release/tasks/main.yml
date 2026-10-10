@@ -1,7 +1,3 @@
-- name: Skip firmware release helper on non-target hosts
-  ansible.builtin.meta: end_role
-  when: inventory_hostname != firmware_release_target_host
-
 - name: Install firmware release helper dependencies
   ansible.builtin.apt:
     name:
