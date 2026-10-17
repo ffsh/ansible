@@ -53,6 +53,21 @@ If you want to add a service host, place it in the dedicated service group in `h
 - `services_map` for the map stack (`batman`, `batctl`, `grafana_public`, `meshviewer`)
 - `services_web` for the web stack (`batman`, `batctl`, `website`, `firmware_release`, `firmware_selector`)
 
+### Website deployment
+
+The website role runs on `web-ffsh`. The main domain is served as a static site
+from `/var/www/web-static`; the beta domain remains at `/var/www/web-beta`.
+The previous WordPress files at `/var/www/web` and the PHP runtime are retained
+for rollback, but the main-domain vhost no longer serves them.
+
+The Hugo repository's CI should build the site and deploy pushes to `main` only
+to beta, with production deployments restricted to version tags. Use separate
+SSH keys for the two destinations. Add their public keys to the Ansible Vault
+variables `vault_website_beta_deploy_public_key` and
+`vault_website_prod_deploy_public_key` in `group_vars/secrets.yml`; keep the
+matching private keys in the Hugo repository's CI secrets. The CI workflow is
+separate from this Ansible repository.
+
 The standalone DNS host belongs to the `dns` group. The DNS play only installs
 node_exporter and bind_exporter; it does not manage the existing BIND service,
 zones, or listening addresses.
