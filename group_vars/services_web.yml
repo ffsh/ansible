@@ -2,19 +2,21 @@ website_vhosts:
   - name: freifunk-suedholstein.de
     aliases:
       - www.freifunk-suedholstein.de
-    root: /var/www/web
-    index: index.php
-    type: php
+    root: /var/www/web-static
+    owner: website-deploy
+    group: www-data
+    mode: "0755"
+    index: index.html
+    type: static
     tls: true
     redirect_http_to_https: true
-    autoindex: true
+    autoindex: false
     stats_proxy: http://127.0.0.1:9100/
     cors_enabled: true
     cors_allowed_origins:
       - localhost
       - www.freifunk-suedholstein.de
       - freifunk-suedholstein.de
-    php_fpm_socket: /var/run/php/php8.3-fpm.sock
 
   - name: firmware.freifunk-suedholstein.de
     aliases:
@@ -33,7 +35,7 @@ website_vhosts:
     root: /var/www/web-beta
     owner: beta-deploy
     group: www-data
-    mode: "0775"
+    mode: "0755"
     index: index.html
     type: static
     tls: true
@@ -42,17 +44,20 @@ website_vhosts:
     cors_enabled: false
     cors_allow_all: false
 
-website_deploy_user:
-  username: beta-deploy
-  group: www-data
-  groups:
-    - www-data
-  shell: /bin/bash
-  web_root: /var/www/web-beta
-  web_root_mode: "0775"
-  ssh_key: "{{ vault_secrets.vault_website_beta_deploy_public_key | default('') }}"
+website_deploy_users:
+  - username: beta-deploy
+    group: www-data
+    shell: /bin/bash
+    web_root: /var/www/web-beta
+    web_root_mode: "0755"
+    ssh_key: "{{ vault_secrets.vault_website_beta_deploy_public_key | default('') }}"
+  - username: website-deploy
+    group: www-data
+    shell: /bin/bash
+    web_root: /var/www/web-static
+    web_root_mode: "0755"
+    ssh_key: "{{ vault_secrets.vault_website_prod_deploy_public_key | default('') }}"
 
 website_nginx_sites_available_dir: /etc/nginx/sites-available
 website_nginx_sites_enabled_dir: /etc/nginx/sites-enabled
-website_php_fpm_socket: /var/run/php/php8.3-fpm.sock
 website_default_email: noc@freifunk-suedholstein.de

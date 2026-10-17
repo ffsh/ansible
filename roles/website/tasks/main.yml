@@ -8,57 +8,57 @@
       - python3-certbot-nginx
     state: present
 
-- name: Ensure deployment user exists when configured
+- name: Ensure website deployment users exist
   ansible.builtin.user:
-    name: "{{ website_deploy_user.username }}"
+    name: "{{ deploy_user.username }}"
     state: present
     create_home: true
-    shell: "{{ website_deploy_user.shell | default('/bin/bash') }}"
-    group: "{{ website_deploy_user.group | default('www-data') }}"
-    groups: "{{ website_deploy_user.groups | default(['www-data']) }}"
-    append: true
-  when:
-    - website_deploy_user is defined
-    - website_deploy_user.username is defined
-    - website_deploy_user.username | length > 0
+    shell: "{{ deploy_user.shell | default('/bin/bash') }}"
+    group: "{{ deploy_user.group | default('www-data') }}"
+  loop: "{{ website_deploy_users }}"
+  loop_control:
+    loop_var: deploy_user
+    label: "{{ deploy_user.username }}"
 
-- name: Ensure beta deployment directory exists and is writable
+- name: Ensure website deployment directories exist
   ansible.builtin.file:
-    path: "{{ website_deploy_user.web_root }}"
+    path: "{{ deploy_user.web_root }}"
     state: directory
-    owner: "{{ website_deploy_user.username }}"
-    group: "{{ website_deploy_user.group | default('www-data') }}"
-    mode: "{{ website_deploy_user.web_root_mode | default('0775') }}"
-  when:
-    - website_deploy_user is defined
-    - website_deploy_user.web_root is defined
-    - website_deploy_user.web_root | length > 0
+    owner: "{{ deploy_user.username }}"
+    group: "{{ deploy_user.group | default('www-data') }}"
+    mode: "{{ deploy_user.web_root_mode | default('0755') }}"
+  loop: "{{ website_deploy_users }}"
+  loop_control:
+    loop_var: deploy_user
+    label: "{{ deploy_user.web_root }}"
 
-- name: Ensure beta deployment directory contents are writable for deploy user and web group
+- name: Ensure website deployment directory contents are owned by each deploy user
   ansible.builtin.file:
-    path: "{{ website_deploy_user.web_root }}"
+    path: "{{ deploy_user.web_root }}"
     state: directory
     recurse: true
-    owner: "{{ website_deploy_user.username }}"
-    group: "{{ website_deploy_user.group | default('www-data') }}"
-    mode: "u=rwX,g=rwX,o=rX"
-  when:
-    - website_deploy_user is defined
-    - website_deploy_user.web_root is defined
-    - website_deploy_user.web_root | length > 0
+    owner: "{{ deploy_user.username }}"
+    group: "{{ deploy_user.group | default('www-data') }}"
+    mode: "u=rwX,g=rX,o=rX"
+  loop: "{{ website_deploy_users }}"
+  loop_control:
+    loop_var: deploy_user
+    label: "{{ deploy_user.web_root }}"
 
-- name: Install deploy SSH key for the deployment user
+- name: Install website deployment SSH keys
   ansible.posix.authorized_key:
-    user: "{{ website_deploy_user.username }}"
+    user: "{{ deploy_user.username }}"
     state: present
-    key: "{{ website_deploy_user.ssh_key }}"
+    key: "{{ deploy_user.ssh_key }}"
     exclusive: false
     manage_dir: true
+  loop: "{{ website_deploy_users }}"
+  loop_control:
+    loop_var: deploy_user
+    label: "{{ deploy_user.username }}"
   when:
-    - website_deploy_user is defined
-    - website_deploy_user.username is defined
-    - website_deploy_user.ssh_key is defined
-    - website_deploy_user.ssh_key | length > 0
+    - deploy_user.ssh_key is defined
+    - deploy_user.ssh_key | length > 0
 
 - name: Ensure all website document roots exist
   ansible.builtin.file:
