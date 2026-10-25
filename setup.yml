@@ -33,7 +33,10 @@
     - {role: batctl, tags: "batctl"}
     - {role: fastd, tags: "fastd"}
     - {role: radvd, tags: "radvd"}
-    - {role: kea_dhcp, tags: ["isc-dhcp4-server", "kea-dhcp4-server", "kea-exporter"]}
+    - {
+        role: kea_dhcp,
+        tags: ["isc-dhcp4-server", "kea-dhcp4-server", "kea-exporter"],
+      }
     - {role: kea_exporter, tags: "kea-exporter"}
     - {role: bind, tags: "dns"}
     - {role: respondd, tags: "respondd"}
