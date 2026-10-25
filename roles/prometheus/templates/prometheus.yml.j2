@@ -33,7 +33,7 @@ scrape_configs:
       module: [http_2xx]
 
     static_configs:
-{% for target in groups['gateways'] + groups['services'] %}
+{% for target in groups['gateways'] + groups['services_map'] + groups['services_web'] %}
       - targets: ["{{ hostvars[target].blackbox_http_url }}"]
         labels:
           instance: "{{ target }}"
@@ -67,6 +67,16 @@ scrape_configs:
         target_label: instance
       - target_label: __address__
         replacement: 127.0.0.1:9115
+
+  - job_name: "kea-exporter"
+
+    static_configs:
+{% for target in groups['gateways'] %}
+      - targets: ["{{ hostvars[target].ansible_ssh_host }}:9547"]
+        labels:
+          instance: "{{ target }}"
+          target: "{{ target }}"
+{% endfor %}
 
   - job_name: "dns-node-exporter"
 

@@ -1,0 +1,31 @@
+- name: Install Python virtual environment dependencies
+  ansible.builtin.apt:
+    name:
+      - python3-pip
+      - python3-venv
+    state: present
+    update_cache: true
+
+- name: Install kea-exporter in an isolated virtual environment
+  ansible.builtin.pip:
+    name: "kea-exporter=={{ kea_exporter_version }}"
+    virtualenv: "{{ kea_exporter_venv }}"
+    virtualenv_command: /usr/bin/python3 -m venv
+    state: present
+  notify: Restart kea_exporter
+
+- name: Install kea_exporter service
+  ansible.builtin.template:
+    src: kea_exporter.service
+    dest: /etc/systemd/system/kea_exporter.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart kea_exporter
+
+- name: Enable and start kea_exporter
+  ansible.builtin.systemd:
+    name: kea_exporter
+    daemon_reload: true
+    enabled: true
+    state: started

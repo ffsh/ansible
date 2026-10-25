@@ -18,3 +18,48 @@ groups:
         annotations:
           summary: "WireGuard exit is down on {{ '{{ $labels.target }}' }}"
           description: "The WireGuard exit connection on {{ '{{ $labels.target }}' }} has been down for more than 5 minutes."
+
+  - name: kea-dhcp4
+    rules:
+      - alert: KeaExporterDown
+        expr: up{job="kea-exporter"} == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Kea metrics unavailable on {{ '{{ $labels.target }}' }}"
+          description: "Prometheus has been unable to scrape the Kea exporter for more than 5 minutes. This can indicate an exporter, Kea control socket, or network failure."
+
+      - alert: KeaDhcp4PoolWarning
+        expr: kea_dhcp4_addresses_assigned_total / kea_dhcp4_addresses_total > 0.8
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Kea DHCP pool above 80% on {{ '{{ $labels.target }}' }}"
+          description: "Pool {{ '{{ $labels.pool }}' }} ({{ '{{ $labels.subnet }}' }}) has been above 80% utilization for 10 minutes."
+
+      - alert: KeaDhcp4PoolCritical
+        expr: kea_dhcp4_addresses_assigned_total / kea_dhcp4_addresses_total > 0.9
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Kea DHCP pool above 90% on {{ '{{ $labels.target }}' }}"
+          description: "Pool {{ '{{ $labels.pool }}' }} ({{ '{{ $labels.subnet }}' }}) has been above 90% utilization for 5 minutes."
+
+      - alert: KeaDhcp4AllocationFailures
+        expr: delta(kea_dhcp4_allocations_failed_total[5m]) > 0
+        labels:
+          severity: warning
+        annotations:
+          summary: "Kea DHCP allocation failure on {{ '{{ $labels.target }}' }}"
+          description: "Kea recorded an allocation failure for {{ '{{ $labels.context }}' }} in subnet {{ '{{ $labels.subnet }}' }} within the last 5 minutes."
+
+      - alert: KeaDhcp4PacketDrops
+        expr: delta(kea_dhcp4_packets_received_total{operation="drop"}[5m]) > 10
+        labels:
+          severity: warning
+        annotations:
+          summary: "Kea DHCP packet drops on {{ '{{ $labels.target }}' }}"
+          description: "Kea recorded more than 10 dropped DHCPv4 packets in the last 5 minutes."
