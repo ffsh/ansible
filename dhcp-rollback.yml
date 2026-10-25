@@ -1,0 +1,26 @@
+- name: Roll back gateway DHCP to ISC
+  hosts: gateways
+  serial: "{{ deploy_serial | default(1) }}"
+  pre_tasks:
+    - name: Abort if target OS is not Debian 13
+      ansible.builtin.assert:
+        that:
+          - ansible_facts["distribution"] == "Debian"
+          - ansible_facts["distribution_major_version"] == "13"
+        fail_msg: >-
+          Unsupported target OS: {{ ansible_facts["distribution"] }} {{
+          ansible_facts["distribution_version"] }}. This playbook supports
+          Debian 13 only.
+
+    - name: Gather installed services
+      ansible.builtin.service_facts:
+
+    - name: Stop and disable Kea DHCP
+      ansible.builtin.systemd:
+        name: kea-dhcp4-server
+        enabled: false
+        state: stopped
+      when: "'kea-dhcp4-server.service' in ansible_facts.services"
+
+  roles:
+    - role: dhcp

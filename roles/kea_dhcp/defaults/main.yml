@@ -1,0 +1,10 @@
+kea_dhcp_package: kea-dhcp4-server
+kea_dhcp_service: kea-dhcp4-server
+kea_dhcp_group: _kea
+kea_dhcp_config_path: /etc/kea/kea-dhcp4.conf
+kea_dhcp_static_repo: https://github.com/ffsh/dhcp-static.git
+kea_dhcp_static_repo_version: master
+kea_dhcp_static_path: /var/lib/kea/dhcp-static
+kea_dhcp_static_reservations_path: "{{ kea_dhcp_static_path }}/reservations.json"
+kea_dhcp_reservations_path: /etc/kea/dhcp4-reservations.json
+kea_dhcp_update_script_path: /usr/local/sbin/update-kea-dhcp-reservations

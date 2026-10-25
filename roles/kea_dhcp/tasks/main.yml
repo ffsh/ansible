@@ -1,0 +1,163 @@
+- name: Install Kea DHCPv4 without starting the package default service
+  ansible.builtin.apt:
+    name: "{{ kea_dhcp_package }}"
+    state: present
+    policy_rc_d: 101
+
+- name: Ensure Kea configuration directory exists
+  ansible.builtin.file:
+    path: /etc/kea
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Clone dhcp-static repository for Kea reservations
+  ansible.builtin.git:
+    repo: "{{ kea_dhcp_static_repo }}"
+    dest: "{{ kea_dhcp_static_path }}"
+    force: true
+    version: "{{ kea_dhcp_static_repo_version }}"
+  environment:
+    GIT_CONFIG_COUNT: "1"
+    GIT_CONFIG_KEY_0: safe.directory
+    GIT_CONFIG_VALUE_0: "{{ kea_dhcp_static_path }}"
+
+- name: Check for structured Kea reservations
+  ansible.builtin.stat:
+    path: "{{ kea_dhcp_static_reservations_path }}"
+  register: kea_dhcp_reservations_file
+
+- name: Require structured Kea reservations from dhcp-static
+  ansible.builtin.assert:
+    that:
+      - kea_dhcp_reservations_file.stat.exists
+      - kea_dhcp_reservations_file.stat.isreg
+    fail_msg: >-
+      {{ kea_dhcp_static_reservations_path }} is missing. Publish the structured
+      reservations.json file in ffsh/dhcp-static before deploying Kea.
+
+- name: Check for an existing active reservations file
+  ansible.builtin.stat:
+    path: "{{ kea_dhcp_reservations_path }}"
+  register: kea_dhcp_active_reservations
+
+- name: Save the current active reservations
+  ansible.builtin.slurp:
+    src: "{{ kea_dhcp_reservations_path }}"
+  register: kea_dhcp_previous_reservations
+  when: kea_dhcp_active_reservations.stat.exists
+
+- name: Deploy and validate Kea reservations and configuration
+  block:
+    - name: Install source reservations as the active Kea include
+      ansible.builtin.copy:
+        src: "{{ kea_dhcp_static_reservations_path }}"
+        owner: root
+        group: "{{ kea_dhcp_group }}"
+        mode: "0640"
+        dest: "{{ kea_dhcp_reservations_path }}"
+        remote_src: true
+
+    - name: Deploy Kea DHCPv4 configuration
+      ansible.builtin.template:
+        src: kea-dhcp4.conf.j2
+        dest: "{{ kea_dhcp_config_path }}"
+        owner: root
+        group: "{{ kea_dhcp_group }}"
+        mode: "0640"
+        validate: "kea-dhcp4 -t %s"
+  rescue:
+    - name: Restore the previous active reservations
+      ansible.builtin.copy:
+        dest: "{{ kea_dhcp_reservations_path }}"
+        content: "{{ kea_dhcp_previous_reservations.content | b64decode }}"
+        owner: root
+        group: "{{ kea_dhcp_group }}"
+        mode: "0640"
+      when: kea_dhcp_active_reservations.stat.exists
+
+    - name: Remove invalid initial reservations
+      ansible.builtin.file:
+        path: "{{ kea_dhcp_reservations_path }}"
+        state: absent
+      when: not kea_dhcp_active_reservations.stat.exists
+
+    - name: Report invalid Kea configuration before cutover
+      ansible.builtin.fail:
+        msg: Kea DHCP configuration validation failed; active ISC service was left untouched.
+
+- name: Ensure Kea systemd override directory exists
+  ansible.builtin.file:
+    path: /etc/systemd/system/kea-dhcp4-server.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Configure Kea to start after fastd
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/kea-dhcp4-server.service.d/override.conf
+    content: |
+      [Unit]
+      After=fastd@ffsh.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload systemd manager configuration
+
+- name: Deploy validated reservation refresh helper
+  ansible.builtin.template:
+    src: update-kea-dhcp-reservations.sh.j2
+    dest: "{{ kea_dhcp_update_script_path }}"
+    owner: root
+    group: root
+    mode: "0750"
+
+- name: Schedule static reservation refresh
+  ansible.builtin.cron:
+    name: Update Kea DHCP static reservations
+    minute: "*/15"
+    job: "{{ kea_dhcp_update_script_path }}"
+
+- name: Gather installed services
+  ansible.builtin.service_facts:
+
+- name: Switch from ISC DHCP to Kea
+  block:
+    - name: Stop and disable ISC DHCP
+      ansible.builtin.systemd:
+        name: isc-dhcp-server
+        enabled: false
+        state: stopped
+      when: "'isc-dhcp-server.service' in ansible_facts.services"
+
+    - name: Enable and restart Kea DHCP
+      ansible.builtin.systemd:
+        name: "{{ kea_dhcp_service }}"
+        enabled: true
+        state: restarted
+        daemon_reload: true
+
+    - name: Verify Kea DHCP is active
+      ansible.builtin.command:
+        argv:
+          - systemctl
+          - is-active
+          - "{{ kea_dhcp_service }}"
+      changed_when: false
+  rescue:
+    - name: Stop Kea DHCP after failed cutover
+      ansible.builtin.systemd:
+        name: "{{ kea_dhcp_service }}"
+        enabled: false
+        state: stopped
+      failed_when: false
+
+    - name: Restore ISC DHCP after failed cutover
+      ansible.builtin.include_role:
+        name: dhcp
+
+    - name: Report failed Kea cutover after restoring ISC
+      ansible.builtin.fail:
+        msg: Kea DHCP cutover failed; ISC DHCP has been restored.
