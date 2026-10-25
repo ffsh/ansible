@@ -4,6 +4,10 @@
       "interfaces": [ "bat0" ],
       "service-sockets-require-all": true
     },
+    "control-socket": {
+      "socket-type": "unix",
+      "socket-name": "{{ kea_dhcp_control_socket_path }}"
+    },
     "lease-database": {
       "type": "memfile",
       "persist": true,

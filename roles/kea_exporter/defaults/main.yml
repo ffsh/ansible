@@ -1,0 +1,4 @@
+kea_exporter_venv: /opt/kea-exporter
+kea_exporter_listen_address: "{{ ansible_ssh_host }}"
+kea_exporter_port: 9547
+kea_exporter_interval: 15

@@ -1,0 +1,24 @@
+[Unit]
+Description=Kea DHCP Prometheus Exporter
+Wants=network-online.target
+After=network-online.target kea-dhcp4-server.service
+Requires=kea-dhcp4-server.service
+
+[Service]
+User=_kea
+Group=_kea
+ExecStart={{ kea_exporter_venv }}/bin/kea-exporter --address {{ kea_exporter_listen_address }} --port {{ kea_exporter_port }} --interval {{ kea_exporter_interval }} {{ kea_dhcp_control_socket_path }}
+Restart=on-failure
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+IPAddressDeny=any
+IPAddressAllow={{ hostvars['prometheus'].ansible_ssh_host }}/32
+
+[Install]
+WantedBy=multi-user.target
