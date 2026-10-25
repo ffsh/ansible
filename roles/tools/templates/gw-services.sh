@@ -5,6 +5,7 @@ set -eu
 ACTION="${1:-check}"
 
 FASTD_SVC="fastd@ffsh.service"
+KEA_DHCP_SVC="kea-dhcp4-server.service"
 WG_SVC="wg-quick@exit.service"
 BIND_SVC="bind9.service"
 CHRONY_SVC="chrony.service"
@@ -320,6 +321,13 @@ check_status() {
     add_failure "$FASTD_SVC not running"
   fi
 
+  if is_service_active "$KEA_DHCP_SVC"; then
+    ok "Service $KEA_DHCP_SVC is active"
+  else
+    fail "Service $KEA_DHCP_SVC is NOT active"
+    add_failure "$KEA_DHCP_SVC not running"
+  fi
+
   if is_service_active "$BIND_SVC"; then
     ok "Service $BIND_SVC is active"
   else
@@ -369,9 +377,9 @@ check_status() {
 
 restart_services() {
 {% if enable_wireguard_exit | default(false) %}
-  info "Restart order: $FASTD_SVC -> $WG_SVC -> $BIND_SVC -> $CHRONY_SVC -> $NGINX_SVC"
+  info "Restart order: $FASTD_SVC -> $WG_SVC -> $KEA_DHCP_SVC -> $BIND_SVC -> $CHRONY_SVC -> $NGINX_SVC"
 {% else %}
-  info "Restart order: $FASTD_SVC -> $BIND_SVC -> $CHRONY_SVC -> $NGINX_SVC"
+  info "Restart order: $FASTD_SVC -> $KEA_DHCP_SVC -> $BIND_SVC -> $CHRONY_SVC -> $NGINX_SVC"
 {% endif %}
 
   info "Restarting $FASTD_SVC"
@@ -381,6 +389,9 @@ restart_services() {
   info "Restarting $WG_SVC"
   systemctl restart "$WG_SVC"
 {% endif %}
+
+  info "Restarting $KEA_DHCP_SVC"
+  systemctl restart "$KEA_DHCP_SVC"
 
   info "Restarting $BIND_SVC"
   systemctl restart "$BIND_SVC"

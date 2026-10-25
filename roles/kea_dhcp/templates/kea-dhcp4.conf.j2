@@ -1,0 +1,45 @@
+{
+  "Dhcp4": {
+    "interfaces-config": {
+      "interfaces": [ "bat0" ],
+      "service-sockets-require-all": true
+    },
+    "lease-database": {
+      "type": "memfile",
+      "persist": true,
+      "name": "kea-leases4.csv"
+    },
+    "valid-lifetime": 120,
+    "max-valid-lifetime": 600,
+    "option-data": [
+      {
+        "name": "domain-name",
+        "data": ".ffsh"
+      }
+    ],
+    "subnet4": [
+      {
+        "id": 1,
+        "subnet": "10.144.0.0/16",
+        "interface": "bat0",
+        "authoritative": true,
+        "pools": [
+          {
+            "pool": "{{ dhcp_range | replace('-', ' - ') }}"
+          }
+        ],
+        "option-data": [
+          {
+            "name": "routers",
+            "data": "{{ ffsh_ipv4_address }}"
+          },
+          {
+            "name": "domain-name-servers",
+            "data": "{{ ffsh_ipv4_address }}"
+          }
+        ],
+        "reservations": <?include "{{ kea_dhcp_reservations_path }}"?>
+      }
+    ]
+  }
+}

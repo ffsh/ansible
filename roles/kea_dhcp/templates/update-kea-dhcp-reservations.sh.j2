@@ -1,0 +1,32 @@
+#!/bin/sh
+
+set -eu
+
+repo="{{ kea_dhcp_static_path }}"
+source="{{ kea_dhcp_static_reservations_path }}"
+reservations="{{ kea_dhcp_reservations_path }}"
+config="{{ kea_dhcp_config_path }}"
+service="{{ kea_dhcp_service }}"
+backup=$(mktemp "$(dirname "$reservations")/.reservations-backup.XXXXXX")
+candidate=$(mktemp "$(dirname "$reservations")/.reservations-candidate.XXXXXX")
+trap 'rm -f "$backup" "$candidate"' EXIT
+
+cp -p "$reservations" "$backup"
+
+if ! git -C "$repo" pull -qpf; then
+  exit 1
+fi
+
+if cmp -s "$reservations" "$source"; then
+  exit 0
+fi
+
+install -m 0640 -o root -g "{{ kea_dhcp_group }}" "$source" "$candidate"
+mv -f "$candidate" "$reservations"
+
+if ! kea-dhcp4 -t "$config"; then
+  mv -f "$backup" "$reservations"
+  exit 1
+fi
+
+systemctl kill --signal=HUP "$service"
