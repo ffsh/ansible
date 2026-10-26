@@ -31,7 +31,7 @@ groups:
           description: "Prometheus has been unable to scrape the Kea exporter for more than 5 minutes. This can indicate an exporter, Kea control socket, or network failure."
 
       - alert: KeaDhcp4PoolWarning
-        expr: kea_dhcp4_addresses_assigned_total / kea_dhcp4_addresses_total > 0.8
+        expr: kea_dhcp4_addresses_assigned_total{pool!=""} / kea_dhcp4_addresses_total{pool!=""} > 0.8
         for: 10m
         labels:
           severity: warning
@@ -40,7 +40,7 @@ groups:
           description: "Pool {{ '{{ $labels.pool }}' }} ({{ '{{ $labels.subnet }}' }}) has been above 80% utilization for 10 minutes."
 
       - alert: KeaDhcp4PoolCritical
-        expr: kea_dhcp4_addresses_assigned_total / kea_dhcp4_addresses_total > 0.9
+        expr: kea_dhcp4_addresses_assigned_total{pool!=""} / kea_dhcp4_addresses_total{pool!=""} > 0.9
         for: 5m
         labels:
           severity: critical
