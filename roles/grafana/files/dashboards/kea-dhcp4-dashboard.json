@@ -135,7 +135,7 @@
             },
             "targets": [
                 {
-                    "expr": "100 * kea_dhcp4_addresses_assigned_total{target=~\"$target\"} / kea_dhcp4_addresses_total{target=~\"$target\"}",
+                    "expr": "100 * kea_dhcp4_addresses_assigned_total{target=~\"$target\",pool!=\"\"} / kea_dhcp4_addresses_total{target=~\"$target\",pool!=\"\"}",
                     "legendFormat": "{{target}} {{subnet}} {{pool}}",
                     "refId": "A"
                 }
@@ -338,7 +338,7 @@
         "from": "now-6h",
         "to": "now"
     },
-    "title": "Kea DHCPv4",
+    "title": "Kea DHCPv4 (v1.0.0)",
     "uid": "kea-dhcp4",
     "version": 1
 }
