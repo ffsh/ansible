@@ -147,8 +147,8 @@ The config has the following options.
 | wg_address   | ipV4 and ipV6 address provided by mullvad                                    |
 | wg_country   | Country supported by mullvad                                                 |
 | wg_city      | A City that mullvad has in your selected country                             |
-| ffshmon_mail | The email that should be used to send alerts if the wireguard tunnel is down |
-| ffshmon_pw   | The password for the email                                                   |
+| ffshmon_mail | Mail username for ffshmon email alerts (exported as FFSHMON_MAIL_USER)      |
+| ffshmon_pw   | Mail password for ffshmon email alerts (exported as FFSHMON_MAIL_PASSWORD)  |
 
 For available country and city check here: https://mullvad.net/de/servers
 
@@ -164,6 +164,8 @@ wg_city: Amsterdam
 ffshmon_mail: wg-mon@freifunk-suedholstein.de
 ffshmon_pw: secretpassword
 ```
+Email alerts are enabled in this Ansible setup by passing `--email-alerts` to ffshmon.
+
 save and close the editor, done you added your secret :)
 
 You can change the content any time by

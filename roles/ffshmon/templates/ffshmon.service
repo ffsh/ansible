@@ -8,7 +8,9 @@ Type=simple
 WorkingDirectory=/opt/ffshmon
 User=ffshmon
 Group=ffshmon
-ExecStart=/opt/ffshmon/.venv/bin/python /opt/ffshmon/wireguard.py serve --user {{ ffshmon_mail }} --password {{ ffshmon_pw }} --log /var/log/ffshmon/ffshmon.log --loglevel WARNING --host 127.0.0.1 --port 8000 --interval 300
+Environment="FFSHMON_MAIL_USER={{ ffshmon_mail }}"
+Environment="FFSHMON_MAIL_PASSWORD={{ ffshmon_pw }}"
+ExecStart=/opt/ffshmon/.venv/bin/python /opt/ffshmon/wireguard.py serve --email-alerts --log /var/log/ffshmon/ffshmon.log --loglevel WARNING --host 127.0.0.1 --port 8000 --interval 300
 Restart=on-failure
 ProtectHome=true
 PrivateTmp=true
