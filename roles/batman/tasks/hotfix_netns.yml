@@ -1,0 +1,23 @@
+# TODO: Remove this hotfix once batman-adv releases a version supporting netns_immutable
+- name: Check for batman-adv source
+  ansible.builtin.stat:
+    path: /usr/src/batman-adv-{{ batman_version }}/net/batman-adv/mesh-interface.c
+  register: batman_mesh_interface_src
+
+- name: Check if installed kernel headers renamed netns_local to netns_immutable
+  ansible.builtin.shell: grep -lw netns_immutable /usr/src/linux-headers-*/include/linux/netdevice.h
+  register: batman_netns_immutable_headers
+  changed_when: false
+  failed_when: batman_netns_immutable_headers.rc > 1
+  check_mode: false
+
+- name: Patch batman-adv for netns_immutable rename
+  ansible.builtin.replace:
+    path: /usr/src/batman-adv-{{ batman_version }}/net/batman-adv/mesh-interface.c
+    regexp: 'dev->netns_local = true;'
+    replace: 'dev->netns_immutable = true;'
+  register: batman_netns_patch
+  when:
+    - batman_version == '2026.3'
+    - batman_mesh_interface_src.stat.exists
+    - batman_netns_immutable_headers.rc == 0
