@@ -33,15 +33,6 @@
     - batman_version is defined
     - not ansible_check_mode
 
-- name: Rebuild already installed batman-adv after hotfix
-  ansible.builtin.command: "dkms install -m batman-adv -v {{ batman_version }} --force"
-  changed_when: true
-  when:
-    - batman_version is defined
-    - not ansible_check_mode
-    - batman_netns_patch is changed
-    - (batman_installed_version.stdout | default('')) == batman_version
-
 - name: Check if batman-adv needs to be installed or upgraded
   ansible.builtin.include_tasks: from_source.yml
   when:
