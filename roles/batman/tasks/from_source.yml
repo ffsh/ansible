@@ -36,6 +36,25 @@
     mode: "0644"
   when: not ansible_check_mode
 
+# TODO: Remove this hotfix once batman-adv releases a version supporting the renamed field
+- name: Check if installed kernel headers renamed netns_local to netns_immutable
+  ansible.builtin.shell: grep -lw netns_immutable /usr/src/linux-headers-*/include/linux/netdevice.h
+  register: batman_netns_immutable_headers
+  changed_when: false
+  failed_when: batman_netns_immutable_headers.rc > 1
+  check_mode: false
+
+# Hotfix until batman-adv releases a version supporting the renamed field
+- name: Patch batman-adv for netns_immutable rename
+  ansible.builtin.replace:
+    path: /usr/src/batman-adv-{{ batman_version }}/net/batman-adv/mesh-interface.c
+    regexp: 'dev->netns_local = true;'
+    replace: 'dev->netns_immutable = true;'
+  when:
+    - batman_version == '2026.3'
+    - batman_netns_immutable_headers.rc == 0
+    - not ansible_check_mode
+
 - name: Build and install batman-adv
   ansible.builtin.command: "dkms install -m batman-adv -v {{ batman_version }}"
   # notify: restart batman
