@@ -8,9 +8,10 @@ Type=simple
 WorkingDirectory=/opt/ffshmon
 User=ffshmon
 Group=ffshmon
+# TODO: Remove the mail env vars (and ffshmon_mail/ffshmon_pw) once mail alerts are dropped for good
 Environment="FFSHMON_MAIL_USER={{ ffshmon_mail }}"
 Environment="FFSHMON_MAIL_PASSWORD={{ ffshmon_pw }}"
-ExecStart=/opt/ffshmon/.venv/bin/python /opt/ffshmon/wireguard.py serve --email-alerts --log /var/log/ffshmon/ffshmon.log --loglevel WARNING --host 127.0.0.1 --port 8000 --interval 300
+ExecStart=/opt/ffshmon/.venv/bin/python /opt/ffshmon/wireguard.py serve --log /var/log/ffshmon/ffshmon.log --loglevel WARNING --host 127.0.0.1 --port 8000 --interval 300
 Restart=on-failure
 ProtectHome=true
 PrivateTmp=true
