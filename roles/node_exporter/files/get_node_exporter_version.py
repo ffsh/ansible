@@ -5,7 +5,7 @@ import sys
 import re
 
 # compile regex for installed node_exporter version
-pattern = re.compile(r"node_exporter, version (\d\.\d\.\d)")
+pattern = re.compile(r"node_exporter, version (\d+\.\d+\.\d+)")
 
 # check current node_exporter
 try:
