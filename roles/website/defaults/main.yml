@@ -1,7 +1,5 @@
 website_nginx_sites_available_dir: /etc/nginx/sites-available
 website_nginx_sites_enabled_dir: /etc/nginx/sites-enabled
-website_default_php_fpm_socket: /var/run/php/php8.3-fpm.sock
-website_default_index: index.php
 website_default_autoindex: false
 website_default_http_redirect: true
 website_default_tls: true
