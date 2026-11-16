@@ -45,6 +45,12 @@ this allows you to interactively accept key changes.
 As the login is done via ssh make sure that the ssh key is registered at your identity manager `ssh-add $keyfile`.
 That way Ansible will be able to automatically detect the right ssh key and connect to the server.
 
+The SSH role adds the current maintainer keys and removes explicitly listed
+revoked keys from root's authorized keys. Other keys, including cloud-init
+keys, remain in place. The revoked public key files are retained so those
+exact keys can be removed on existing hosts; other keys belonging to a former
+maintainer must be identified separately.
+
 ## hosts
 If you want to deploy to a new gateway you need to add it to the `hosts.yml` file in the repo, just compare it to brunsbach and add your own details.
 
