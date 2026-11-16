@@ -24,31 +24,31 @@
       ansible.builtin.apt:
         update_cache: true
   roles:
-    - {role: network, tags: "network"}
-    - {role: wireguardexit, tags: "wireguard, exit"}
-    - {role: ffshmon, tags: "wireguard, ffshmon"}
-    - {role: hostname, tags: "hostname"}
-    - {role: fail2ban, tags: "fail2ban"}
-    - {role: batman, tags: "batman-adv"}
-    - {role: batctl, tags: "batctl"}
-    - {role: fastd, tags: "fastd"}
-    - {role: radvd, tags: "radvd"}
+    - { role: network, tags: "network" }
+    - { role: wireguardexit, tags: "wireguard, exit" }
+    - { role: ffshmon, tags: "wireguard, ffshmon" }
+    - { role: hostname, tags: "hostname" }
+    - { role: fail2ban, tags: "fail2ban" }
+    - { role: batman, tags: "batman-adv" }
+    - { role: batctl, tags: "batctl" }
+    - { role: fastd, tags: "fastd" }
+    - { role: radvd, tags: "radvd" }
     - role: kea_dhcp
       tags:
         - isc-dhcp4-server
         - kea-dhcp4-server
         - kea-exporter
-    - {role: kea_exporter, tags: "kea-exporter"}
-    - {role: bind, tags: "dns"}
-    - {role: respondd, tags: "respondd"}
-    - {role: node_exporter, tags: "node_exporter"}
-    - {role: letsencrypt, tags: "letsencrypt"}
-    - {role: nginx, tags: "node_exporter, nginx"}
-    - {role: tools, tags: "admin-tools"}
-    - {role: motd, tags: "motd"}
-    - {role: ohmyzsh, tags: "oh-my-zsh"}
-    - {role: ohmyzshtheme, tags: "oh-my-zsh"}
-    - {role: ssh, tags: "ssh keys"}
+    - { role: kea_exporter, tags: "kea-exporter" }
+    - { role: bind, tags: "dns" }
+    - { role: respondd, tags: "respondd" }
+    - { role: node_exporter, tags: "node_exporter" }
+    - { role: letsencrypt, tags: "letsencrypt" }
+    - { role: nginx, tags: "node_exporter, nginx" }
+    - { role: tools, tags: "admin-tools" }
+    - { role: motd, tags: "motd" }
+    - { role: ohmyzsh, tags: "oh-my-zsh" }
+    - { role: ohmyzshtheme, tags: "oh-my-zsh" }
+    - { role: ssh, tags: "ssh keys" }
 
   post_tasks:
     - name: Check if reboot is required
@@ -104,10 +104,10 @@
       ansible.builtin.apt:
         update_cache: true
   roles:
-    - {role: batman, tags: "batman-adv"}
-    - {role: batctl, tags: "batctl"}
-    - {role: grafana_public, tags: "grafana-public"}
-    - {role: meshviewer, tags: "meshviewer"}
+    - { role: batman, tags: "batman-adv" }
+    - { role: batctl, tags: "batctl" }
+    - { role: grafana_public, tags: "grafana-public" }
+    - { role: meshviewer, tags: "meshviewer" }
 
   post_tasks:
     - name: Check if reboot is required
@@ -163,12 +163,13 @@
       ansible.builtin.apt:
         update_cache: true
   roles:
-    - {role: batman, tags: "batman-adv"}
-    - {role: batctl, tags: "batctl"}
-    - {role: node_exporter, tags: "node_exporter"}
-    - {role: firmware_release, tags: "firmware-release"}
-    - {role: firmware_selector, tags: "firmware-selector"}
-    - {role: website, tags: "website"}
+    - { role: batman, tags: "batman-adv" }
+    - { role: batctl, tags: "batctl" }
+    - { role: node_exporter, tags: "node_exporter" }
+    - { role: firmware_release, tags: "firmware-release" }
+    - { role: firmware_selector, tags: "firmware-selector" }
+    - { role: website, tags: "website" }
+    - { role: ssh, tags: "ssh keys" }
 
   post_tasks:
     - name: Check if reboot is required
@@ -224,10 +225,10 @@
   #   ansible.builtin.apt:
   #     update_cache: true
   roles:
-    - {role: blackbox_exporter, tags: "blackbox-exporter"}
-    - {role: grafana, tags: "grafana"}
-    - {role: alertmanager, tags: "alertmanager"}
-    - {role: prometheus, tags: "prometheus"}
+    - { role: blackbox_exporter, tags: "blackbox-exporter" }
+    - { role: grafana, tags: "grafana" }
+    - { role: alertmanager, tags: "alertmanager" }
+    - { role: prometheus, tags: "prometheus" }
 
   post_tasks:
     - name: Check if reboot is required
@@ -272,5 +273,5 @@
       tags:
         - always
   roles:
-    - {role: node_exporter, tags: "node_exporter"}
-    - {role: bind_exporter, tags: "bind_exporter"}
+    - { role: node_exporter, tags: "node_exporter" }
+    - { role: bind_exporter, tags: "bind_exporter" }
