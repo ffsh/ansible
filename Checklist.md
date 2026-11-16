@@ -2,7 +2,7 @@
 
 ## Host basics
 
-- [ ] Manage maintainer SSH keys for root.
+- [x] Manage maintainer SSH keys for root.
 - [x] Deploy and verify the node_exporter role added to the web play. The
   existing service listens on `127.0.0.1:9100`; nginx proxies `/stats/` to it.
   The role installs the shared pinned version, enables the systemd and process
@@ -11,8 +11,9 @@
   `ffsh-mesh`, `bat0`, its addresses, peers and secrets. Fastd currently listens
   on UDP port 10000. The gateway fastd role has gateway-specific settings and
   must not be applied unchanged.
-- [ ] Manage fail2ban and preserve its SSH jail. UFW is inactive, but nftables
-  contains fail2ban rules; check for any additional external firewall rules.
+- [x] Add the fail2ban role to the web host play and preserve Debian's default
+  `sshd` jail. UFW is inactive, but nftables contains fail2ban rules; check for
+  any additional external firewall rules.
 - [ ] Capture unattended-upgrades configuration and update policy.
 - [ ] Document backup and restore procedures for website and firmware data.
 
