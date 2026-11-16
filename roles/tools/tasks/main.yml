@@ -6,17 +6,10 @@
         "jq",
         "htop",
         "rsync",
-        "unattended-upgrades",
         "apt-listchanges",
         "iperf3",
         "pipx",
       ]
-- name: Activate unattended-upgrades
-  ansible.builtin.shell: |
-    echo unattended-upgrades unattended-upgrades/enable_auto_updates boolean true | debconf-set-selections
-    dpkg-reconfigure -f noninteractive unattended-upgrades
-  register: tools_unattended_upgrades
-  changed_when: tools_unattended_upgrades.rc == 0
 - name: Copy README.md
   ansible.builtin.copy:
     src: files/README.md

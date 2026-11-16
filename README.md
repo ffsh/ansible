@@ -57,7 +57,7 @@ If you want to deploy to a new gateway you need to add it to the `hosts.yml` fil
 If you want to add a service host, place it in the dedicated service group in `hosts.yml`:
 
 - `services_map` for the map stack (`batman`, `batctl`, `grafana_public`, `meshviewer`)
-- `services_web` for the web stack (`batman`, `batctl`, `node_exporter`, `website`, `firmware_release`, `firmware_selector`, `fail2ban`)
+- `services_web` for the web stack (`batman`, `batctl`, `node_exporter`, `website`, `firmware_release`, `firmware_selector`, `fail2ban`, `unattended_upgrades`)
 
 ### Website deployment
 
@@ -100,6 +100,17 @@ loopback traffic is ignored. Deploy it to the web host with:
 
 ```bash
 ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit services_web --tags fail2ban
+```
+
+The unattended_upgrades role (also applied to gateways, replacing the
+unattended-upgrades handling formerly in the tools role) enables daily
+unattended upgrades limited to security origins (plus Ubuntu ESM security on
+Ubuntu), through drop-ins that leave the
+packaged `50unattended-upgrades` untouched. It never reboots on its own; the
+play reboots the host after a run when `/var/run/reboot-required` exists.
+
+```bash
+ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit services_web --tags unattended-upgrades
 ```
 
 The standalone DNS host belongs to the `dns` group. The DNS play only installs

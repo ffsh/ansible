@@ -14,7 +14,11 @@
 - [x] Add the fail2ban role to the web host play and preserve Debian's default
   `sshd` jail. UFW is inactive, but nftables contains fail2ban rules; check for
   any additional external firewall rules.
-- [ ] Capture unattended-upgrades configuration and update policy.
+- [x] Capture unattended-upgrades configuration and update policy: security and
+  ESM security origins only, daily, no automatic reboot (the play reboots when
+  required). Previously the host used Ubuntu's defaults, which also included
+  `noble` (non-security) updates. Verify with `apt-config dump | grep
+  Unattended-Upgrade` after the first deployment.
 - [ ] Document backup and restore procedures for website and firmware data.
 
 ## Websites and nginx
