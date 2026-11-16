@@ -22,8 +22,9 @@
   `/var/www/web-beta`, including their separate deployment users and CI keys.
 - [ ] Correct the README: the old WordPress files were intentionally removed
   after the static site proved stable; they are not a rollback option.
-- [ ] Manage `install.freifunk-suedholstein.de`, which serves
-  `/var/www/firmware-selector`, including its HTTP redirect and TLS certificate.
+- [ ] Deploy and verify the managed `install.freifunk-suedholstein.de` vhost,
+  which serves `/var/www/firmware-selector` using the existing nginx site
+  filename, HTTP redirect and TLS certificate.
 - [ ] Remove `ffshev.de` and its aliases from the intended configuration; the
   group no longer owns the domain.
 - [ ] Resolve the duplicate firmware vhosts. The older `ffsh-firmware.conf` and
@@ -385,3 +386,65 @@ fastd   22-4build2
 nginx   1.24.0-2ubuntu7.19
 unattended-upgrades     2.9.1+nmu4ubuntu1
 Status: inactive
+
+root@web:~# cat /etc/nginx/sites-available/install
+server {
+    listen 80;
+    listen [::]:80;
+
+    server_name install.freifunk-suedholstein.de;
+
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+
+    server_name install.freifunk-suedholstein.de;
+
+    root /var/www/firmware-selector;
+    index index.html;
+
+    autoindex on;
+    access_log off;
+
+    location = /favicon.ico {
+        log_not_found off;
+        access_log off;
+    }
+
+    location = /robots.txt {
+        allow all;
+        log_not_found off;
+        access_log off;
+    }
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+        expires max;
+        log_not_found off;
+    }
+
+    ssl_certificate /etc/letsencrypt/live/install.freifunk-suedholstein.de/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/install.freifunk-suedholstein.de/privkey.pem;
+    ssl_session_timeout 1d;
+    ssl_session_cache shared:SSL:50m;
+    ssl_session_tickets off;
+
+    ssl_dhparam /etc/nginx/dhparam.pem;
+
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers on;
+
+    add_header Strict-Transport-Security max-age=15768000;
+
+    ssl_stapling on;
+    ssl_stapling_verify on;
+
+}
+

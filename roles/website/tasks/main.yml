@@ -109,7 +109,7 @@
 - name: Ensure nginx site configuration files exist
   ansible.builtin.template:
     src: site.conf.j2
-    dest: "{{ website_nginx_sites_available_dir }}/{{ item.name | replace('.', '-') }}.conf"
+    dest: "{{ website_nginx_sites_available_dir }}/{{ item.config_filename | default((item.name | replace('.', '-')) ~ '.conf') }}"
     owner: root
     group: root
     mode: "0644"
@@ -120,8 +120,8 @@
 
 - name: Enable nginx website config files
   ansible.builtin.file:
-    src: "{{ website_nginx_sites_available_dir }}/{{ item.name | replace('.', '-') }}.conf"
-    dest: "{{ website_nginx_sites_enabled_dir }}/{{ item.name | replace('.', '-') }}.conf"
+    src: "{{ website_nginx_sites_available_dir }}/{{ item.config_filename | default((item.name | replace('.', '-')) ~ '.conf') }}"
+    dest: "{{ website_nginx_sites_enabled_dir }}/{{ item.config_filename | default((item.name | replace('.', '-')) ~ '.conf') }}"
     state: link
     force: true
   loop: "{{ website_vhosts }}"

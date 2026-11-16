@@ -44,6 +44,21 @@ website_vhosts:
     cors_enabled: false
     cors_allow_all: false
 
+  - name: install.freifunk-suedholstein.de
+    config_filename: install
+    root: /var/www/firmware-selector
+    owner: root
+    group: root
+    index: index.html
+    type: static
+    tls: true
+    redirect_http_to_https: true
+    autoindex: true
+    http_access_log: true
+    quiet_common_files: true
+    cache_static_assets: true
+    no_cache: false
+
 website_deploy_users:
   - username: beta-deploy
     group: www-data
