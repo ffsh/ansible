@@ -7,6 +7,15 @@
   loop_control:
     label: "{{ item.name }}"
 
+- name: Validate website HTTP listener settings
+  ansible.builtin.assert:
+    that:
+      - not (item.serve_http | default(false) and item.redirect_http_to_https | default(true))
+    fail_msg: "Website vhost {{ item.name }} cannot both serve and redirect HTTP."
+  loop: "{{ website_vhosts }}"
+  loop_control:
+    label: "{{ item.name }}"
+
 - name: Install nginx and certbot
   ansible.builtin.apt:
     pkg:
@@ -139,6 +148,13 @@
   ansible.builtin.file:
     path: "{{ website_nginx_sites_enabled_dir }}/default"
     state: absent
+
+- name: Disable retired nginx sites
+  ansible.builtin.file:
+    path: "{{ website_nginx_sites_enabled_dir }}/{{ item }}"
+    state: absent
+  loop: "{{ website_disabled_sites }}"
+  notify: Reload nginx
 
 - name: Validate nginx configuration
   ansible.builtin.command: nginx -t

@@ -65,6 +65,10 @@ firmware selector from `/var/www/firmware-selector`. It reuses the existing
 nginx site filename `install` and expects its certificate under
 `/etc/letsencrypt/live/install.freifunk-suedholstein.de/`.
 
+The firmware site serves HTTP and HTTPS and allows cross-origin requests for
+the selector. The website role disables the old `ffsh-firmware.conf` and
+`ffshev` enabled sites; their files in `sites-available` are not removed.
+
 The Hugo repository's CI should build the site and deploy pushes to `main` only
 to beta, with production deployments restricted to version tags. Use separate
 SSH keys for the two destinations. Add their public keys to the Ansible Vault

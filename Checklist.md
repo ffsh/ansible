@@ -20,11 +20,12 @@
 
 - [ ] Preserve the main static site at `/var/www/web-static` and beta at
   `/var/www/web-beta`, including their separate deployment users and CI keys.
-- [ ] Correct the README: the old WordPress files were intentionally removed
+- [x] Correct the README: the old WordPress files were intentionally removed
   after the static site proved stable; they are not a rollback option.
-- [ ] Deploy and verify the managed `install.freifunk-suedholstein.de` vhost,
-  which serves `/var/www/firmware-selector` using the existing nginx site
-  filename, HTTP redirect and TLS certificate.
+- [x] Remove PHP installation and the obsolete WordPress nginx templates.
+- [x] Deploy the managed `install.freifunk-suedholstein.de` vhost using the
+  existing nginx site filename, HTTP redirect and TLS certificate.
+- [x] Verify the selector page, firmware listings and downloads after deployment.
 - [ ] Remove `ffshev.de` and its aliases from the intended configuration; the
   group no longer owns the domain.
 - [ ] Resolve the duplicate firmware vhosts. The older `ffsh-firmware.conf` and
@@ -43,9 +44,9 @@
 
 - [ ] Make certificate issuance, renewal, nginx reload, and the required
   `/etc/nginx/dhparam.pem` reproducible on a fresh host.
-- [ ] Resolve beta certificate renewal: it uses the standalone authenticator
-  while nginx listens on port 80, and no pre/post/deploy hooks were listed.
-  Verify the renewal mechanism and reload behavior.
+- [ ] Capture beta certificate renewal in Ansible. Its saved authenticator is
+  standalone, but the systemd override runs Certbot with `--nginx`; a beta
+  renewal dry run with the nginx plugin succeeded.
 - [ ] Capture the other certificates' nginx authenticator and installer
   behavior; verify renewal without allowing Certbot to make unintended changes
   to managed nginx configuration.
