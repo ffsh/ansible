@@ -31,8 +31,12 @@
 - [x] Deploy the managed `install.freifunk-suedholstein.de` vhost using the
   existing nginx site filename, HTTP redirect and TLS certificate.
 - [x] Verify the selector page, firmware listings and downloads after deployment.
-- [ ] Remove `ffshev.de` and its aliases from the intended configuration; the
-  group no longer owns the domain.
+- [x] Remove `ffshev.de` and its aliases from the intended configuration; the
+  group no longer owns the domain. The firmware vhost has no ffshev aliases, the
+  `ffshev` site is disabled by the website role, and the unused
+  `firmware.conf.j2` template was removed. The `ffshev.de` zone was also dropped
+  from the gateway BIND config; the firmware repository no longer references
+  the domain.
 - [ ] Resolve the duplicate firmware vhosts. The older `ffsh-firmware.conf` and
   the Ansible-managed firmware config conflict on HTTPS. Before disabling the
   old config, decide whether to retain HTTP downloads, firmware access logs,
