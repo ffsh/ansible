@@ -57,7 +57,7 @@ If you want to deploy to a new gateway you need to add it to the `hosts.yml` fil
 If you want to add a service host, place it in the dedicated service group in `hosts.yml`:
 
 - `services_map` for the map stack (`batman`, `batctl`, `grafana_public`, `meshviewer`)
-- `services_web` for the web stack (`batman`, `batctl`, `node_exporter`, `website`, `firmware_release`, `firmware_selector`)
+- `services_web` for the web stack (`batman`, `batctl`, `node_exporter`, `website`, `firmware_release`, `firmware_selector`, `fail2ban`)
 
 ### Website deployment
 
@@ -93,6 +93,14 @@ ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit services_web --ta
 The role installs the shared pinned version, enables the systemd and process
 collectors, and restarts the exporter. As with other tagged deployments, the
 play's `always` tasks can reboot the host if a reboot is required.
+
+The fail2ban role installs fail2ban and rsyslog and enables the `sshd` jail.
+The jail bans an address after 5 failed attempts within 1 day for 2 hours;
+loopback traffic is ignored. Deploy it to the web host with:
+
+```bash
+ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit services_web --tags fail2ban
+```
 
 The standalone DNS host belongs to the `dns` group. The DNS play only installs
 node_exporter and bind_exporter; it does not manage the existing BIND service,
