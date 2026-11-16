@@ -40,15 +40,19 @@
 - [x] Resolve the duplicate firmware vhosts. The managed firmware vhost now
   retains HTTP downloads (`serve_http`), the firmware access log, CORS with
   exposed headers and autoindex, and the website role disables the old
-  `ffsh-firmware.conf`. Confirm on the host that `nginx -t` no longer reports
-  conflicting firmware server names after deployment.
+  `ffsh-firmware.conf`. Verified on the host: `nginx -t` no longer reports
+  conflicting firmware server names.
 - [ ] Decide which remaining legacy redirects to retain and who manages their
   DNS. `freifunk-stormarn.de`, `lauenburg.freifunk.net`, and
   `stormarn.freifunk.net` currently point to this host and redirect over HTTP;
   HTTPS certificate validation failed for each. `reinbek.freifunk.net` points
   elsewhere and returned HTTP 410; its HTTPS certificate validation also failed.
-- [ ] Review nginx's listener/protocol warnings and verify active vhosts after
-  changes. Do not remove configs solely because they look old.
+- [ ] Review nginx's remaining warnings and verify active vhosts after
+  changes. The conflicting-name and `ffshev` warnings are resolved. Still open:
+  "protocol options redefined" for port 443 (`freifunk-stormarn`, `lauenburg`
+  and the main site's `http2` listener). The `ssl_stapling` warnings were
+  resolved by removing stapling from the vhost template. Do not remove configs
+  solely because they look old.
 
 ## TLS and renewal
 
