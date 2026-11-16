@@ -27,9 +27,3 @@ zone "freifunk-suedholstein.de" {
      file "/etc/bind/zones/db.de.freifunk-suedholstein";
      allow-transfer { none; };
 };
-
-zone "ffshev.de" {
-     type master;
-     file "/etc/bind/zones/db.de.ffshev";
-     allow-transfer { none; };
-};
