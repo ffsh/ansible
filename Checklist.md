@@ -37,10 +37,11 @@
   `firmware.conf.j2` template was removed. The `ffshev.de` zone was also dropped
   from the gateway BIND config; the firmware repository no longer references
   the domain.
-- [ ] Resolve the duplicate firmware vhosts. The older `ffsh-firmware.conf` and
-  the Ansible-managed firmware config conflict on HTTPS. Before disabling the
-  old config, decide whether to retain HTTP downloads, firmware access logs,
-  CORS exposed headers, and its other behavior.
+- [x] Resolve the duplicate firmware vhosts. The managed firmware vhost now
+  retains HTTP downloads (`serve_http`), the firmware access log, CORS with
+  exposed headers and autoindex, and the website role disables the old
+  `ffsh-firmware.conf`. Confirm on the host that `nginx -t` no longer reports
+  conflicting firmware server names after deployment.
 - [ ] Decide which remaining legacy redirects to retain and who manages their
   DNS. `freifunk-stormarn.de`, `lauenburg.freifunk.net`, and
   `stormarn.freifunk.net` currently point to this host and redirect over HTTP;
