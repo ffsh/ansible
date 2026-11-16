@@ -165,6 +165,7 @@
   roles:
     - {role: batman, tags: "batman-adv"}
     - {role: batctl, tags: "batctl"}
+    - {role: node_exporter, tags: "node_exporter"}
     - {role: firmware_release, tags: "firmware-release"}
     - {role: firmware_selector, tags: "firmware-selector"}
     - {role: website, tags: "website"}

@@ -51,7 +51,7 @@ If you want to deploy to a new gateway you need to add it to the `hosts.yml` fil
 If you want to add a service host, place it in the dedicated service group in `hosts.yml`:
 
 - `services_map` for the map stack (`batman`, `batctl`, `grafana_public`, `meshviewer`)
-- `services_web` for the web stack (`batman`, `batctl`, `website`, `firmware_release`, `firmware_selector`)
+- `services_web` for the web stack (`batman`, `batctl`, `node_exporter`, `website`, `firmware_release`, `firmware_selector`)
 
 ### Website deployment
 
@@ -67,6 +67,17 @@ variables `vault_website_beta_deploy_public_key` and
 `vault_website_prod_deploy_public_key` in `group_vars/secrets.yml`; keep the
 matching private keys in the Hugo repository's CI secrets. The CI workflow is
 separate from this Ansible repository.
+
+The web host's node_exporter listens on localhost and is exposed through the
+website's `/stats/` proxy. Deploy it with:
+
+```bash
+ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit services_web --tags node_exporter
+```
+
+The role installs the shared pinned version, enables the systemd and process
+collectors, and restarts the exporter. As with other tagged deployments, the
+play's `always` tasks can reboot the host if a reboot is required.
 
 The standalone DNS host belongs to the `dns` group. The DNS play only installs
 node_exporter and bind_exporter; it does not manage the existing BIND service,
