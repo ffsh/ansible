@@ -8,7 +8,9 @@ server {
     listen [::]:80{% if use_default_server %} default_server{% endif %};
 
     server_name {{ server_names | join(' ') }};
+    {% if not (item.http_access_log | default(false)) %}
     access_log off;
+    {% endif %}
 
     return 301 https://$host$request_uri;
 }
@@ -30,7 +32,7 @@ server {
     autoindex {{ 'on' if item.autoindex | default(false) else 'off' }};
     access_log off;
 
-    {% if item.type | default('static') == 'php' %}
+    {% if item.type | default('static') == 'php' or item.quiet_common_files | default(false) %}
     location = /favicon.ico {
         log_not_found off;
         access_log off;
@@ -50,8 +52,10 @@ server {
     {% endif %}
 
     location / {
+        {% if item.no_cache | default(true) %}
         expires 0;
         add_header Cache-Control "no-cache" always;
+        {% endif %}
 
         {% if item.cors_enabled | default(false) %}
         {% if item.cors_allow_all | default(false) %}
@@ -104,6 +108,13 @@ server {
 
     location ~ ^/wp-json/ {
         rewrite ^/wp-json/(.*?)$ /?rest_route=/$1 last;
+    }
+    {% endif %}
+
+    {% if item.cache_static_assets | default(false) %}
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+        expires max;
+        log_not_found off;
     }
     {% endif %}
 

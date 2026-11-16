@@ -60,6 +60,11 @@ from `/var/www/web-static`; the beta domain remains at `/var/www/web-beta`.
 The previous WordPress files at `/var/www/web` and the PHP runtime are retained
 for rollback, but the main-domain vhost no longer serves them.
 
+The website role also manages `install.freifunk-suedholstein.de`, serving the
+firmware selector from `/var/www/firmware-selector`. It reuses the existing
+nginx site filename `install` and expects its certificate under
+`/etc/letsencrypt/live/install.freifunk-suedholstein.de/`.
+
 The Hugo repository's CI should build the site and deploy pushes to `main` only
 to beta, with production deployments restricted to version tags. Use separate
 SSH keys for the two destinations. Add their public keys to the Ansible Vault
