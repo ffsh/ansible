@@ -1,9 +1,16 @@
-- name: Install nginx and PHP runtime
+- name: Validate website vhost types
+  ansible.builtin.assert:
+    that:
+      - item.type | default('static') == 'static'
+    fail_msg: "Website vhost {{ item.name }} must be static."
+  loop: "{{ website_vhosts }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Install nginx and certbot
   ansible.builtin.apt:
     pkg:
       - nginx
-      - php8.3-fpm
-      - php8.3-cli
       - certbot
       - python3-certbot-nginx
     state: present

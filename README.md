@@ -57,8 +57,8 @@ If you want to add a service host, place it in the dedicated service group in `h
 
 The website role runs on `web-ffsh`. The main domain is served as a static site
 from `/var/www/web-static`; the beta domain remains at `/var/www/web-beta`.
-The previous WordPress files at `/var/www/web` and the PHP runtime are retained
-for rollback, but the main-domain vhost no longer serves them.
+The previous WordPress files were removed after the static site stabilized.
+The role no longer installs PHP.
 
 The website role also manages `install.freifunk-suedholstein.de`, serving the
 firmware selector from `/var/www/firmware-selector`. It reuses the existing
