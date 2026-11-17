@@ -4,12 +4,9 @@
   "remoteUser": "vscode",
   "updateRemoteUserUID": true,
   "features": {
-    // "ghcr.io/devcontainers/features/common-utils:2.5.9": {
-    //   "installZsh": true,
-    //   "installOhMyZsh": true,
-    //   "configureZshAsDefaultShell": true,
-    //   "username": "vscode"
-    // }
+    "ghcr.io/devcontainers/features/node:2.1.2": {
+      "version": "22"
+    }
   },
   "customizations": {
     "vscode": {
@@ -30,7 +27,7 @@
     "LANG": "C.UTF-8",
     "LC_ALL": "C.UTF-8",
     "LANGUAGE": "C.UTF-8",
-    "SHELL": "/bin/zsh"
+    "SHELL": "/bin/bash"
   },
   "postCreateCommand": "python -m pip install --user ansible ansible-lint && ansible --version && ansible-lint --version"
 }

@@ -16,6 +16,7 @@ This project provisions Freifunk Südholstein gateways and related services. The
 ## Main files
 
 - README.md: deployment, usage, and vault guidance
+- docs/: detailed project documentation built with Astro and Starlight
 - setup.yml: main playbook with gateway, service, and monitoring roles
 - hosts.yml: inventory for gateways, split service groups, and monitoring hosts
 - group_vars/versions.yml: shared software versions
@@ -49,12 +50,30 @@ ansible-lint
 - keep host-specific data in host_vars/
 - keep shared config in group_vars/
 - validate with ansible-lint before broader deployment
+- keep the README and the relevant Starlight pages current in the same change
+
+## Documentation guidelines
+
+- Keep the root README a quick-start and quick-reference page: prerequisites,
+  common playbook commands, and the most-used inventory limits or check mode.
+- Put detailed procedures, role and service behavior, architecture, migrations,
+  troubleshooting, Vault workflows, and extensive examples in `docs/`.
+- When a change affects deployment behavior, inventory, variables, or operations,
+  update the relevant guide or reference page. Add new pages under
+  `docs/src/content/docs/guides/` or `docs/src/content/docs/reference/`; those
+  sections are added to the sidebar automatically.
+- Keep any README explanation short and link to the detailed docs rather than
+  duplicating them. If a detailed procedure changes, update its short README
+  command or summary too when applicable.
+- Docs build and deployment checks should run only for changes under `docs/` or
+  to the docs publishing workflow, not for unrelated Ansible changes.
 
 ## High-level structure
 
 ```text
 ansible/
 ├── README.md
+├── docs/
 ├── setup.yml
 ├── hosts.yml
 ├── ansible.cfg

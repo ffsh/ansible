@@ -1,292 +1,58 @@
 # Ansible
+
 [![Ansible Lint](https://github.com/ffsh/ansible/actions/workflows/ansible-lint.yml/badge.svg?branch=main)](https://github.com/ffsh/ansible/actions/workflows/ansible-lint.yml)
 
-This repository holds the Ansible playbook to deploy a ffsh gateway in the standard configuration and to provision dedicated service hosts.
-It is based on https://docs.freifunk-suedholstein.de/de/1.5/gateway.html but changes were made where it was plausible.
+Ansible playbooks for deploying Freifunk Südholstein gateways and service
+hosts.
 
-## requirements
-- Clone the repository.
-- Ansible [installed](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#selecting-an-ansible-package-and-version-to-install)
+## Requirements
 
-## devcontainer
-This repository includes a devcontainer so you can run Ansible and ansible-lint in a reproducible environment.
+- Ansible installed ([installation guide](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#selecting-an-ansible-package-and-version-to-install))
+- Access to the Ansible Vault password for the `fastd_key` vault ID
 
-1. Open the repository in VS Code.
-2. Run `Dev Containers: Reopen in Container`.
-3. Wait for the build to finish. The container installs `ansible` and `ansible-lint`.
-
-Quick checks:
-
-```bash
-ansible --version
-ansible-lint --version
-```
-
-Run linting:
+The repository includes a devcontainer with Ansible and ansible-lint. Open it
+with **Dev Containers: Reopen in Container**. To lint locally, run:
 
 ```bash
 ansible-lint
 ```
 
-Run the playbook:
+## Quick deployment
+
+From the repository root, deploy to the inventory:
 
 ```bash
 ansible-playbook --vault-id=fastd_key@prompt setup.yml
 ```
 
-If you run into ssh issues try running:
-
-```bash
-ssh root@$gatewayIP
-```
-this allows you to interactively accept key changes.
-
-## ssh-key
-As the login is done via ssh make sure that the ssh key is registered at your identity manager `ssh-add $keyfile`.
-That way Ansible will be able to automatically detect the right ssh key and connect to the server.
-
-The SSH role adds the current maintainer keys and removes explicitly listed
-revoked keys from root's authorized keys. Other keys, including cloud-init
-keys, remain in place. The revoked public key files are retained so those
-exact keys can be removed on existing hosts; other keys belonging to a former
-maintainer must be identified separately.
-
-## hosts
-If you want to deploy to a new gateway you need to add it to the `hosts.yml` file in the repo, just compare it to brunsbach and add your own details.
-
-If you want to add a service host, place it in the dedicated service group in `hosts.yml`:
-
-- `services_map` for the map stack (`batman`, `batctl`, `grafana_public`, `meshviewer`)
-- `services_web` for the web stack (`batman`, `batctl`, `node_exporter`, `website`, `firmware_release`, `firmware_selector`, `fail2ban`, `unattended_upgrades`)
-
-### Website deployment
-
-The website role runs on `web-ffsh`. The main domain is served as a static site
-from `/var/www/web-static`; the beta domain remains at `/var/www/web-beta`.
-The previous WordPress files were removed after the static site stabilized.
-The role no longer installs PHP.
-
-The website role also manages `install.freifunk-suedholstein.de`, serving the
-firmware selector from `/var/www/firmware-selector`. It reuses the existing
-nginx site filename `install` and expects its certificate under
-`/etc/letsencrypt/live/install.freifunk-suedholstein.de/`.
-
-The firmware site serves HTTP and HTTPS and allows cross-origin requests for
-the selector. The website role disables the old `ffsh-firmware.conf` and
-`ffshev` enabled sites; their files in `sites-available` are not removed.
-
-The Hugo repository's CI should build the site and deploy pushes to `main` only
-to beta, with production deployments restricted to version tags. Use separate
-SSH keys for the two destinations. Add their public keys to the Ansible Vault
-variables `vault_website_beta_deploy_public_key` and
-`vault_website_prod_deploy_public_key` in `group_vars/secrets.yml`; keep the
-matching private keys in the Hugo repository's CI secrets. The CI workflow is
-separate from this Ansible repository.
-
-The web host's node_exporter listens on localhost and is exposed through the
-website's `/stats/` proxy. Deploy it with:
-
-```bash
-ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit services_web --tags node_exporter
-```
-
-The role installs the shared pinned version, enables the systemd and process
-collectors, and restarts the exporter. As with other tagged deployments, the
-play's `always` tasks can reboot the host if a reboot is required.
-
-The fail2ban role installs fail2ban and rsyslog and enables the `sshd` jail.
-The jail bans an address after 5 failed attempts within 1 day for 2 hours;
-loopback traffic is ignored. Deploy it to the web host with:
-
-```bash
-ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit services_web --tags fail2ban
-```
-
-The unattended_upgrades role (also applied to gateways, replacing the
-unattended-upgrades handling formerly in the tools role) enables daily
-unattended upgrades limited to security origins (plus Ubuntu ESM security on
-Ubuntu), through drop-ins that leave the
-packaged `50unattended-upgrades` untouched. It never reboots on its own; the
-play reboots the host after a run when `/var/run/reboot-required` exists.
-
-```bash
-ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit services_web --tags unattended-upgrades
-```
-
-The standalone DNS host belongs to the `dns` group. The DNS play only installs
-node_exporter and bind_exporter; it does not manage the existing BIND service,
-zones, or listening addresses.
-
-Before deploying the exporters, configure the DNS host's manually managed BIND
-instance to expose its statistics channel on localhost at
-`http://127.0.0.1:8053/`, then reload BIND and verify its statistics endpoint.
-The bind_exporter service reads the BIND PID file at
-`/run/named/named.pid`. Allow the monitoring host to reach TCP/UDP port 53 and
-TCP ports 9100 and 9119 as appropriate for the blackbox DNS probe and exporter
-scrapes; restrict exporter access to the monitoring host.
-
-Deploy the DNS exporters with:
-
-```bash
-ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit bind --tags node_exporter,bind_exporter
-```
-
-The monitoring host probes `freifunk-suedholstein.de` as an `A` record against
-the DNS host and exposes the result as the `blackbox-dns` Prometheus job.
-
-If you set enable_wireguard_exit to true ansible will deploy wireguard and attempt to generate a mullvad config.
-
-### Gateway DHCP migration
-
-Gateway deployments now configure Kea DHCPv4. The Kea role expects the
-`ffsh/dhcp-static` repository to publish `/reservations.json` as a JSON array of
-Kea reservation objects, for example:
-
-```json
-[
-	{
-		"hw-address": "18:b1:69:cd:34:ff",
-		"ip-address": "10.144.1.4"
-	}
-]
-```
-
-Keep the existing ISC `static.conf` in that repository during the migration
-window so rollback remains available. Do not run ISC and Kea simultaneously on
-the same gateway. Validate a single gateway after cutover, then roll out
-host-by-host:
-
-```bash
-ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit <gateway> --tags kea-dhcp4-server
-```
-
-The previous `isc-dhcp4-server` tag remains an alias during the transition. To
-restore ISC DHCP on one gateway:
-
-```bash
-ansible-playbook --vault-id=fastd_key@prompt dhcp-rollback.yml --limit <gateway>
-```
-
-## Mullvad
-This ansible script uses [wg-conf-gen](https://github.com/ffsh/wg-conf-gen) to generate a Mullvad wireguard configurration.
-
-The python script will call the Mullvad API with the details you provide in host_vars (see below).
-
-It will select a random gateway based on country and city.
-
-### host_vars/$gatewayname.yml
-You also need to supply your fastd secret as an encrypted secret, you get the password via the NOC Team.
-
-To create a new fastd secret, execute the following, this will ask you for a password and open an editor.
-```bash
-ansible-vault create --vault-id fastd_key@prompt host_vars/$gatewayname.yml
-```
-
-The config has the following options.
-
-| option       | comment                                                                      |
-|:-------------|:-----------------------------------------------------------------------------|
-| fastd_secret | fastd secret key                                                             |
-| wg_device    | Optional but you can put the name here that was generated by mullvad         |
-| wg_pk        | Wireguard private key provided by mullvad                                    |
-| wg_address   | ipV4 and ipV6 address provided by mullvad                                    |
-| wg_country   | Country supported by mullvad                                                 |
-| wg_city      | A City that mullvad has in your selected country                             |
-| ffshmon_mail | Mail username for ffshmon email alerts (exported as FFSHMON_MAIL_USER)      |
-| ffshmon_pw   | Mail password for ffshmon email alerts (exported as FFSHMON_MAIL_PASSWORD)  |
-
-For available country and city check here: https://mullvad.net/de/servers
-
-Example config:
-
-```yaml
-fastd_secret: 1234df132fssd...
-wg_device: Mellow Pony
-wg_pk: aDfkfdsgnn1232345...
-wg_address: 1.2.3.4/32,fxx...../128
-wg_country: Netherlands
-wg_city: Amsterdam
-ffshmon_mail: wg-mon@freifunk-suedholstein.de
-ffshmon_pw: secretpassword
-```
-Email alerts are enabled in this Ansible setup by passing `--email-alerts` to ffshmon.
-
-save and close the editor, done you added your secret :)
-
-You can change the content any time by
-```bash
-ansible-vault edit --vault-id fastd_key@prompt host_vars/$gatewayname.yml
-```
-## Usage
-
-Run playbook on all gateways listed in `hosts`:
+Limit a run to common inventory groups:
 
 ```bash
 ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit gateways
-```
-
-Run both service hosts:
-
-```bash
 ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit "services_map:services_web"
-```
-
-Run only the map service host:
-
-```bash
-ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit services_map
-```
-
-Run only the web service host:
-
-```bash
-ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit services_web
-```
-
-Run the monitoring host:
-
-```bash
 ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit monitoring
 ```
 
-Alertmanager is available through an SSH tunnel because it listens on localhost
-on the monitoring host:
+Preview a targeted run before applying it:
 
 ```bash
-ssh -N -L 9093:127.0.0.1:9093 root@$monitoringIP
+ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit <host-or-group> --check
 ```
 
-Then open `http://127.0.0.1:9093` in your browser.
+For role tags, host setup, service-specific procedures, and operational
+caveats, see the [deployment guide](docs/src/content/docs/guides/deploying.md)
+and the [full documentation](docs/).
 
-The Alertmanager role installs the official release, including the web UI and
-the `amtool` command-line utility. The debian package does not contain the web UI so we go with this.
+## Documentation site
 
-By default, deployments run one host at a time (`serial: 1`).
-
-Special case: run all gateways at once (for example for fast static page updates):
+The [documentation site](https://ffsh.github.io/ansible/) contains detailed
+guides and reference material; its source is in [docs/](docs/). To preview it
+locally:
 
 ```bash
-ansible-playbook --vault-id=fastd_key@prompt setup.yml -e deploy_serial=100%
+cd docs
+npm ci
+npm run dev
 ```
 
-Run playbook on one host
-```bash
-ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit $hostname
-```
-
-Run only the batman and batctl roles for a specific service host:
-```bash
-ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit $hostname --tags "batman-adv,batctl"
-```
-
-Run only the roles with the specific tag, to see which role is attached to which tag open `setup.yaml`:
-
-```bash
-ansible-playbook --vault-id=fastd_key@prompt setup.yml --tags "ssh keys"
-```
-
-These can also be combined:
-
-```bash
-ansible-playbook --vault-id=fastd_key@prompt setup.yml --limit $hostname --tags "oh-my-zsh"
-```
+See [docs/README.md](docs/README.md) for build and publishing details.
