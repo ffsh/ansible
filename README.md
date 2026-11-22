@@ -5,6 +5,10 @@
 Ansible playbooks for deploying Freifunk Südholstein gateways and service
 hosts.
 
+## Docs
+
+https://ffsh.github.io/ansible/
+
 ## Requirements
 
 - Ansible installed ([installation guide](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#selecting-an-ansible-package-and-version-to-install))
