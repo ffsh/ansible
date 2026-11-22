@@ -23,7 +23,7 @@ receivers:
           ❗ WireGuard tunnel is down.
 
           Please check.
-          {{ else if eq .Labels.job "blackbox-dns" }}
+          {{ else if eq .Labels.alertname "ProbeDnsFailed" }}
           <b>{{ .Labels.target }}</b>
 
           ❗ DNS check failed.
@@ -40,7 +40,7 @@ receivers:
           <b>{{ .Labels.target }}</b>
 
           ✅ WireGuard tunnel is up again.
-          {{ else if eq .Labels.job "blackbox-dns" }}
+          {{ else if eq .Labels.alertname "ProbeDnsFailed" }}
           <b>{{ .Labels.target }}</b>
 
           ✅ DNS check is up again.
