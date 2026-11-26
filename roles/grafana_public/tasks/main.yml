@@ -23,10 +23,22 @@
     creates: "{{ grafana_public_apt_keyring }}"
 
 - name: Configure Grafana APT repository
-  ansible.builtin.apt_repository:
-    repo: "{{ grafana_public_apt_repository }}"
-    filename: grafana-public
+  ansible.builtin.deb822_repository:
+    name: grafana-public
+    types:
+      - deb
+    uris:
+      - "{{ grafana_public_apt_uri }}"
+    suites:
+      - "{{ grafana_public_apt_suite }}"
+    components:
+      - "{{ grafana_public_apt_component }}"
+    signed_by: "{{ grafana_public_apt_keyring }}"
+    install_python_debian: true
     state: present
+
+- name: Update APT cache after configuring Grafana repository
+  ansible.builtin.apt:
     update_cache: true
 
 - name: Install Grafana
