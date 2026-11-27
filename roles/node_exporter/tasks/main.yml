@@ -17,6 +17,14 @@
     system: true
     create_home: false
 
+- name: Create node_exporter textfile collector directory
+  ansible.builtin.file:
+    path: /var/lib/node_exporter/textfile_collector
+    state: directory
+    owner: prometheus
+    group: prometheus
+    mode: "0755"
+
 - name: Check for currently installed node_exporter
   ansible.builtin.script: files/get_node_exporter_version.py
   args:
