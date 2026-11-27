@@ -1,0 +1,8 @@
+- name: Run systemd-tmpfiles
+  ansible.builtin.command: systemd-tmpfiles --create
+  changed_when: false
+
+- name: Restart Fastd client
+  ansible.builtin.systemd:
+    name: fastd@ffsh
+    state: restarted

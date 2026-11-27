@@ -19,6 +19,14 @@ Keep shared configuration in `group_vars/` and host-specific configuration in
 `host_vars/`. Encrypt secrets with Ansible Vault; do not put plaintext
 credentials in inventory or documentation.
 
+## Mesh service hosts
+
+Map and web hosts use the `fastd_client` role rather than the gateway
+`fastd` role. The role manages shared Fastd client configuration, bat0
+startup/address settings, the `gateways` peer repository, and one generated or
+preserved Fastd key. Gateway routing, NAT, policy routing, and predefined peer
+verification remain in the gateway role.
+
 ## SSH access
 
 Register the deployment key with the local SSH agent:

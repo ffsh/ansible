@@ -1,0 +1,20 @@
+fastd_client_config_dir: /etc/fastd/ffsh
+fastd_client_config_file: /etc/fastd/ffsh/fastd.conf
+fastd_client_interface: ffsh-mesh
+fastd_client_listen_port: 10000
+fastd_client_listen_interface: eth0
+fastd_client_mtu: 1426
+fastd_client_method:
+  - "null"
+  - salsa2012+umac
+fastd_client_peers_repo: https://github.com/ffsh/gateways.git
+fastd_client_peers_dir: /etc/fastd/ffsh/gateways
+fastd_client_bat_interface: bat0
+fastd_client_bat_mac: ""
+fastd_client_fastd_mac: ""
+fastd_client_ipv4_address: ""
+fastd_client_ipv4_prefix: 16
+fastd_client_ipv6_address: ""
+fastd_client_ipv6_prefix: 64
+fastd_client_generate_secret: true
+fastd_client_bat_config_file: /etc/network/interfaces.d/ffsh-bat0
