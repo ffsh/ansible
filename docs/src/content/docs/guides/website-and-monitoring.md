@@ -56,7 +56,8 @@ The monitoring stack probes the main, beta, firmware, and install TLS
 certificates through Blackbox. Prometheus warns when a certificate expires
 within 30 days and alerts critically within 14 days. The web role also runs a
 daily Certbot renewal dry-run and exports `ffsh_certbot_renewal_success` through
-node_exporter; Prometheus alerts if the latest dry-run fails.
+node_exporter; Prometheus alerts if the latest dry-run fails. The Grafana
+status dashboard includes certificate expiry and Certbot renewal panels.
 
 ## fail2ban and unattended upgrades
 
