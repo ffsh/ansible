@@ -52,6 +52,12 @@ The role enables the systemd and process collectors and restarts the exporter.
 As with other tagged deployments, `always` tasks can reboot the host if a
 reboot is required.
 
+The monitoring stack probes the main, beta, firmware, and install TLS
+certificates through Blackbox. Prometheus warns when a certificate expires
+within 30 days and alerts critically within 14 days. The web role also runs a
+daily Certbot renewal dry-run and exports `ffsh_certbot_renewal_success` through
+node_exporter; Prometheus alerts if the latest dry-run fails.
+
 ## fail2ban and unattended upgrades
 
 The fail2ban role installs fail2ban and rsyslog and enables the `sshd` jail. It

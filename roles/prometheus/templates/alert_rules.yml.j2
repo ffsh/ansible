@@ -19,6 +19,33 @@ groups:
           summary: "DNS probe failed for {{ '{{ $labels.instance }}' }}"
           description: "The DNS probe for {{ '{{ $labels.instance }}' }} has failed for more than 5 minutes."
 
+      - alert: CertificateExpiryWarning
+        expr: probe_success{job="blackbox-tls"} == 1 and (probe_ssl_earliest_cert_expiry - time()) < 30 * 24 * 60 * 60
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "TLS certificate expires soon for {{ '{{ $labels.target }}' }}"
+          description: "The TLS certificate for {{ '{{ $labels.target }}' }} expires within 30 days."
+
+      - alert: CertificateExpiryCritical
+        expr: probe_success{job="blackbox-tls"} == 1 and (probe_ssl_earliest_cert_expiry - time()) < 14 * 24 * 60 * 60
+        for: 15m
+        labels:
+          severity: critical
+        annotations:
+          summary: "TLS certificate expires imminently for {{ '{{ $labels.target }}' }}"
+          description: "The TLS certificate for {{ '{{ $labels.target }}' }} expires within 14 days."
+
+      - alert: CertbotRenewalDryRunFailed
+        expr: ffsh_certbot_renewal_success == 0
+        for: 15m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Certbot renewal dry-run failed"
+          description: "The Certbot renewal dry-run did not succeed for the web host."
+
       - alert: WireguardDown
         expr: wireguard_up{interface="exit"} == 0 or up{job="ffshmon"} == 0
         for: 5m

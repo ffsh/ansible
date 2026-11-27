@@ -74,7 +74,10 @@
 - [x] Review certificate names and domains before changes. The main certificate
   includes `lauenburg.freifunk.net`; the firmware certificate covers only
   `firmware.freifunk-suedholstein.de`, not the obsolete ffshev aliases.
-- [ ] Add certificate expiry and renewal monitoring.
+- [x] Add certificate expiry and renewal monitoring. Blackbox TLS probes cover
+  the main, beta, firmware and install hostnames. Prometheus warns at 30 days
+  and alerts critically at 14 days. A daily Certbot renewal dry-run writes a
+  node_exporter textfile metric that alerts when renewal fails.
 
 ## Firmware and verification
 

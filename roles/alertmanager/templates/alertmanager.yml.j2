@@ -29,6 +29,24 @@ receivers:
           ❗ DNS check failed.
 
           Please check.
+          {{ else if eq .Labels.alertname "CertificateExpiryWarning" }}
+          <b>{{ .Labels.target }}</b>
+
+          ⚠️ TLS certificate expires within 30 days.
+
+          Please renew or check Certbot.
+          {{ else if eq .Labels.alertname "CertificateExpiryCritical" }}
+          <b>{{ .Labels.target }}</b>
+
+          ❗ TLS certificate expires within 14 days.
+
+          Please renew or check Certbot urgently.
+          {{ else if eq .Labels.alertname "CertbotRenewalDryRunFailed" }}
+          <b>{{ .Labels.instance }}</b>
+
+          ❗ Certbot renewal dry-run failed.
+
+          Please check Certbot and nginx configuration.
           {{ else }}
           <b>{{ .Labels.target }}</b>
           
