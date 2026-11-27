@@ -1,0 +1,111 @@
+- name: Install Fastd client dependencies
+  ansible.builtin.apt:
+    name:
+      - fastd
+      - ifupdown
+    state: present
+
+- name: Validate Fastd client methods
+  ansible.builtin.assert:
+    that:
+      - fastd_client_method | length > 0
+      - fastd_client_method | reject('equalto', '') | list | length == fastd_client_method | length
+    fail_msg: "fastd_client_method must contain non-empty Fastd method names."
+
+- name: Add Fastd system user
+  ansible.builtin.user:
+    name: ffsh
+    system: true
+    create_home: false
+
+- name: Create Fastd client directory
+  ansible.builtin.file:
+    path: "{{ fastd_client_config_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Create Fastd network interfaces directory
+  ansible.builtin.file:
+    path: /etc/network/interfaces.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Check for an existing Fastd client secret
+  ansible.builtin.shell: |
+    set -o pipefail
+    awk -F'"' '/^[[:space:]]*secret[[:space:]]/ {print $2; exit}' {{ fastd_client_config_file | quote }}
+  args:
+    executable: bash
+  register: fastd_client_existing_secret
+  changed_when: false
+  failed_when: false
+
+- name: Generate a Fastd client secret
+  ansible.builtin.command: openssl rand -hex 32
+  register: fastd_client_generated_secret
+  changed_when: true
+  when:
+    - fastd_client_generate_secret | bool
+    - fastd_client_existing_secret.stdout | trim | length == 0
+
+- name: Select the Fastd client secret
+  ansible.builtin.set_fact:
+    fastd_client_secret: >-
+      {{ fastd_client_existing_secret.stdout | trim
+         if fastd_client_existing_secret.stdout | trim | length > 0
+         else fastd_client_generated_secret.stdout | trim }}
+
+- name: Create Fastd client tmpfiles configuration
+  ansible.builtin.copy:
+    src: fastd.conf
+    dest: /etc/tmpfiles.d/fastd.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Run systemd-tmpfiles
+
+- name: Install Fastd client configuration
+  ansible.builtin.template:
+    src: fastd.conf.j2
+    dest: "{{ fastd_client_config_file }}"
+    owner: root
+    group: root
+    mode: "0600"
+  notify: Restart Fastd client
+
+- name: Configure the Fastd client bat0 interface
+  ansible.builtin.template:
+    src: bat0.interfaces.j2
+    dest: "{{ fastd_client_bat_config_file }}"
+    owner: root
+    group: root
+    mode: "0644"
+  when:
+    - fastd_client_bat_mac | length > 0
+      or fastd_client_ipv4_address | length > 0
+      or fastd_client_ipv6_address | length > 0
+
+- name: Clone Fastd client peers repository
+  ansible.builtin.git:
+    repo: "{{ fastd_client_peers_repo }}"
+    dest: "{{ fastd_client_peers_dir }}"
+    force: true
+    version: master
+
+- name: Stop and disable legacy Fastd service
+  ansible.builtin.systemd:
+    name: fastd.service
+    enabled: false
+    state: stopped
+    daemon_reload: true
+
+- name: Enable Fastd client service
+  ansible.builtin.systemd:
+    name: "fastd@ffsh"
+    enabled: true
+    state: started
+    daemon_reload: true

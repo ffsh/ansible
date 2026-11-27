@@ -1,0 +1,13 @@
+auto {{ fastd_client_bat_interface }}
+iface {{ fastd_client_bat_interface }} inet manual
+    pre-up ip link add dev {{ fastd_client_bat_interface }} type batadv 2>/dev/null || true
+{% if fastd_client_bat_mac | length > 0 %}
+    pre-up ip link set dev {{ fastd_client_bat_interface }} address {{ fastd_client_bat_mac }}
+{% endif %}
+{% if fastd_client_ipv4_address | length > 0 %}
+    post-up ip address replace {{ fastd_client_ipv4_address }}/{{ fastd_client_ipv4_prefix }} dev {{ fastd_client_bat_interface }}
+{% endif %}
+{% if fastd_client_ipv6_address | length > 0 %}
+    post-up ip -6 address replace {{ fastd_client_ipv6_address }}/{{ fastd_client_ipv6_prefix }} dev {{ fastd_client_bat_interface }}
+{% endif %}
+    post-down ip link delete dev {{ fastd_client_bat_interface }} 2>/dev/null || true

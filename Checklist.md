@@ -7,10 +7,15 @@
   existing service listens on `127.0.0.1:9100`; nginx proxies `/stats/` to it.
   The role installs the shared pinned version, enables the systemd and process
   collectors, and restarts the exporter.
-- [ ] Capture the web host's fastd and batman-adv configuration, including
-  `ffsh-mesh`, `bat0`, its addresses, peers and secrets. Fastd currently listens
-  on UDP port 10000. The gateway fastd role has gateway-specific settings and
-  must not be applied unchanged.
+- [x] Capture the web host and map host fastd/batman-adv client configuration.
+  Both are mesh clients rather than gateways. They use UDP port 10000, accept
+  peers through the shared `gateways` repository, have gateway mode off, and
+  do not currently need gateway NAT or policy-routing rules. Web uses
+  `ffsh-mesh`, bat0 MAC `00:5b:27:81:00:22`, and IPv6
+  `fddf:bf7:80::222:1`. Map uses `mesh-vpn`, bat0 IPv4 `10.144.3.3/16`,
+  IPv6 `fddf:bf7:80::333:3/48`, and bat0 MAC `00:5b:27:80:03:33`. The dedicated
+  `fastd_client` role now manages the shared client setup and preserves an
+  existing Fastd secret or generates one only for a new host.
 - [x] Add the fail2ban role to the web host play and preserve Debian's default
   `sshd` jail. UFW is inactive, but nftables contains fail2ban rules; check for
   any additional external firewall rules.
