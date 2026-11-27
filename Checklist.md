@@ -42,29 +42,36 @@
   exposed headers and autoindex, and the website role disables the old
   `ffsh-firmware.conf`. Verified on the host: `nginx -t` no longer reports
   conflicting firmware server names.
-- [ ] Decide which remaining legacy redirects to retain and who manages their
+- [x] Decide which remaining legacy redirects to retain and who manages their
   DNS. `freifunk-stormarn.de`, `lauenburg.freifunk.net`, and
   `stormarn.freifunk.net` currently point to this host and redirect over HTTP;
-  HTTPS certificate validation failed for each. `reinbek.freifunk.net` points
-  elsewhere and returned HTTP 410; its HTTPS certificate validation also failed.
-- [ ] Review nginx's remaining warnings and verify active vhosts after
-  changes. The conflicting-name and `ffshev` warnings are resolved. Still open:
-  "protocol options redefined" for port 443 (`freifunk-stormarn`, `lauenburg`
-  and the main site's `http2` listener). The `ssl_stapling` warnings were
+  these are now managed HTTP-only redirects in the website role.
+  `reinbek.freifunk.net` points elsewhere and returned HTTP 410; its HTTPS
+  certificate validation also failed. The reinbek enabled-site symlink is now
+  retired by the website role; the sites-available file is preserved.
+- [x] Review nginx's remaining warnings and verify active vhosts after
+  changes. The conflicting-name and `ffshev` warnings are resolved. Diagnosis:
+  `freifunk-stormarn` and `lauenburg` formerly contained plain `listen 443` and
+  `[::]:443` directives despite only defining HTTP-to-HTTPS redirects. They are
+  now managed HTTP-only redirect vhosts, so re-run `nginx -t` and verify that
+  the protocol-options warnings are gone. The `ssl_stapling` warnings were
   resolved by removing stapling from the vhost template. Do not remove configs
   solely because they look old.
 
 ## TLS and renewal
 
 - [ ] Make certificate issuance, renewal, nginx reload, and the required
-  `/etc/nginx/dhparam.pem` reproducible on a fresh host.
-- [ ] Capture beta certificate renewal in Ansible. Its saved authenticator is
+  `/etc/nginx/dhparam.pem` reproducible on a fresh host. The website role now
+  generates 2048-bit DH parameters once and configures Certbot renewal through
+  the nginx plugin. Certificate issuance remains opt-in, and renewal dry-runs
+  are enabled with `website_verify_certbot_renewal=true`.
+- [x] Capture beta certificate renewal in Ansible. Its saved authenticator is
   standalone, but the systemd override runs Certbot with `--nginx`; a beta
   renewal dry run with the nginx plugin succeeded.
 - [ ] Capture the other certificates' nginx authenticator and installer
   behavior; verify renewal without allowing Certbot to make unintended changes
   to managed nginx configuration.
-- [ ] Review certificate names and domains before changes. The main certificate
+- [x] Review certificate names and domains before changes. The main certificate
   includes `lauenburg.freifunk.net`; the firmware certificate covers only
   `firmware.freifunk-suedholstein.de`, not the obsolete ffshev aliases.
 - [ ] Add certificate expiry and renewal monitoring.
