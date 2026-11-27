@@ -2,6 +2,17 @@
 {% set cert_path = '/etc/letsencrypt/live/' + item.name %}
 {% set use_default_server = item.default_server | default(false) %}
 
+{% if item.type | default('static') == 'redirect' %}
+server {
+    listen 80{% if use_default_server %} default_server{% endif %};
+    listen [::]:80{% if use_default_server %} default_server{% endif %};
+
+    server_name {{ server_names | join(' ') }};
+    access_log off;
+
+    return 301 https://{{ item.redirect_to }}$request_uri;
+}
+{% else %}
 {% if item.redirect_http_to_https | default(true) %}
 server {
     listen 80{% if use_default_server %} default_server{% endif %};
@@ -124,3 +135,4 @@ server {
     {% endif %}
 
 }
+{% endif %}

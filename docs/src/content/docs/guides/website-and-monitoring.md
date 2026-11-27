@@ -16,6 +16,23 @@ The firmware site serves HTTP and HTTPS and allows cross-origin requests for
 the selector. The role disables the old `ffsh-firmware.conf` and `ffshev`
 enabled sites but does not remove their files from `sites-available`.
 
+The role also manages the HTTP-only redirects for
+`freifunk-stormarn.de`, `lauenburg.freifunk.net`, and
+`stormarn.freifunk.net`. Each redirect returns HTTP 301 responses to
+`https://freifunk-suedholstein.de` and does not listen on port 443 or request
+a TLS certificate.
+
+The role disables the retired `reinbek` nginx site because
+`reinbek.freifunk.net` is managed elsewhere. It leaves the legacy file in
+`sites-available` untouched so it can be inspected or restored manually.
+
+The role generates `/etc/nginx/dhparam.pem` once with 2048-bit parameters and
+configures the packaged Certbot renewal timer to use the nginx plugin. Set
+`website_verify_certbot_renewal: true` for a deployment to run
+`certbot renew --dry-run --nginx --no-random-sleep-on-renew` after nginx
+passes validation. Certificate issuance remains opt-in:
+`website_auto_issue_tls: true`.
+
 The Hugo repository's separate CI should deploy pushes to `main` to beta and
 restrict production deployments to version tags. Use separate SSH keys for
 each destination. Store only their public keys in the Ansible Vault variables

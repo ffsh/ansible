@@ -1,4 +1,22 @@
 website_vhosts:
+  - name: freifunk-stormarn.de
+    config_filename: freifunk-stormarn
+    type: redirect
+    tls: false
+    redirect_to: freifunk-suedholstein.de
+
+  - name: lauenburg.freifunk.net
+    config_filename: lauenburg
+    type: redirect
+    tls: false
+    redirect_to: freifunk-suedholstein.de
+
+  - name: stormarn.freifunk.net
+    config_filename: stormarn
+    type: redirect
+    tls: false
+    redirect_to: freifunk-suedholstein.de
+
   - name: freifunk-suedholstein.de
     aliases:
       - www.freifunk-suedholstein.de
@@ -79,3 +97,4 @@ website_default_email: noc@freifunk-suedholstein.de
 website_disabled_sites:
   - ffsh-firmware.conf
   - ffshev
+  - reinbek

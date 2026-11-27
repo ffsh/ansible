@@ -1,11 +1,23 @@
 - name: Validate website vhost types
   ansible.builtin.assert:
     that:
-      - item.type | default('static') == 'static'
-    fail_msg: "Website vhost {{ item.name }} must be static."
+      - item.type | default('static') in ['static', 'redirect']
+    fail_msg: "Website vhost {{ item.name }} must be static or redirect."
   loop: "{{ website_vhosts }}"
   loop_control:
     label: "{{ item.name }}"
+
+- name: Validate website redirect vhosts
+  ansible.builtin.assert:
+    that:
+      - item.redirect_to is defined
+      - item.redirect_to | length > 0
+      - not (item.tls | default(true))
+    fail_msg: "Redirect vhost {{ item.name }} must define redirect_to and disable TLS."
+  loop: "{{ website_vhosts }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.type | default('static') == 'redirect'
 
 - name: Validate website HTTP listener settings
   ansible.builtin.assert:
@@ -21,8 +33,46 @@
     pkg:
       - nginx
       - certbot
+      - openssl
       - python3-certbot-nginx
     state: present
+
+- name: Check whether the nginx DH parameters exist
+  ansible.builtin.stat:
+    path: "{{ website_default_ssl_dhparam }}"
+  register: website_dhparam_stat
+
+- name: Generate nginx DH parameters
+  ansible.builtin.command: >-
+    openssl dhparam -out {{ website_default_ssl_dhparam | quote }}
+    {{ website_dhparam_bits }}
+  changed_when: true
+  when: not website_dhparam_stat.stat.exists
+  notify: Reload nginx
+
+- name: Create the Certbot systemd override directory
+  ansible.builtin.file:
+    path: /etc/systemd/system/certbot.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Configure the Certbot renewal service to use nginx
+  ansible.builtin.template:
+    src: certbot.service.j2
+    dest: /etc/systemd/system/certbot.service.d/override.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload certbot
+
+- name: Configure the Certbot renewal timer
+  ansible.builtin.systemd:
+    name: certbot.timer
+    enabled: true
+    state: started
+    daemon_reload: true
 
 - name: Ensure website deployment users exist
   ansible.builtin.user:
@@ -86,6 +136,7 @@
   loop: "{{ website_vhosts }}"
   loop_control:
     loop_var: item
+  when: item.type | default('static') == 'static'
 
 - name: Check whether a certificate already exists for each configured vhost
   ansible.builtin.stat:
@@ -94,6 +145,7 @@
   loop: "{{ website_vhosts }}"
   loop_control:
     loop_var: item
+  when: item.tls | default(true)
 
 - name: Obtain TLS certificates for configured vhosts when explicitly enabled
   ansible.builtin.command: >-
@@ -114,13 +166,14 @@
 - name: Fail before enabling TLS vhosts when the certificate is missing
   ansible.builtin.assert:
     that:
-      - not (item.tls | default(true)) or (website_cert_stat.results | selectattr('item.name', 'equalto', item.name) | map(attribute='stat.exists') | first)
+      - website_cert_stat.results | selectattr('item.name', 'equalto', item.name) | map(attribute='stat.exists') | first
     fail_msg: >-
       No certificate exists for {{ item.name }}. Issue the certificate manually or set
       website_auto_issue_tls=true for automatic issuance.
   loop: "{{ website_vhosts }}"
   loop_control:
     loop_var: item
+  when: item.tls | default(true)
 
 - name: Ensure nginx site configuration files exist
   ansible.builtin.template:
@@ -160,3 +213,8 @@
   ansible.builtin.command: nginx -t
   changed_when: false
   notify: Reload nginx
+
+- name: Verify Certbot renewal with the nginx plugin
+  ansible.builtin.command: certbot renew --dry-run --nginx --no-random-sleep-on-renew
+  changed_when: false
+  when: website_verify_certbot_renewal | bool

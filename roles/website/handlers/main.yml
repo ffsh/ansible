@@ -2,3 +2,9 @@
   ansible.builtin.systemd:
     name: nginx
     state: reloaded
+
+- name: Reload certbot
+  ansible.builtin.systemd:
+    name: certbot
+    enabled: true
+    daemon_reload: true
