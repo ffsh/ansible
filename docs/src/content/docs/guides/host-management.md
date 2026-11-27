@@ -27,6 +27,10 @@ startup/address settings, the `gateways` peer repository, and one generated or
 preserved Fastd key. Gateway routing, NAT, policy routing, and predefined peer
 verification remain in the gateway role.
 
+For a fresh web host, follow the [web host restoration procedure](./web-host-restoration/).
+The exact CI repository and workflow names, plus the manual firmware signature
+check, remain explicitly marked for completion.
+
 ## SSH access
 
 Register the deployment key with the local SSH agent:
