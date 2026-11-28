@@ -11,8 +11,8 @@
 
 - name: Install firmware selector configuration
   ansible.builtin.template:
-    src: firmware-selector-config.js
-    dest: "{{ firmware_selector_path }}/firmware-selector-config.js"
+    src: config.js
+    dest: "{{ firmware_selector_path }}/config.js"
     owner: root
     group: root
     mode: "0644"

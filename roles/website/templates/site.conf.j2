@@ -1,5 +1,5 @@
 {% set server_names = [item.name] + (item.aliases | default([])) %}
-{% set cert_path = '/etc/letsencrypt/live/' + item.name %}
+{% set cert_path = '/etc/letsencrypt/live/' + (item.cert_name | default(item.name)) %}
 {% set use_default_server = item.default_server | default(false) %}
 
 {% if item.type | default('static') == 'redirect' %}

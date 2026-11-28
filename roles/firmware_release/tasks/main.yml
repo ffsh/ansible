@@ -28,3 +28,20 @@
     owner: root
     group: root
     mode: "0750"
+
+- name: Ensure firmware release root exists
+  ansible.builtin.file:
+    path: "{{ firmware_release_root }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Ensure firmware release content is root-owned
+  ansible.builtin.file:
+    path: "{{ firmware_release_root }}"
+    state: directory
+    recurse: true
+    owner: root
+    group: root
+    mode: "u=rwX,g=rX,o=rX"

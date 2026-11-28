@@ -38,6 +38,9 @@ website_vhosts:
 
   - name: firmware.freifunk-suedholstein.de
     root: /var/www/firmware
+    owner: root
+    group: root
+    mode: "0755"
     index: index.html index.htm index.nginx-debian.html
     type: static
     tls: true
@@ -94,6 +97,7 @@ website_deploy_users:
 website_nginx_sites_available_dir: /etc/nginx/sites-available
 website_nginx_sites_enabled_dir: /etc/nginx/sites-enabled
 website_default_email: noc@freifunk-suedholstein.de
+website_auto_issue_tls: true
 website_disabled_sites:
   - ffsh-firmware.conf
   - ffshev
