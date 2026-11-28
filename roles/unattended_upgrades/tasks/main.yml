@@ -1,3 +1,13 @@
+- name: Validate supported unattended-upgrades operating systems
+  ansible.builtin.assert:
+    that:
+      - >-
+        (ansible_facts["distribution"] == "Ubuntu" and
+        ansible_facts["distribution_version"] == "24.04") or
+        (ansible_facts["distribution"] == "Debian" and
+        ansible_facts["distribution_major_version"] == "13")
+    fail_msg: "Unattended-upgrades supports Ubuntu 24.04 or Debian 13 only."
+
 - name: Install unattended-upgrades
   ansible.builtin.apt:
     name: unattended-upgrades

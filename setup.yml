@@ -88,16 +88,19 @@
       tags:
         - always
 
-    - name: Abort if target OS is not Ubuntu 24.04
+    - name: Abort if target OS is unsupported
       ansible.builtin.assert:
         that:
-          - ansible_facts["distribution"] == "Ubuntu"
-          - ansible_facts["distribution_version"] == "24.04"
+          - >-
+            (ansible_facts["distribution"] == "Ubuntu" and
+            ansible_facts["distribution_version"] == "24.04") or
+            (ansible_facts["distribution"] == "Debian" and
+            ansible_facts["distribution_major_version"] == "13")
         fail_msg: >-
           Unsupported target OS: {{ ansible_facts["distribution"] }} {{
           ansible_facts["distribution_version"] }}. This playbook supports
-          Ubuntu 24.04 only.
-        success_msg: "Target OS check passed: Ubuntu 24.04"
+          Ubuntu 24.04 or Debian 13 only.
+        success_msg: "Target OS check passed: Ubuntu 24.04 or Debian 13"
       tags:
         - always
 
@@ -148,16 +151,19 @@
       tags:
         - always
 
-    - name: Abort if target OS is not Ubuntu 24.04
+    - name: Abort if target OS is unsupported
       ansible.builtin.assert:
         that:
-          - ansible_facts["distribution"] == "Ubuntu"
-          - ansible_facts["distribution_version"] == "24.04"
+          - >-
+            (ansible_facts["distribution"] == "Ubuntu" and
+            ansible_facts["distribution_version"] == "24.04") or
+            (ansible_facts["distribution"] == "Debian" and
+            ansible_facts["distribution_major_version"] == "13")
         fail_msg: >-
           Unsupported target OS: {{ ansible_facts["distribution"] }} {{
           ansible_facts["distribution_version"] }}. This playbook supports
-          Ubuntu 24.04 only.
-        success_msg: "Target OS check passed: Ubuntu 24.04"
+          Ubuntu 24.04 or Debian 13 only.
+        success_msg: "Target OS check passed: Ubuntu 24.04 or Debian 13"
       tags:
         - always
 
@@ -213,16 +219,19 @@
       tags:
         - always
   # pre_tasks:
-  #   - name: Abort if target OS is not Ubuntu 24.04
+  #   - name: Abort if target OS is unsupported
   #     ansible.builtin.assert:
   #       that:
-  #         - ansible_facts["distribution"] == "Ubuntu"
-  #         - ansible_facts["distribution_version"] == "24.04"
+  #         - >-
+  #           (ansible_facts["distribution"] == "Ubuntu" and
+  #           ansible_facts["distribution_version"] == "24.04") or
+  #           (ansible_facts["distribution"] == "Debian" and
+  #           ansible_facts["distribution_major_version"] == "13")
   #       fail_msg: >-
   #         Unsupported target OS: {{ ansible_facts["distribution"] }} {{
   #         ansible_facts["distribution_version"] }}. This playbook supports
-  #         Ubuntu 24.04 only.
-  #       success_msg: "Target OS check passed: Ubuntu 24.04"
+  #         Ubuntu 24.04 or Debian 13 only.
+  #       success_msg: "Target OS check passed: Ubuntu 24.04 or Debian 13"
   #     tags:
   #       - always
 
