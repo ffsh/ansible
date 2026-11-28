@@ -3,8 +3,10 @@
 // Reboots are handled by the playbook when /var/run/reboot-required exists.
 #clear Unattended-Upgrade::Allowed-Origins;
 Unattended-Upgrade::Allowed-Origins {
+{% if ansible_facts['distribution'] == 'Debian' %}
+    "Debian:${distro_codename}-security";
+{% elif ansible_facts['distribution'] == 'Ubuntu' %}
     "${distro_id}:${distro_codename}-security";
-{% if ansible_facts['distribution'] == 'Ubuntu' %}
     "${distro_id}ESMApps:${distro_codename}-apps-security";
     "${distro_id}ESM:${distro_codename}-infra-security";
 {% endif %}

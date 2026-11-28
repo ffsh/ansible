@@ -3,7 +3,7 @@
 ## Host basics
 
 - [ ] Debian migration blockers for `web-ffsh`:
-  - The web play currently asserts Ubuntu 24.04.
+  - The web play currently accepts Ubuntu 24.04 or Debian 13.
   - The gateways already run Debian 13 and demonstrate that batman-adv,
     batctl, Fastd, DKMS, fail2ban, nftables, Certbot, nginx and systemd
     role patterns work on Debian. They reduce, but do not eliminate, the web
@@ -16,8 +16,8 @@
     for Debian while retaining the source/DKMS build already used by gateways.
   - `batman`'s current 2026.x source build and netns hotfix need Debian kernel
     validation.
-  - The unattended-upgrades role contains Ubuntu ESM branches. It should keep
-    Debian security origins and add them only on Ubuntu.
+  - The unattended-upgrades role now selects Debian `trixie-security` origins
+    or Ubuntu security plus ESM origins based on the operating system.
   - The service OS version may differ in fail2ban defaults, nftables integration,
     Fastd package support, Certbot package/plugin names, and systemd unit naming.
   - The migration must preserve the public address, route/DNS configuration,
