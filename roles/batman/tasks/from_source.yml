@@ -1,14 +1,12 @@
 - name: Install dependencies for batman-adv
   ansible.builtin.apt:
     name:
-      [
-        "linux-headers-generic",
-        "libnl-3-dev",
-        "libnl-genl-3-dev",
-        "libcap-dev",
-        "pkg-config",
-        "build-essential",
-      ]
+      - "{{ 'linux-headers-' ~ ansible_facts['kernel'] if ansible_facts['distribution'] == 'Debian' else 'linux-headers-generic' }}"
+      - libnl-3-dev
+      - libnl-genl-3-dev
+      - libcap-dev
+      - pkg-config
+      - build-essential
 
 - name: Download batman source
   ansible.builtin.get_url:

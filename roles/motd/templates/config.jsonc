@@ -59,7 +59,7 @@
         {
             "type": "command",
             "key": "Owner",
-            "text": "echo '{{ owner }}'"
+            "text": "echo '{{ owner | default('FFSH') }}'"
         },
         {
             "type": "command",

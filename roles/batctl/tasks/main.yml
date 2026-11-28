@@ -1,13 +1,11 @@
 - name: Install dependencies for batctl
   ansible.builtin.apt:
     name:
-      [
-        "libnl-3-dev",
-        "libnl-genl-3-dev",
-        "libcap-dev",
-        "pkg-config",
-        "build-essential",
-      ]
+      - libnl-3-dev
+      - libnl-genl-3-dev
+      - libcap-dev
+      - pkg-config
+      - build-essential
 
 - name: Check if batctl is already installed
   ansible.builtin.stat:

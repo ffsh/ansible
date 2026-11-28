@@ -5,10 +5,12 @@
   register: batman_mesh_interface_src
 
 - name: Check if installed kernel headers renamed netns_local to netns_immutable
-  ansible.builtin.shell: grep -lw netns_immutable /usr/src/linux-headers-*/include/linux/netdevice.h
+  ansible.builtin.shell: |
+    find /usr/src -type f -path '*/include/linux/netdevice.h' \
+      -exec grep -l netns_immutable {} + 2>/dev/null || true
   register: batman_netns_immutable_headers
   changed_when: false
-  failed_when: batman_netns_immutable_headers.rc > 1
+  failed_when: false
   check_mode: false
 
 - name: Patch batman-adv for netns_immutable rename
@@ -20,4 +22,4 @@
   when:
     - batman_version == '2026.3'
     - batman_mesh_interface_src.stat.exists
-    - batman_netns_immutable_headers.rc == 0
+    - batman_netns_immutable_headers.stdout | trim | length > 0

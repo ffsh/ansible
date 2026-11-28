@@ -7,6 +7,7 @@ website_default_ssl_dhparam: /etc/nginx/dhparam.pem
 website_dhparam_bits: 2048
 website_default_email: noc@freifunk-suedholstein.de
 website_auto_issue_tls: false
+website_configure_certbot_nginx: true
 website_verify_certbot_renewal: false
 website_deploy_users: []
 website_disabled_sites: []

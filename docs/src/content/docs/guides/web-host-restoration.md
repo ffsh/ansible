@@ -124,6 +124,22 @@ For a new host with no existing certificates:
 3. Run the web role.
 4. Verify nginx and the renewal timer.
 
+Certbot certificate names must match the primary vhost name. The website role
+passes `--cert-name` explicitly and places the primary domain first in the
+domain list. If an old run created `www.freifunk-suedholstein.de` instead,
+first verify the new primary certificate exists:
+
+```sh
+certbot certificates
+ls -l /etc/letsencrypt/live/freifunk-suedholstein.de
+```
+
+After verification, remove only the unintended alias-named certificate:
+
+```sh
+certbot delete --cert-name www.freifunk-suedholstein.de
+```
+
 Before removing this option, run a dry-run:
 
 ```sh

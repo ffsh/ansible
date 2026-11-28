@@ -181,6 +181,9 @@
     - { role: ssh, tags: "ssh-keys" }
     - { role: fail2ban, tags: "fail2ban" }
     - { role: unattended_upgrades, tags: "unattended-upgrades" }
+    - { role: motd, tags: "motd" }
+    - { role: ohmyzsh, tags: "oh-my-zsh" }
+    - { role: ohmyzshtheme, tags: "oh-my-zsh" }
 
   post_tasks:
     - name: Check if reboot is required

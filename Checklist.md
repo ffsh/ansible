@@ -3,6 +3,9 @@
 ## Host basics
 
 - [ ] Debian migration blockers for `web-ffsh`:
+  - Migration is planned to use a Debian snapshot rollback: preserve the current
+    Ubuntu snapshot until web, Fastd, bat0, nginx, TLS and recovery commands are
+    verified on Debian.
   - The web play currently accepts Ubuntu 24.04 or Debian 13.
   - The gateways already run Debian 13 and demonstrate that batman-adv,
     batctl, Fastd, DKMS, fail2ban, nftables, Certbot, nginx and systemd

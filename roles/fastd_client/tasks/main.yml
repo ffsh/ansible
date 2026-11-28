@@ -3,6 +3,7 @@
     name:
       - fastd
       - ifupdown
+      - git
     state: present
 
 - name: Validate Fastd client methods
@@ -45,19 +46,31 @@
   failed_when: false
 
 - name: Generate a Fastd client secret
-  ansible.builtin.command: openssl rand -hex 32
+  ansible.builtin.command: fastd --generate-key --machine-readable
   register: fastd_client_generated_secret
   changed_when: true
   when:
     - fastd_client_generate_secret | bool
-    - fastd_client_existing_secret.stdout | trim | length == 0
+    - not ((fastd_client_existing_secret.stdout | trim | regex_search('[0-9a-fA-F]{64}')) | default(''))
+
+- name: Extract generated Fastd client secret
+  ansible.builtin.set_fact:
+    fastd_client_generated_secret_hex: "{{ fastd_client_generated_secret.stdout | regex_search('[0-9a-fA-F]{64}') | default('') }}"
+  when: fastd_client_generated_secret is not skipped
 
 - name: Select the Fastd client secret
   ansible.builtin.set_fact:
     fastd_client_secret: >-
-      {{ fastd_client_existing_secret.stdout | trim
-         if fastd_client_existing_secret.stdout | trim | length > 0
-         else fastd_client_generated_secret.stdout | trim }}
+      {{ (fastd_client_existing_secret.stdout | regex_search('[0-9a-fA-F]{64}') | default(''))
+         if (fastd_client_existing_secret.stdout | regex_search('[0-9a-fA-F]{64}') | default(''))
+         else (fastd_client_generated_secret_hex | default('')) }}
+
+- name: Validate the Fastd client secret
+  ansible.builtin.assert:
+    that:
+      - fastd_client_secret | length == 64
+      - fastd_client_secret is match('^[0-9a-fA-F]{64}$')
+    fail_msg: "Fastd did not provide a valid 64-character hexadecimal secret."
 
 - name: Create Fastd client tmpfiles configuration
   ansible.builtin.copy:

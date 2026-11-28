@@ -177,7 +177,7 @@
 
 - name: Check whether a certificate already exists for each configured vhost
   ansible.builtin.stat:
-    path: "/etc/letsencrypt/live/{{ item.name }}/fullchain.pem"
+    path: "/etc/letsencrypt/live/{{ item.cert_name | default(item.name) }}/fullchain.pem"
   register: website_cert_stat
   loop: "{{ website_vhosts }}"
   loop_control:
@@ -185,25 +185,57 @@
   when: item.tls | default(true)
 
 - name: Obtain TLS certificates for configured vhosts when explicitly enabled
-  ansible.builtin.command: >-
-    certbot certonly --standalone --non-interactive --agree-tos --email {{ website_default_email }}
-    {% for domain in (item.aliases | default([]) + [item.name]) %}
-    -d {{ domain }}
-    {% endfor %}
-  args:
-    creates: "/etc/letsencrypt/live/{{ item.name }}/fullchain.pem"
+  when: website_auto_issue_tls | bool
+  block:
+    - name: Find configured vhosts with missing certificates
+      ansible.builtin.set_fact:
+        website_missing_certs: >-
+          {{ website_cert_stat.results
+             | selectattr('stat.exists', 'defined')
+             | selectattr('stat.exists', 'equalto', false)
+             | list }}
+
+    - name: Stop nginx before standalone certificate issuance
+      ansible.builtin.systemd:
+        name: nginx
+        state: stopped
+      when: website_missing_certs | length > 0
+
+    - name: Issue missing TLS certificates
+      ansible.builtin.command: >-
+        certbot certonly --standalone --non-interactive --agree-tos --email {{ website_default_email }}
+        --cert-name {{ item.cert_name | default(item.name) }}
+        {% for domain in ([item.name] + (item.aliases | default([]))) %}
+        -d {{ domain }}
+        {% endfor %}
+      args:
+        creates: "/etc/letsencrypt/live/{{ item.cert_name | default(item.name) }}/fullchain.pem"
+      loop: "{{ website_vhosts }}"
+      loop_control:
+        loop_var: item
+      when:
+        - item.tls | default(true)
+        - not website_cert_stat.results | selectattr('item.name', 'equalto', item.name) | map(attribute='stat.exists') | first
+  always:
+    - name: Start nginx after standalone certificate issuance
+      ansible.builtin.systemd:
+        name: nginx
+        state: started
+      when: website_missing_certs | length > 0
+
+- name: Recheck TLS certificates after issuance
+  ansible.builtin.stat:
+    path: "/etc/letsencrypt/live/{{ item.cert_name | default(item.name) }}/fullchain.pem"
+  register: website_cert_stat_recheck
   loop: "{{ website_vhosts }}"
   loop_control:
     loop_var: item
-  when:
-    - item.tls | default(true)
-    - website_auto_issue_tls | bool
-    - not website_cert_stat.results | selectattr('item.name', 'equalto', item.name) | map(attribute='stat.exists') | first
+  when: item.tls | default(true)
 
 - name: Fail before enabling TLS vhosts when the certificate is missing
   ansible.builtin.assert:
     that:
-      - website_cert_stat.results | selectattr('item.name', 'equalto', item.name) | map(attribute='stat.exists') | first
+      - website_cert_stat_recheck.results | selectattr('item.name', 'equalto', item.name) | map(attribute='stat.exists') | first
     fail_msg: >-
       No certificate exists for {{ item.name }}. Issue the certificate manually or set
       website_auto_issue_tls=true for automatic issuance.
@@ -245,6 +277,20 @@
     state: absent
   loop: "{{ website_disabled_sites }}"
   notify: Reload nginx
+
+- name: Configure Certbot nginx authenticator and installer
+  ansible.builtin.command: >-
+    certbot reconfigure --non-interactive
+    --cert-name {{ item.cert_name | default(item.name) }}
+    --authenticator nginx
+    --installer nginx
+  changed_when: false
+  loop: "{{ website_vhosts }}"
+  loop_control:
+    loop_var: item
+  when:
+    - website_configure_certbot_nginx | bool
+    - item.tls | default(true)
 
 - name: Validate nginx configuration
   ansible.builtin.command: nginx -t
